@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diego Vila Nova — ERP Advocatício</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-50: #E6F1FB;
+  --blue-100: #B5D4F4;
+  --blue-200: #85B7EB;
+  --blue-400: #378ADD;
+  --blue-600: #185FA5;
+  --blue-700: #0F4A87;
+  --blue-800: #0C447C;
+  --blue-900: #042C53;
+  --navy: #071D3B;
+  --surface: #F4F8FD;
+  --white: #FFFFFF;
+  --text-primary: #0C1A2E;
+  --text-secondary: #4A6080;
+  --text-muted: #7A92AA;
+  --border: #DAEAF7;
+  --border-strong: #B5D4F4;
+  --success: #0B7B45;
+  --success-bg: #E2F5EC;
+  --danger: #B91C1C;
+  --danger-bg: #FEE2E2;
+  --warning: #92400E;
+  --warning-bg: #FEF3C7;
+  --info-bg: #E6F1FB;
+  --shadow-sm: 0 1px 3px rgba(7,29,59,0.08);
+  --shadow-md: 0 4px 16px rgba(7,29,59,0.10);
+  --shadow-lg: 0 8px 32px rgba(7,29,59,0.13);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--surface);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+}
+
+.logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-mark {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--blue-400), var(--blue-600));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 16px; color: white;
+}
+.logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: white; }
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+
+nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+.nav-section { margin-bottom: 6px; }
+.nav-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); padding: 8px 12px 4px; display: block;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius);
+  color: rgba(255,255,255,0.6); font-size: 13.5px; font-weight: 400;
+  cursor: pointer; transition: all 0.18s; margin-bottom: 1px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+.nav-item.active { background: rgba(55,138,221,0.25); color: var(--blue-200); font-weight: 500; }
+.nav-item .icon { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; background: var(--blue-600); color: white;
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px;
+}
+
+.sidebar-footer {
+  padding: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.user-info { display: flex; align-items: center; gap: 10px; }
+.user-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--blue-600); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.user-name { font-size: 12.5px; color: white; font-weight: 500; }
+.user-role { font-size: 10.5px; color: rgba(255,255,255,0.4); }
+
+/* MAIN */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 600; color: var(--text-primary); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: var(--radius);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: none; transition: all 0.18s; text-decoration: none;
+}
+.btn-primary { background: var(--blue-600); color: white; }
+.btn-primary:hover { background: var(--blue-700); box-shadow: var(--shadow-md); }
+.btn-outline { background: white; color: var(--blue-600); border: 1.5px solid var(--blue-200); }
+.btn-outline:hover { background: var(--blue-50); border-color: var(--blue-400); }
+.btn-ghost { background: transparent; color: var(--text-secondary); }
+.btn-ghost:hover { background: var(--surface); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #991b1b; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-icon { padding: 7px; width: 34px; height: 34px; justify-content: center; }
+
+/* CONTENT */
+.content { padding: 28px 32px; flex: 1; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.card-body { padding: 20px 22px; }
+
+/* STAT CARDS */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--border); padding: 20px 22px;
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--blue-400), var(--blue-600));
+}
+.stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px; margin-bottom: 8px; text-transform: uppercase; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--text-primary); }
+.stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.stat-icon {
+  position: absolute; right: 16px; top: 20px;
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.stat-icon.blue { background: var(--blue-50); color: var(--blue-600); }
+.stat-icon.green { background: var(--success-bg); color: var(--success); }
+.stat-icon.red { background: var(--danger-bg); color: var(--danger); }
+.stat-icon.amber { background: var(--warning-bg); color: var(--warning); }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.data-table th {
+  background: var(--surface); color: var(--text-secondary);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+}
+table.data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: middle; }
+table.data-table tr:last-child td { border-bottom: none; }
+table.data-table tr:hover td { background: var(--blue-50); }
+table.data-table tr { transition: background 0.12s; }
+
+/* BADGE */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500;
+}
+.badge-green { background: var(--success-bg); color: var(--success); }
+.badge-red { background: var(--danger-bg); color: var(--danger); }
+.badge-amber { background: var(--warning-bg); color: var(--warning); }
+.badge-blue { background: var(--blue-50); color: var(--blue-600); }
+.badge-gray { background: #F1F5F9; color: #475569; }
+.badge-navy { background: #E8EDF5; color: var(--navy); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(7,29,59,0.55);
+  z-index: 1000; display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius-xl);
+  width: 580px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; box-shadow: var(--shadow-lg);
+  animation: modalIn 0.22s ease;
+}
+@keyframes modalIn { from { transform: translateY(-16px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-header {
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; }
+.modal-body { padding: 22px 26px; }
+.modal-footer {
+  padding: 14px 26px 20px;
+  display: flex; gap: 10px; justify-content: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+/* FORMS */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+.form-control {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--text-primary);
+  background: white; transition: border 0.18s;
+  outline: none;
+}
+.form-control:focus { border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(55,138,221,0.12); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+select.form-control { cursor: pointer; }
+textarea.form-control { resize: vertical; min-height: 80px; }
+
+/* TABS */
+.tabs-bar {
+  display: flex; gap: 2px; padding: 4px;
+  background: var(--surface); border-radius: var(--radius-lg);
+  border: 1px solid var(--border); margin-bottom: 24px;
+  width: fit-content;
+}
+.tab-btn {
+  padding: 7px 18px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: none; background: none; color: var(--text-secondary);
+  transition: all 0.18s;
+}
+.tab-btn.active { background: var(--blue-600); color: white; box-shadow: var(--shadow-sm); }
+.tab-btn:hover:not(.active) { background: var(--white); color: var(--text-primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* SEARCH BAR */
+.search-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+.search-wrap { position: relative; flex: 1; }
+.search-wrap input { padding-left: 36px; }
+.search-wrap .search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px; pointer-events: none;
+}
+
+/* PROGRESS */
+.progress-bar { background: var(--border); border-radius: 20px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--blue-400), var(--blue-600)); transition: width 0.4s; }
+
+/* TIMELINE */
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); border-radius: 2px; }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-dot {
+  position: absolute; left: -16px; top: 3px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--blue-400); border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--blue-200);
+}
+.timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+.timeline-text { font-size: 13px; color: var(--text-primary); }
+
+/* CHARTS (pure CSS bars) */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 10px; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--blue-400), var(--blue-600)); min-height: 4px; transition: height 0.5s; }
+.bar-label { font-size: 10px; color: var(--text-muted); }
+.bar-val { font-size: 10px; color: var(--text-secondary); font-weight: 600; }
+
+/* FINANCIAL CARD */
+.fin-card {
+  border-radius: var(--radius-lg); padding: 20px;
+  border: 1px solid var(--border); background: white;
+}
+.fin-amount { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+.fin-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; }
+.fin-green { border-top: 3px solid var(--success); }
+.fin-red { border-top: 3px solid var(--danger); }
+.fin-blue { border-top: 3px solid var(--blue-400); }
+.fin-amber { border-top: 3px solid #F59E0B; }
+
+/* PARCEL TABLE */
+.parcel-row { display: grid; grid-template-columns: 40px 1fr 120px 110px 80px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.parcel-row:last-child { border-bottom: none; }
+.parcel-header { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* ALERT */
+.alert { padding: 12px 16px; border-radius: var(--radius); font-size: 13px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+.alert-info { background: var(--blue-50); border: 1px solid var(--blue-200); color: var(--blue-800); }
+.alert-warning { background: var(--warning-bg); border: 1px solid #FDE68A; color: var(--warning); }
+.alert-success { background: var(--success-bg); border: 1px solid #A7F3D0; color: var(--success); }
+.alert-danger { background: var(--danger-bg); border: 1px solid #FCA5A5; color: var(--danger); }
+
+/* DASHBOARD CHART CSS */
+.donut-wrap { display: flex; align-items: center; gap: 24px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* TOAST */
+.toast-container { position: fixed; top: 76px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--navy); color: white; padding: 12px 18px;
+  border-radius: var(--radius); font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg); pointer-events: auto;
+  display: flex; align-items: center; gap: 10px;
+  animation: toastIn 0.25s ease; min-width: 260px;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+@keyframes toastIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">DV</div>
+      <div>
+        <div class="logo-text">Diego Vila Nova</div>
+        <div class="logo-sub">ERP Advocatício</div>
+      </div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section">
+      <span class="nav-label">Principal</span>
+      <button class="nav-item active" onclick="navigate('dashboard',this)">
+        <span class="icon">📊</span> Dashboard
+      </button>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Cadastros</span>
+      <button class="nav-item" onclick="navigate('tipos',this)">
+        <span class="icon">📋</span> Tipos de Processo
+      </button>
+      <button class="nav-item" onclick="navigate('clientes',this)">
+        <span class="icon">👤</span> Clientes
+      </button>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Operacional</span>
+      <button class="nav-item" onclick="navigate('processos',this)">
+        <span class="icon">⚖️</span> Processos
+        <span class="nav-badge" id="badge-processos">0</span>
+      </button>
+    </div>
+    <div class="nav-section">
+      <span class="nav-label">Financeiro</span>
+      <button class="nav-item" onclick="navigate('financeiro',this)">
+        <span class="icon">💰</span> Financeiro
+      </button>
+      <button class="nav-item" onclick="navigate('relatorios',this)">
+        <span class="icon">📈</span> Relatórios
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info" onclick="openModal('modal-contato')" style="cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'" title="Ver cartão de contato">
+      <div class="user-avatar" style="background:linear-gradient(135deg,var(--blue-400),var(--blue-600))">AD</div>
+      <div>
+        <div class="user-name">Administrador</div>
+        <div class="user-role">Gestor do Sistema</div>
+      </div>
+      <div style="margin-left:auto;color:rgba(255,255,255,0.35);font-size:14px">›</div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-right">
+      <span id="topbar-date" style="font-size:13px;color:var(--text-muted)"></span>
+      <button class="btn btn-primary" id="topbar-action-btn" onclick="topbarAction()">
+        + Nova Entrada
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">⚖️</div>
+          <div class="stat-label">Processos Ativos</div>
+          <div class="stat-value" id="dash-ativos">0</div>
+          <div class="stat-sub">Total em andamento</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">👥</div>
+          <div class="stat-label">Total Clientes</div>
+          <div class="stat-value" id="dash-clientes">0</div>
+          <div class="stat-sub">Clientes cadastrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-label">Recebido (mês)</div>
+          <div class="stat-value" id="dash-recebido">R$ 0</div>
+          <div class="stat-sub">Pagamentos confirmados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">⏳</div>
+          <div class="stat-label">A Receber</div>
+          <div class="stat-value" id="dash-areceber">R$ 0</div>
+          <div class="stat-sub">Parcelas em aberto</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Processos por Status -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Processos por Status</span>
+          </div>
+          <div class="card-body">
+            <div id="status-chart-container">
+              <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0">Nenhum processo cadastrado ainda.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas / Próximos vencimentos -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Alertas do Sistema</span>
+          </div>
+          <div class="card-body" id="alertas-container">
+            <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0">Sem alertas no momento.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Últimos Processos</span>
+            <button class="btn btn-outline btn-sm" onclick="navigate('processos',null)">Ver todos</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="dash-table-processos">
+              <thead><tr>
+                <th>Nº Processo</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Valor Total</th>
+              </tr></thead>
+              <tbody id="dash-tbody-processos">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Nenhum processo ainda.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TIPOS DE PROCESSO ========== -->
+    <div class="page" id="page-tipos">
+      <div class="search-row">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" placeholder="Buscar tipo de processo..." oninput="renderTipos(this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-tipo')">+ Novo Tipo</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>#</th><th>Nome do Tipo</th><th>Área do Direito</th><th>Valor Total</th><th>Parcelamento</th><th>Datas Acordadas</th><th>Descrição</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="tbody-tipos">
+              <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum tipo cadastrado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CLIENTES ========== -->
+    <div class="page" id="page-clientes">
+      <div class="search-row">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" placeholder="Buscar cliente..." oninput="renderClientes(this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-cliente')">+ Novo Cliente</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>#</th><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>Natureza</th><th>Benefício</th><th>Responsável</th><th>Processo Contratado</th><th>Status</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="tbody-clientes">
+              <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum cliente cadastrado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PROCESSOS ========== -->
+    <div class="page" id="page-processos">
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('proc','todos',this)">Todos</button>
+        <button class="tab-btn" onclick="switchTab('proc','andamento',this)">Em Andamento</button>
+        <button class="tab-btn" onclick="switchTab('proc','aguardando',this)">Aguardando</button>
+        <button class="tab-btn" onclick="switchTab('proc','encerrado',this)">Encerrados</button>
+      </div>
+      <div class="search-row">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" id="search-processos" placeholder="Buscar processo, cliente..." oninput="renderProcessos()">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-processo')">+ Novo Processo</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>Nº Processo</th><th>Cliente</th><th>Tipo</th><th>Advogado Resp.</th><th>Abertura</th><th>Status</th><th>Andamento</th><th>Valor</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="tbody-processos">
+              <tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum processo cadastrado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== FINANCEIRO ========== -->
+    <div class="page" id="page-financeiro">
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('fin','visao',this)">Visão Geral</button>
+        <button class="tab-btn" onclick="switchTab('fin','parcelas',this)">Parcelas</button>
+        <button class="tab-btn" onclick="switchTab('fin','lancar',this)">Lançar Pagamento</button>
+      </div>
+
+      <!-- VISÃO GERAL -->
+      <div class="tab-content active" id="fin-visao">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div class="fin-card fin-green">
+            <div class="fin-label">Total Recebido</div>
+            <div class="fin-amount" style="color:var(--success)" id="fin-total-recebido">R$ 0,00</div>
+          </div>
+          <div class="fin-card fin-red">
+            <div class="fin-label">Total Vencido</div>
+            <div class="fin-amount" style="color:var(--danger)" id="fin-total-vencido">R$ 0,00</div>
+          </div>
+          <div class="fin-card fin-blue">
+            <div class="fin-label">A Receber (em dia)</div>
+            <div class="fin-amount" style="color:var(--blue-600)" id="fin-total-areceber">R$ 0,00</div>
+          </div>
+          <div class="fin-card fin-amber">
+            <div class="fin-label">Total Contratado</div>
+            <div class="fin-amount" style="color:#92400E" id="fin-total-contratado">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Parcelas Vencidas</span></div>
+            <div class="card-body">
+              <div id="vencidas-list">
+                <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem parcelas vencidas.</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Próximos Vencimentos (30 dias)</span></div>
+            <div class="card-body">
+              <div id="proximos-list">
+                <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem vencimentos próximos.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARCELAS -->
+      <div class="tab-content" id="fin-parcelas">
+        <div class="search-row">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="Buscar por cliente ou processo..." oninput="renderParcelas(this.value)">
+          </div>
+          <select class="form-control" style="width:180px" id="filter-status-parcela" onchange="renderParcelas()">
+            <option value="">Todos os status</option>
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+            <option value="vencido">Vencido</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Processo</th><th>Cliente</th><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="tbody-parcelas">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhuma parcela lançada.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LANÇAR PAGAMENTO -->
+      <div class="tab-content" id="fin-lancar">
+        <div class="card" style="max-width:560px">
+          <div class="card-header"><span class="card-title">Confirmar Pagamento</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Selecionar Parcela</label>
+              <select class="form-control" id="select-parcela-pagar">
+                <option value="">— Selecione uma parcela pendente —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data do Pagamento</label>
+              <input type="date" class="form-control" id="data-pagamento">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Observação</label>
+              <textarea class="form-control" id="obs-pagamento" placeholder="Ex: PIX, boleto, espécie..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="confirmarPagamento()">✅ Confirmar Pagamento</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RELATÓRIOS ========== -->
+    <div class="page" id="page-relatorios">
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('rel','fluxo',this)">Fluxo de Caixa</button>
+        <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">Clientes</button>
+        <button class="tab-btn" onclick="switchTab('rel','processos-rel',this)">Processos</button>
+      </div>
+
+      <!-- FLUXO DE CAIXA -->
+      <div class="tab-content active" id="rel-fluxo">
+        <div style="display:flex;gap:12px;margin-bottom:20px;align-items:flex-end">
+          <div class="form-group" style="margin:0;flex:1">
+            <label class="form-label">Período De</label>
+            <input type="date" class="form-control" id="rel-de">
+          </div>
+          <div class="form-group" style="margin:0;flex:1">
+            <label class="form-label">Até</label>
+            <input type="date" class="form-control" id="rel-ate">
+          </div>
+          <button class="btn btn-primary" onclick="gerarRelatorio()">🔍 Gerar Relatório</button>
+          <button class="btn btn-outline" onclick="exportarCSV()">⬇ Exportar CSV</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div class="fin-card fin-green">
+            <div class="fin-label">Entradas no Período</div>
+            <div class="fin-amount" style="color:var(--success)" id="rel-entradas">R$ 0,00</div>
+          </div>
+          <div class="fin-card fin-red">
+            <div class="fin-label">Vencidos no Período</div>
+            <div class="fin-amount" style="color:var(--danger)" id="rel-vencidos">R$ 0,00</div>
+          </div>
+          <div class="fin-card fin-blue">
+            <div class="fin-label">Saldo do Período</div>
+            <div class="fin-amount" style="color:var(--blue-600)" id="rel-saldo">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Detalhamento do Fluxo</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Data Venc.</th><th>Data Pgto</th><th>Cliente</th><th>Processo</th><th>Parcela</th><th>Valor</th><th>Status</th>
+              </tr></thead>
+              <tbody id="tbody-rel-fluxo">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Selecione um período e gere o relatório.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="tab-content" id="rel-clientes-rel">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Relatório de Clientes</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Cliente</th><th>Processos</th><th>Total Contratado</th><th>Total Pago</th><th>Em Aberto</th><th>Status</th>
+              </tr></thead>
+              <tbody id="tbody-rel-clientes">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:28px">Sem dados para exibir.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROCESSOS -->
+      <div class="tab-content" id="rel-processos-rel">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Relatório de Processos</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Nº Processo</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Abertura</th><th>Valor Total</th><th>Pago</th><th>A Receber</th>
+              </tr></thead>
+              <tbody id="tbody-rel-processos">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:28px">Sem dados para exibir.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ===== MODAIS ===== -->
+
+<!-- MODAL TIPO -->
+<div class="modal-overlay" id="modal-tipo">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-tipo-title">Novo Tipo de Processo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-tipo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tipo-edit-id">
+
+      <!-- Identificação -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Identificação</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome do Tipo *</label>
+          <input type="text" class="form-control" id="tipo-nome" placeholder="Ex: Ação Trabalhista">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área do Direito *</label>
+          <select class="form-control" id="tipo-area">
+            <option value="">Selecione...</option>
+            <option>Trabalhista</option>
+            <option>Civil</option>
+            <option>Criminal</option>
+            <option>Tributário</option>
+            <option>Previdenciário</option>
+            <option>Família</option>
+            <option>Empresarial</option>
+            <option>Ambiental</option>
+            <option>Administrativo</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Financeiro -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Condições Financeiras Padrão</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Total do Serviço (R$) *</label>
+          <input type="number" class="form-control" id="tipo-valor" placeholder="0,00" min="0" step="0.01" oninput="tipoCalcParcelas()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Parcelas *</label>
+          <input type="number" class="form-control" id="tipo-parcelas" placeholder="1" min="1" max="120" value="1" oninput="tipoGerarDatas()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor por Parcela</label>
+          <input type="text" class="form-control" id="tipo-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600" placeholder="—">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data da 1ª Parcela</label>
+          <input type="date" class="form-control" id="tipo-data1" oninput="tipoGerarDatas()">
+        </div>
+      </div>
+
+      <!-- Datas das parcelas -->
+      <div id="tipo-datas-container" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding-bottom:6px;border-bottom:1px solid var(--border);flex:1">Datas Acordadas com o Cliente</div>
+        </div>
+        <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:var(--blue-800)">
+          💡 As datas abaixo são preenchidas automaticamente mas podem ser ajustadas individualmente conforme acordado com o cliente.
+        </div>
+        <div id="tipo-datas-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:220px;overflow-y:auto;padding-right:4px"></div>
+      </div>
+
+      <!-- Descrição -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Observações</div>
+      <div class="form-group">
+        <label class="form-label">Descrição do Serviço</label>
+        <textarea class="form-control" id="tipo-descricao" placeholder="Descreva o serviço, escopo, condições especiais..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-tipo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarTipo()">💾 Salvar Tipo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal" style="width:700px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-cliente-title">Novo Cliente</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cliente-edit-id">
+
+      <!-- Dados Pessoais -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Dados Pessoais</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome Completo / Razão Social *</label>
+          <input type="text" class="form-control" id="cliente-nome" placeholder="Nome do cliente">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CPF / CNPJ *</label>
+          <input type="text" class="form-control" id="cliente-cpf" placeholder="000.000.000-00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="text" class="form-control" id="cliente-tel" placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-control" id="cliente-email" placeholder="email@exemplo.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Endereço</label>
+          <input type="text" class="form-control" id="cliente-endereco" placeholder="Rua, número, bairro">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cidade / UF</label>
+          <input type="text" class="form-control" id="cliente-cidade" placeholder="Cidade - UF">
+        </div>
+      </div>
+
+      <!-- Informações do Processo -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Informações do Processo</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Natureza</label>
+          <input type="text" class="form-control" id="cliente-natureza" placeholder="Ex: Aposentadoria por Invalidez">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Benefício</label>
+          <input type="text" class="form-control" id="cliente-beneficio" placeholder="Ex: BPC/LOAS, Aposentadoria...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Senha do INSS</label>
+          <input type="text" class="form-control" id="cliente-senha-inss" placeholder="Senha de acesso ao INSS">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Indicação</label>
+          <input type="text" class="form-control" id="cliente-indicacao" placeholder="Quem indicou o cliente">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Responsável</label>
+          <input type="text" class="form-control" id="cliente-responsavel" placeholder="Advogado ou colaborador responsável">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de Processo Contratado</label>
+          <select class="form-control" id="cliente-tipo-processo">
+            <option value="">— Selecionar Tipo —</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Anotações -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Anotações</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="cliente-status">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea class="form-control" id="cliente-obs" placeholder="Anotações gerais sobre o cliente..." style="min-height:38px"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">DIP <span style="font-size:11px;color:var(--text-muted);font-weight:400">(Diário de Informações do Processo)</span></label>
+        <textarea class="form-control" id="cliente-dip" placeholder="Registre aqui o histórico detalhado do processo, documentos recebidos, pendências, andamentos, ligações, reuniões e qualquer informação relevante ao acompanhamento do caso..." style="min-height:100px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCliente()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROCESSO -->
+<div class="modal-overlay" id="modal-processo">
+  <div class="modal" style="width:700px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-processo-title">Novo Processo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-processo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="processo-edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Número do Processo *</label>
+          <input type="text" class="form-control" id="proc-numero" placeholder="0000000-00.0000.0.00.0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cliente *</label>
+          <select class="form-control" id="proc-cliente" onchange="preencherTipoPorCliente()">
+            <option value="">— Selecionar Cliente —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo de Processo *</label>
+          <select class="form-control" id="proc-tipo" onchange="preencherValorPorTipo()">
+            <option value="">— Selecionar Tipo —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Advogado Responsável</label>
+          <input type="text" class="form-control" id="proc-adv" placeholder="Nome do advogado">
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Data de Abertura *</label>
+          <input type="date" class="form-control" id="proc-abertura">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="proc-status">
+            <option value="andamento">Em Andamento</option>
+            <option value="aguardando">Aguardando</option>
+            <option value="encerrado">Encerrado</option>
+            <option value="suspenso">Suspenso</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vara / Tribunal</label>
+          <input type="text" class="form-control" id="proc-vara" placeholder="Ex: 2ª Vara do Trabalho">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Total (R$) *</label>
+          <input type="number" class="form-control" id="proc-valor" placeholder="0,00" min="0" step="0.01" oninput="calcularParcelas()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Parcelas *</label>
+          <input type="number" class="form-control" id="proc-parcelas" placeholder="1" min="1" max="120" value="1" oninput="calcularParcelas()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data 1ª Parcela *</label>
+          <input type="date" class="form-control" id="proc-1a-parcela">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor por Parcela</label>
+          <input type="text" class="form-control" id="proc-valor-parcela" readonly style="background:var(--surface)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição / Andamento Inicial</label>
+        <textarea class="form-control" id="proc-descricao" placeholder="Descreva o processo, fatos relevantes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-processo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarProcesso()">💾 Salvar + Gerar Parcelas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ANDAMENTO -->
+<div class="modal-overlay" id="modal-andamento">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Atualizar Andamento</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-andamento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="andamento-proc-id">
+      <div class="form-group">
+        <label class="form-label">Novo Status</label>
+        <select class="form-control" id="andamento-status">
+          <option value="andamento">Em Andamento</option>
+          <option value="aguardando">Aguardando</option>
+          <option value="encerrado">Encerrado</option>
+          <option value="suspenso">Suspenso</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Histórico / Movimentação</label>
+        <textarea class="form-control" id="andamento-texto" placeholder="Descreva o andamento, audiência, decisão..." style="min-height:100px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-andamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAndamento()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHES PROCESSO -->
+<div class="modal-overlay" id="modal-detalhe">
+  <div class="modal" style="width:700px">
+    <div class="modal-header">
+      <span class="modal-title" id="detalhe-title">Detalhes do Processo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-detalhe')">✕</button>
+    </div>
+    <div class="modal-body" id="detalhe-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-detalhe')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CARTÃO DE CONTATO -->
+<div class="modal-overlay" id="modal-contato">
+  <div class="modal" style="width:420px">
+    <div class="modal-header" style="border-bottom:none;padding-bottom:0">
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-contato')" style="margin-left:auto">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:8px;padding-bottom:28px">
+
+      <!-- Cartão -->
+      <div style="background:linear-gradient(135deg,var(--navy) 0%,var(--blue-800) 100%);border-radius:var(--radius-xl);padding:28px 28px 24px;position:relative;overflow:hidden;margin-bottom:24px">
+        <!-- Detalhe decorativo -->
+        <div style="position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(55,138,221,0.18)"></div>
+        <div style="position:absolute;right:20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(55,138,221,0.10)"></div>
+
+        <!-- Avatar -->
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue-400),var(--blue-200));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--navy);margin-bottom:16px;position:relative;z-index:1">TR</div>
+
+        <!-- Nome e cargo -->
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:white;margin-bottom:4px;position:relative;z-index:1">Thalyta Richelly</div>
+        <div style="font-size:13px;color:var(--blue-200);font-weight:500;letter-spacing:0.3px;margin-bottom:20px;position:relative;z-index:1">Consultora de Gestão</div>
+
+        <!-- Linha divisória -->
+        <div style="height:1px;background:rgba(255,255,255,0.12);margin-bottom:18px;position:relative;z-index:1"></div>
+
+        <!-- Contato -->
+        <div style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(55,138,221,0.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📱</div>
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:1px">WhatsApp / Telefone</div>
+              <div style="font-size:15px;color:white;font-weight:500">(81) 99604-0412</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <a href="https://wa.me/5581996040412" target="_blank"
+           style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 0;border-radius:var(--radius);background:#25D366;color:white;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;text-decoration:none;transition:opacity 0.18s"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <span style="font-size:17px">💬</span> WhatsApp
+        </a>
+        <a href="tel:+5581996040412"
+           style="display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 0;border-radius:var(--radius);background:var(--blue-600);color:white;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;text-decoration:none;transition:opacity 0.18s"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <span style="font-size:17px">📞</span> Ligar
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA STORE ====================
+let store = {
+  tipos: [],
+  clientes: [],
+  processos: [],
+  parcelas: [],
+  andamentos: {},
+  nextId: { tipo: 1, cliente: 1, processo: 1, parcela: 1 }
+};
+
+// Carregar do localStorage
+function loadData() {
+  const saved = localStorage.getItem('lexpro_erp');
+  if (saved) {
+    try { store = JSON.parse(saved); } catch(e) {}
+  }
+}
+function saveData() {
+  localStorage.setItem('lexpro_erp', JSON.stringify(store));
+}
+loadData();
+
+// ==================== UTILS ====================
+function fmtMoney(v) {
+  return 'R$ ' + (parseFloat(v)||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtDate(d) {
+  if(!d) return '—';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
+}
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+function addMonths(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + n);
+  return d.toISOString().split('T')[0];
+}
+function isVencido(dateStr) {
+  return dateStr && dateStr < today();
+}
+function diffDays(d1, d2) {
+  return Math.round((new Date(d1) - new Date(d2)) / 86400000);
+}
+
+function showToast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.innerHTML = (type==='success' ? '✅' : type==='error' ? '❌' : 'ℹ️') + ' ' + msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ==================== NAVIGATION ====================
+let currentPage = 'dashboard';
+let procTabFilter = 'todos';
+
+const pageTitles = {
+  dashboard: 'Dashboard',
+  tipos: 'Tipos de Processo',
+  clientes: 'Clientes',
+  processos: 'Processos',
+  financeiro: 'Financeiro',
+  relatorios: 'Relatórios'
+};
+const pageActions = {
+  dashboard: 'Atualizar',
+  tipos: '',
+  clientes: '',
+  processos: '',
+  financeiro: '',
+  relatorios: '⬇ Exportar'
+};
+
+function navigate(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if(n.textContent.trim().toLowerCase().includes(page.toLowerCase().substring(0,5))) n.classList.add('active');
+    });
+  }
+  document.getElementById('page-title').textContent = pageTitles[page] || page;
+  const ab = document.getElementById('topbar-action-btn');
+  ab.textContent = pageActions[page] || '';
+  ab.style.display = pageActions[page] ? '' : 'none';
+  currentPage = page;
+  refreshPage(page);
+}
+
+function topbarAction() {
+  const actions = {
+    dashboard: () => refreshPage('dashboard'),
+    tipos: () => openModal('modal-tipo'),
+    clientes: () => openModal('modal-cliente'),
+    processos: () => openModal('modal-processo'),
+    relatorios: () => exportarCSV()
+  };
+  if(actions[currentPage]) actions[currentPage]();
+}
+
+function refreshPage(page) {
+  if(page === 'dashboard') updateDashboard();
+  else if(page === 'tipos') renderTipos();
+  else if(page === 'clientes') renderClientes();
+  else if(page === 'processos') renderProcessos();
+  else if(page === 'financeiro') { renderFinVisao(); renderParcelas(); updateParcelasSelect(); }
+  else if(page === 'relatorios') { renderRelClientes(); renderRelProcessos(); }
+}
+
+// ==================== TABS ====================
+function switchTab(group, tab, btn) {
+  const prefix = group + '-';
+  document.querySelectorAll(`[id^="${prefix}"]`).forEach(el => {
+    if(el.classList.contains('tab-content')) el.classList.remove('active');
+  });
+  const el = document.getElementById(prefix + tab);
+  if(el) el.classList.add('active');
+  if(btn) {
+    btn.closest('.tabs-bar').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if(group === 'proc') {
+    procTabFilter = tab;
+    renderProcessos();
+  }
+  if(group === 'fin' && tab === 'visao') renderFinVisao();
+  if(group === 'fin' && tab === 'parcelas') renderParcelas();
+  if(group === 'fin' && tab === 'lancar') updateParcelasSelect();
+  if(group === 'rel' && tab === 'clientes-rel') renderRelClientes();
+  if(group === 'rel' && tab === 'processos-rel') renderRelProcessos();
+}
+
+// ==================== MODAL ====================
+function openModal(id) {
+  if(id === 'modal-tipo') resetFormTipo();
+  if(id === 'modal-cliente') resetFormCliente();
+  if(id === 'modal-processo') resetFormProcesso();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+// ==================== TIPOS ====================
+function resetFormTipo() {
+  document.getElementById('tipo-edit-id').value = '';
+  document.getElementById('modal-tipo-title').textContent = 'Novo Tipo de Processo';
+  ['tipo-nome','tipo-area','tipo-valor','tipo-descricao','tipo-valor-parcela','tipo-data1'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('tipo-parcelas').value = '1';
+  document.getElementById('tipo-datas-container').style.display = 'none';
+  document.getElementById('tipo-datas-grid').innerHTML = '';
+}
+function tipoCalcParcelas() {
+  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
+  const n = parseInt(document.getElementById('tipo-parcelas').value)||1;
+  document.getElementById('tipo-valor-parcela').value = n > 0 && valor > 0 ? fmtMoney(valor/n) : '';
+  tipoGerarDatas();
+}
+function tipoGerarDatas() {
+  const n = parseInt(document.getElementById('tipo-parcelas').value)||1;
+  const dt1 = document.getElementById('tipo-data1').value;
+  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
+  const vParc = n > 0 && valor > 0 ? parseFloat((valor/n).toFixed(2)) : 0;
+  document.getElementById('tipo-valor-parcela').value = vParc > 0 ? fmtMoney(vParc) : '';
+  const container = document.getElementById('tipo-datas-container');
+  const grid = document.getElementById('tipo-datas-grid');
+  if(n < 1 || n > 60) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  // Preservar datas já digitadas
+  const existing = {};
+  grid.querySelectorAll('input[data-idx]').forEach(inp => { existing[inp.dataset.idx] = inp.value; });
+  grid.innerHTML = '';
+  for(let i = 0; i < n; i++) {
+    const auto = dt1 ? addMonths(dt1, i) : '';
+    const val = existing[i] !== undefined ? existing[i] : auto;
+    grid.innerHTML += `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--blue-600);margin-bottom:4px">
+          ${i+1}ª Parcela ${vParc > 0 ? '· '+fmtMoney(vParc) : ''}
+        </div>
+        <input type="date" class="form-control" style="padding:5px 8px;font-size:12px" data-idx="${i}" value="${val}" placeholder="dd/mm/aaaa">
+      </div>`;
+  }
+}
+function tipoGetDatas() {
+  const inputs = document.getElementById('tipo-datas-grid').querySelectorAll('input[data-idx]');
+  return Array.from(inputs).map(inp => inp.value);
+}
+function salvarTipo() {
+  const nome = document.getElementById('tipo-nome').value.trim();
+  const area = document.getElementById('tipo-area').value;
+  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
+  const parcelas = parseInt(document.getElementById('tipo-parcelas').value)||1;
+  const desc = document.getElementById('tipo-descricao').value.trim();
+  const datas = tipoGetDatas();
+  if(!nome || !area || !valor) { showToast('Preencha Nome, Área e Valor.', 'error'); return; }
+  const editId = document.getElementById('tipo-edit-id').value;
+  if(editId) {
+    const t = store.tipos.find(t => t.id == editId);
+    if(t) { t.nome = nome; t.area = area; t.valor = valor; t.parcelas = parcelas; t.desc = desc; t.datas = datas; }
+    showToast('Tipo atualizado com sucesso!', 'success');
+  } else {
+    store.tipos.push({ id: store.nextId.tipo++, nome, area, valor, parcelas, desc, datas });
+    showToast('Tipo cadastrado com sucesso!', 'success');
+  }
+  saveData(); closeModal('modal-tipo'); renderTipos();
+}
+function editarTipo(id) {
+  const t = store.tipos.find(t => t.id === id);
+  if(!t) return;
+  document.getElementById('tipo-edit-id').value = t.id;
+  document.getElementById('modal-tipo-title').textContent = 'Editar Tipo de Processo';
+  document.getElementById('tipo-nome').value = t.nome;
+  document.getElementById('tipo-area').value = t.area;
+  document.getElementById('tipo-valor').value = t.valor;
+  document.getElementById('tipo-parcelas').value = t.parcelas;
+  document.getElementById('tipo-descricao').value = t.desc||'';
+  // Preencher data1 se existir
+  if(t.datas && t.datas[0]) document.getElementById('tipo-data1').value = t.datas[0];
+  tipoGerarDatas();
+  // Restaurar datas individuais salvas
+  if(t.datas && t.datas.length) {
+    const inputs = document.getElementById('tipo-datas-grid').querySelectorAll('input[data-idx]');
+    inputs.forEach((inp, i) => { if(t.datas[i]) inp.value = t.datas[i]; });
+  }
+  tipoCalcParcelas();
+  openModal('modal-tipo');
+}
+function excluirTipo(id) {
+  if(!confirm('Excluir este tipo de processo?')) return;
+  store.tipos = store.tipos.filter(t => t.id !== id);
+  saveData(); renderTipos(); showToast('Tipo excluído.', '');
+}
+function renderTipos(q = '') {
+  const list = store.tipos.filter(t =>
+    !q || t.nome.toLowerCase().includes(q.toLowerCase()) || t.area.toLowerCase().includes(q.toLowerCase())
+  );
+  const tb = document.getElementById('tbody-tipos');
+  if(!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum tipo cadastrado.</td></tr>'; return; }
+  tb.innerHTML = list.map((t,i) => {
+    const datasOk = t.datas && t.datas.filter(Boolean).length > 0;
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${t.nome}</strong></td>
+      <td><span class="badge badge-blue">${t.area}</span></td>
+      <td><strong>${fmtMoney(t.valor)}</strong></td>
+      <td>${t.parcelas}x de ${fmtMoney(t.valor / t.parcelas)}</td>
+      <td>${datasOk ? `<span class="badge badge-green">✔ ${t.datas.filter(Boolean).length} data(s) definida(s)</span>` : '<span class="badge badge-gray">Sem datas</span>'}</td>
+      <td style="color:var(--text-muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.desc||'—'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editarTipo(${t.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirTipo(${t.id})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ==================== CLIENTES ====================
+function resetFormCliente() {
+  document.getElementById('cliente-edit-id').value = '';
+  document.getElementById('modal-cliente-title').textContent = 'Novo Cliente';
+  ['cliente-nome','cliente-cpf','cliente-tel','cliente-email','cliente-endereco','cliente-cidade',
+   'cliente-natureza','cliente-beneficio','cliente-senha-inss','cliente-indicacao',
+   'cliente-responsavel','cliente-obs','cliente-dip'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cliente-status').value = 'ativo';
+  populateTiposSelect('cliente-tipo-processo');
+}
+function populateTiposSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecionar Tipo —</option>';
+  store.tipos.forEach(t => sel.innerHTML += `<option value="${t.id}">${t.nome} (${t.area})</option>`);
+  sel.value = cur;
+}
+function salvarCliente() {
+  const nome = document.getElementById('cliente-nome').value.trim();
+  const cpf = document.getElementById('cliente-cpf').value.trim();
+  if(!nome || !cpf) { showToast('Nome e CPF/CNPJ são obrigatórios.', 'error'); return; }
+  const data = {
+    nome, cpf,
+    tel: document.getElementById('cliente-tel').value.trim(),
+    email: document.getElementById('cliente-email').value.trim(),
+    endereco: document.getElementById('cliente-endereco').value.trim(),
+    cidade: document.getElementById('cliente-cidade').value.trim(),
+    natureza: document.getElementById('cliente-natureza').value.trim(),
+    beneficio: document.getElementById('cliente-beneficio').value.trim(),
+    senhaInss: document.getElementById('cliente-senha-inss').value.trim(),
+    indicacao: document.getElementById('cliente-indicacao').value.trim(),
+    responsavel: document.getElementById('cliente-responsavel').value.trim(),
+    tipoProcessoId: parseInt(document.getElementById('cliente-tipo-processo').value)||null,
+    status: document.getElementById('cliente-status').value,
+    obs: document.getElementById('cliente-obs').value.trim(),
+    dip: document.getElementById('cliente-dip').value.trim()
+  };
+  const editId = document.getElementById('cliente-edit-id').value;
+  if(editId) {
+    const c = store.clientes.find(c => c.id == editId);
+    if(c) Object.assign(c, data);
+    showToast('Cliente atualizado!', 'success');
+  } else {
+    store.clientes.push({ id: store.nextId.cliente++, ...data });
+    showToast('Cliente cadastrado!', 'success');
+  }
+  saveData(); closeModal('modal-cliente'); renderClientes(); updateDashboard();
+}
+function editarCliente(id) {
+  const c = store.clientes.find(c => c.id === id);
+  if(!c) return;
+  populateTiposSelect('cliente-tipo-processo');
+  document.getElementById('cliente-edit-id').value = c.id;
+  document.getElementById('modal-cliente-title').textContent = 'Editar Cliente';
+  document.getElementById('cliente-nome').value = c.nome;
+  document.getElementById('cliente-cpf').value = c.cpf;
+  document.getElementById('cliente-tel').value = c.tel||'';
+  document.getElementById('cliente-email').value = c.email||'';
+  document.getElementById('cliente-endereco').value = c.endereco||'';
+  document.getElementById('cliente-cidade').value = c.cidade||'';
+  document.getElementById('cliente-natureza').value = c.natureza||'';
+  document.getElementById('cliente-beneficio').value = c.beneficio||'';
+  document.getElementById('cliente-senha-inss').value = c.senhaInss||'';
+  document.getElementById('cliente-indicacao').value = c.indicacao||'';
+  document.getElementById('cliente-responsavel').value = c.responsavel||'';
+  document.getElementById('cliente-tipo-processo').value = c.tipoProcessoId||'';
+  document.getElementById('cliente-status').value = c.status||'ativo';
+  document.getElementById('cliente-obs').value = c.obs||'';
+  document.getElementById('cliente-dip').value = c.dip||'';
+  openModal('modal-cliente');
+}
+function excluirCliente(id) {
+  if(!confirm('Excluir este cliente?')) return;
+  store.clientes = store.clientes.filter(c => c.id !== id);
+  saveData(); renderClientes(); showToast('Cliente excluído.');
+}
+function renderClientes(q = '') {
+  const list = store.clientes.filter(c =>
+    !q || c.nome.toLowerCase().includes(q.toLowerCase()) || c.cpf.includes(q)
+      || (c.responsavel||'').toLowerCase().includes(q.toLowerCase())
+  );
+  const tb = document.getElementById('tbody-clientes');
+  if(!list.length) { tb.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum cliente cadastrado.</td></tr>'; return; }
+  tb.innerHTML = list.map((c,i) => {
+    const tipo = store.tipos.find(t => t.id === c.tipoProcessoId);
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${c.nome}</strong>${c.indicacao?`<br><span style="font-size:10.5px;color:var(--text-muted)">Indicado por: ${c.indicacao}</span>`:''}</td>
+      <td>${c.cpf}</td>
+      <td>${c.tel||'—'}</td>
+      <td>${c.natureza ? `<span style="font-size:12.5px">${c.natureza}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${c.beneficio ? `<span class="badge badge-navy">${c.beneficio}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${c.responsavel||'<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${tipo ? `<span class="badge badge-blue">${tipo.nome}</span>` : '<span class="badge badge-gray">—</span>'}</td>
+      <td><span class="badge ${c.status==='ativo'?'badge-green':'badge-gray'}">${c.status==='ativo'?'Ativo':'Inativo'}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editarCliente(${c.id})" title="Editar">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})" title="Excluir">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ==================== PROCESSOS ====================
+function resetFormProcesso() {
+  document.getElementById('processo-edit-id').value = '';
+  document.getElementById('modal-processo-title').textContent = 'Novo Processo';
+  ['proc-numero','proc-adv','proc-vara','proc-descricao','proc-valor-parcela'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('proc-parcelas').value = '1';
+  document.getElementById('proc-abertura').value = today();
+  document.getElementById('proc-1a-parcela').value = today();
+  document.getElementById('proc-status').value = 'andamento';
+  populateClientesSelect();
+  populateTiposProcSelect();
+}
+function populateClientesSelect() {
+  const sel = document.getElementById('proc-cliente');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecionar Cliente —</option>';
+  store.clientes.filter(c => c.status === 'ativo').forEach(c =>
+    sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`
+  );
+  sel.value = cur;
+}
+function populateTiposProcSelect() {
+  const sel = document.getElementById('proc-tipo');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecionar Tipo —</option>';
+  store.tipos.forEach(t =>
+    sel.innerHTML += `<option value="${t.id}" data-valor="${t.valor}" data-parcelas="${t.parcelas}">${t.nome} (${t.area})</option>`
+  );
+  sel.value = cur;
+}
+function preencherTipoPorCliente() {
+  const cId = parseInt(document.getElementById('proc-cliente').value);
+  const c = store.clientes.find(c => c.id === cId);
+  if(c && c.tipoProcessoId) {
+    document.getElementById('proc-tipo').value = c.tipoProcessoId;
+    preencherValorPorTipo();
+  }
+}
+function preencherValorPorTipo() {
+  const sel = document.getElementById('proc-tipo');
+  const opt = sel.options[sel.selectedIndex];
+  if(opt && opt.dataset.valor) {
+    document.getElementById('proc-valor').value = opt.dataset.valor;
+    document.getElementById('proc-parcelas').value = opt.dataset.parcelas;
+    calcularParcelas();
+  }
+}
+function calcularParcelas() {
+  const valor = parseFloat(document.getElementById('proc-valor').value)||0;
+  const n = parseInt(document.getElementById('proc-parcelas').value)||1;
+  document.getElementById('proc-valor-parcela').value = n > 0 ? fmtMoney(valor/n) : '';
+}
+
+const statusLabels = {
+  andamento: { label: 'Em Andamento', cls: 'badge-blue' },
+  aguardando: { label: 'Aguardando', cls: 'badge-amber' },
+  encerrado:  { label: 'Encerrado',   cls: 'badge-gray' },
+  suspenso:   { label: 'Suspenso',    cls: 'badge-red' }
+};
+
+function salvarProcesso() {
+  const num = document.getElementById('proc-numero').value.trim();
+  const cId = parseInt(document.getElementById('proc-cliente').value);
+  const tId = parseInt(document.getElementById('proc-tipo').value);
+  const valor = parseFloat(document.getElementById('proc-valor').value)||0;
+  const nParcelas = parseInt(document.getElementById('proc-parcelas').value)||1;
+  const dt1 = document.getElementById('proc-1a-parcela').value;
+  if(!num || !cId || !tId || !valor || !dt1) { showToast('Preencha todos os campos obrigatórios.', 'error'); return; }
+  const editId = document.getElementById('processo-edit-id').value;
+  const procData = {
+    numero: num,
+    clienteId: cId,
+    tipoId: tId,
+    adv: document.getElementById('proc-adv').value.trim(),
+    abertura: document.getElementById('proc-abertura').value,
+    status: document.getElementById('proc-status').value,
+    vara: document.getElementById('proc-vara').value.trim(),
+    valor,
+    nParcelas,
+    dt1Parcela: dt1,
+    descricao: document.getElementById('proc-descricao').value.trim()
+  };
+  if(editId) {
+    const p = store.processos.find(p => p.id == editId);
+    if(p) Object.assign(p, procData);
+    showToast('Processo atualizado!', 'success');
+  } else {
+    const pId = store.nextId.processo++;
+    store.processos.push({ id: pId, ...procData });
+    // Gerar parcelas
+    store.parcelas = store.parcelas.filter(p => p.processoId !== pId);
+    for(let i = 0; i < nParcelas; i++) {
+      store.parcelas.push({
+        id: store.nextId.parcela++,
+        processoId: pId,
+        clienteId: cId,
+        num: i+1,
+        total: nParcelas,
+        vencimento: addMonths(dt1, i),
+        valor: parseFloat((valor / nParcelas).toFixed(2)),
+        status: 'pendente',
+        dtPagamento: null,
+        obs: ''
+      });
+    }
+    if(!store.andamentos[pId]) store.andamentos[pId] = [];
+    store.andamentos[pId].push({ data: today(), texto: 'Processo aberto.', status: procData.status });
+    showToast(`Processo criado com ${nParcelas} parcela(s)!`, 'success');
+  }
+  saveData(); closeModal('modal-processo'); renderProcessos(); updateDashboard();
+  document.getElementById('badge-processos').textContent = store.processos.filter(p => p.status === 'andamento').length;
+}
+function renderProcessos() {
+  const q = (document.getElementById('search-processos')||{}).value || '';
+  let list = store.processos.filter(p => {
+    if(procTabFilter !== 'todos' && p.status !== procTabFilter) return false;
+    if(q) {
+      const c = store.clientes.find(c => c.id === p.clienteId);
+      return p.numero.includes(q) || (c && c.nome.toLowerCase().includes(q.toLowerCase()));
+    }
+    return true;
+  });
+  const tb = document.getElementById('tbody-processos');
+  if(!list.length) { tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum processo encontrado.</td></tr>'; return; }
+  tb.innerHTML = list.map(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const t = store.tipos.find(t => t.id === p.tipoId)||{nome:'—'};
+    const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
+    const pago = store.parcelas.filter(pa => pa.processoId===p.id && pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
+    const pct = p.valor > 0 ? Math.min(100, Math.round(pago/p.valor*100)) : 0;
+    return `<tr>
+      <td><strong style="color:var(--blue-600)">${p.numero}</strong></td>
+      <td>${c.nome}</td>
+      <td><span class="badge badge-navy">${t.nome}</span></td>
+      <td>${p.adv||'—'}</td>
+      <td>${fmtDate(p.abertura)}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+      <td style="min-width:100px">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${pct}% pago</div>
+      </td>
+      <td><strong>${fmtMoney(p.valor)}</strong></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" onclick="verDetalhe(${p.id})" title="Detalhes">🔍</button>
+        <button class="btn btn-outline btn-sm" onclick="atualizarAndamento(${p.id})" title="Andamento">📝</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirProcesso(${p.id})" title="Excluir">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function excluirProcesso(id) {
+  if(!confirm('Excluir este processo e suas parcelas?')) return;
+  store.processos = store.processos.filter(p => p.id !== id);
+  store.parcelas = store.parcelas.filter(p => p.processoId !== id);
+  delete store.andamentos[id];
+  saveData(); renderProcessos(); updateDashboard();
+  showToast('Processo excluído.');
+}
+function atualizarAndamento(id) {
+  document.getElementById('andamento-proc-id').value = id;
+  const p = store.processos.find(p => p.id === id);
+  document.getElementById('andamento-status').value = p ? p.status : 'andamento';
+  document.getElementById('andamento-texto').value = '';
+  openModal('modal-andamento');
+}
+function salvarAndamento() {
+  const id = parseInt(document.getElementById('andamento-proc-id').value);
+  const status = document.getElementById('andamento-status').value;
+  const texto = document.getElementById('andamento-texto').value.trim();
+  if(!texto) { showToast('Descreva o andamento.', 'error'); return; }
+  const p = store.processos.find(p => p.id === id);
+  if(p) p.status = status;
+  if(!store.andamentos[id]) store.andamentos[id] = [];
+  store.andamentos[id].push({ data: today(), texto, status });
+  saveData(); closeModal('modal-andamento'); renderProcessos(); updateDashboard();
+  showToast('Andamento registrado!', 'success');
+}
+function verDetalhe(id) {
+  const p = store.processos.find(p => p.id === id);
+  const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+  const t = store.tipos.find(t => t.id === p.tipoId)||{nome:'—'};
+  const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
+  const parcelas = store.parcelas.filter(pa => pa.processoId === id);
+  const andamentos = (store.andamentos[id]||[]).slice().reverse();
+  document.getElementById('detalhe-title').textContent = `Processo ${p.numero}`;
+  document.getElementById('detalhe-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div><div class="form-label">Cliente</div><strong>${c.nome}</strong></div>
+      <div><div class="form-label">Tipo</div><span class="badge badge-navy">${t.nome}</span></div>
+      <div><div class="form-label">Advogado</div>${p.adv||'—'}</div>
+      <div><div class="form-label">Vara/Tribunal</div>${p.vara||'—'}</div>
+      <div><div class="form-label">Abertura</div>${fmtDate(p.abertura)}</div>
+      <div><div class="form-label">Status</div><span class="badge ${st.cls}">${st.label}</span></div>
+      <div><div class="form-label">Valor Total</div><strong style="color:var(--blue-600)">${fmtMoney(p.valor)}</strong></div>
+      <div><div class="form-label">Parcelamento</div>${p.nParcelas}x de ${fmtMoney(p.valor/p.nParcelas)}</div>
+    </div>
+    ${p.descricao ? `<div style="margin-bottom:20px"><div class="form-label">Descrição</div><p style="font-size:13.5px;color:var(--text-secondary)">${p.descricao}</p></div>` : ''}
+    <div style="margin-bottom:20px">
+      <div class="card-title" style="margin-bottom:12px">Parcelas</div>
+      <div class="parcel-row parcel-header"><span>#</span><span>Vencimento</span><span>Valor</span><span>Pagamento</span><span>Status</span></div>
+      ${parcelas.map(pa => `
+        <div class="parcel-row">
+          <span>${pa.num}/${pa.total}</span>
+          <span>${fmtDate(pa.vencimento)}</span>
+          <span>${fmtMoney(pa.valor)}</span>
+          <span>${fmtDate(pa.dtPagamento)}</span>
+          <span><span class="badge ${pa.status==='pago'?'badge-green':isVencido(pa.vencimento)&&pa.status!=='pago'?'badge-red':'badge-amber'}">${pa.status==='pago'?'Pago':isVencido(pa.vencimento)&&pa.status!=='pago'?'Vencido':'Pendente'}</span></span>
+        </div>`).join('')}
+    </div>
+    ${andamentos.length ? `
+    <div>
+      <div class="card-title" style="margin-bottom:12px">Histórico de Andamentos</div>
+      <div class="timeline">
+        ${andamentos.map(a => `
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">${fmtDate(a.data)} — ${statusLabels[a.status]?.label||a.status}</div>
+            <div class="timeline-text">${a.texto}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+  openModal('modal-detalhe');
+}
+
+// ==================== FINANCEIRO ====================
+function getParcelaStatus(pa) {
+  if(pa.status === 'pago') return 'pago';
+  if(isVencido(pa.vencimento)) return 'vencido';
+  return 'pendente';
+}
+function renderFinVisao() {
+  const all = store.parcelas;
+  const pagos = all.filter(p => p.status === 'pago');
+  const vencidos = all.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
+  const aReceber = all.filter(p => p.status !== 'pago' && !isVencido(p.vencimento));
+  const totalContratado = store.processos.reduce((s,p) => s + p.valor, 0);
+  document.getElementById('fin-total-recebido').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0));
+  document.getElementById('fin-total-vencido').textContent = fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0));
+  document.getElementById('fin-total-areceber').textContent = fmtMoney(aReceber.reduce((s,p)=>s+p.valor,0));
+  document.getElementById('fin-total-contratado').textContent = fmtMoney(totalContratado);
+  // Vencidas list
+  const vl = document.getElementById('vencidas-list');
+  if(!vencidos.length) { vl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem parcelas vencidas.</div>'; }
+  else vl.innerHTML = vencidos.slice(0,6).map(p => {
+    const proc = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const dias = diffDays(today(), p.vencimento);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
+      <div style="text-align:right">
+        <div style="color:var(--danger);font-weight:600">${fmtMoney(p.valor)}</div>
+        <div style="font-size:11px;color:var(--danger)">${dias}d atrasado</div>
+      </div>
+    </div>`;
+  }).join('');
+  // Próximos
+  const d30 = new Date(); d30.setDate(d30.getDate()+30);
+  const prox = aReceber.filter(p => new Date(p.vencimento) <= d30).sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+  const pl = document.getElementById('proximos-list');
+  if(!prox.length) { pl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem vencimentos próximos.</div>'; }
+  else pl.innerHTML = prox.slice(0,6).map(p => {
+    const proc = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const dias = diffDays(p.vencimento, today());
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
+      <div style="text-align:right">
+        <div style="color:var(--blue-600);font-weight:600">${fmtMoney(p.valor)}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${fmtDate(p.vencimento)} (${dias}d)</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderParcelas(q = '') {
+  const filterStatus = (document.getElementById('filter-status-parcela')||{}).value || '';
+  let list = store.parcelas.map(p => ({...p, computedStatus: getParcelaStatus(p)}));
+  if(filterStatus) list = list.filter(p => p.computedStatus === filterStatus);
+  if(q) {
+    list = list.filter(p => {
+      const c = store.clientes.find(c => c.id === p.clienteId)||{nome:''};
+      const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:''};
+      return c.nome.toLowerCase().includes(q.toLowerCase()) || pr.numero.includes(q);
+    });
+  }
+  const tb = document.getElementById('tbody-parcelas');
+  if(!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhuma parcela encontrada.</td></tr>'; return; }
+  list.sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+  tb.innerHTML = list.map(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
+    const st = p.computedStatus;
+    const stLabel = st==='pago'?'Pago':st==='vencido'?'Vencido':'Pendente';
+    const stCls = st==='pago'?'badge-green':st==='vencido'?'badge-red':'badge-amber';
+    return `<tr>
+      <td><strong style="color:var(--blue-600)">${pr.numero}</strong></td>
+      <td>${c.nome}</td>
+      <td>${p.num} / ${p.total}</td>
+      <td>${fmtDate(p.vencimento)}</td>
+      <td><strong>${fmtMoney(p.valor)}</strong></td>
+      <td><span class="badge ${stCls}">${stLabel}</span>${p.dtPagamento?`<br><span style="font-size:10px;color:var(--text-muted)">Pago em ${fmtDate(p.dtPagamento)}</span>`:''}</td>
+      <td>${st!=='pago'?`<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>`:'<span style="color:var(--success);font-size:12px">✔ Confirmado</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+function marcarPago(id) {
+  const p = store.parcelas.find(p => p.id === id);
+  if(!p) return;
+  p.status = 'pago';
+  p.dtPagamento = today();
+  saveData(); renderParcelas(); renderFinVisao(); updateDashboard();
+  showToast('Parcela marcada como paga!', 'success');
+}
+function updateParcelasSelect() {
+  const sel = document.getElementById('select-parcela-pagar');
+  sel.innerHTML = '<option value="">— Selecione uma parcela pendente —</option>';
+  const pending = store.parcelas.filter(p => p.status !== 'pago').map(p => ({...p, computedStatus: getParcelaStatus(p)}));
+  pending.sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+  pending.forEach(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'?'};
+    const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:'?'};
+    sel.innerHTML += `<option value="${p.id}">${c.nome} — ${pr.numero} — Parc. ${p.num}/${p.total} — ${fmtDate(p.vencimento)} — ${fmtMoney(p.valor)}</option>`;
+  });
+  document.getElementById('data-pagamento').value = today();
+}
+function confirmarPagamento() {
+  const id = parseInt(document.getElementById('select-parcela-pagar').value);
+  const dt = document.getElementById('data-pagamento').value;
+  const obs = document.getElementById('obs-pagamento').value.trim();
+  if(!id) { showToast('Selecione uma parcela.', 'error'); return; }
+  const p = store.parcelas.find(p => p.id === id);
+  p.status = 'pago'; p.dtPagamento = dt; p.obs = obs;
+  saveData(); updateParcelasSelect(); renderFinVisao();
+  showToast('Pagamento confirmado!', 'success');
+}
+
+// ==================== DASHBOARD ====================
+function updateDashboard() {
+  const ativos = store.processos.filter(p => p.status === 'andamento').length;
+  document.getElementById('dash-ativos').textContent = ativos;
+  document.getElementById('dash-clientes').textContent = store.clientes.length;
+  document.getElementById('badge-processos').textContent = ativos;
+  const now = new Date();
+  const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const recebidoMes = store.parcelas
+    .filter(p => p.status === 'pago' && p.dtPagamento && p.dtPagamento.startsWith(mesAtual))
+    .reduce((s,p) => s+p.valor, 0);
+  const aReceber = store.parcelas
+    .filter(p => p.status !== 'pago')
+    .reduce((s,p) => s+p.valor, 0);
+  document.getElementById('dash-recebido').textContent = fmtMoney(recebidoMes);
+  document.getElementById('dash-areceber').textContent = fmtMoney(aReceber);
+  // Status chart
+  const sc = document.getElementById('status-chart-container');
+  if(!store.processos.length) {
+    sc.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0">Nenhum processo cadastrado ainda.</div>';
+  } else {
+    const counts = { andamento:0, aguardando:0, encerrado:0, suspenso:0 };
+    store.processos.forEach(p => counts[p.status] = (counts[p.status]||0)+1);
+    const total = store.processos.length;
+    const colors = { andamento:'#378ADD', aguardando:'#F59E0B', encerrado:'#6B7280', suspenso:'#EF4444' };
+    sc.innerHTML = `<div class="donut-wrap">
+      <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+        ${(() => {
+          let start = -Math.PI/2; const r=44; const cx=60,cy=60;
+          return Object.entries(counts).filter(([,v])=>v>0).map(([k,v]) => {
+            const angle = (v/total)*2*Math.PI;
+            const x1=cx+r*Math.cos(start), y1=cy+r*Math.sin(start);
+            const x2=cx+r*Math.cos(start+angle), y2=cy+r*Math.sin(start+angle);
+            const large=angle>Math.PI?1:0;
+            const path=`M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`;
+            start+=angle;
+            return `<path d="${path}" fill="${colors[k]}" stroke="white" stroke-width="2"/>`;
+          }).join('');
+        })()}
+        <circle cx="60" cy="60" r="28" fill="white"/>
+        <text x="60" y="55" text-anchor="middle" font-size="18" font-weight="700" fill="#0C1A2E">${total}</text>
+        <text x="60" y="70" text-anchor="middle" font-size="9" fill="#4A6080">processos</text>
+      </svg>
+      <div class="donut-legend">
+        ${Object.entries(counts).filter(([,v])=>v>0).map(([k,v]) => `
+          <div class="legend-item">
+            <div class="legend-dot" style="background:${colors[k]}"></div>
+            <span style="font-size:12.5px;color:var(--text-primary)">${statusLabels[k]?.label||k}: <strong>${v}</strong></span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+  // Alertas
+  const al = document.getElementById('alertas-container');
+  const vencidos = store.parcelas.filter(p => p.status!=='pago' && isVencido(p.vencimento));
+  const alerts = [];
+  if(vencidos.length) alerts.push(`<div class="alert alert-danger">⚠️ <strong>${vencidos.length} parcela(s) vencida(s)</strong> — total de ${fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0))}</div>`);
+  const d7 = new Date(); d7.setDate(d7.getDate()+7);
+  const v7 = store.parcelas.filter(p => p.status!=='pago' && !isVencido(p.vencimento) && new Date(p.vencimento) <= d7);
+  if(v7.length) alerts.push(`<div class="alert alert-warning">⏰ <strong>${v7.length} parcela(s) vencem nos próximos 7 dias</strong></div>`);
+  if(!alerts.length) al.innerHTML = '<div class="alert alert-success">✅ Tudo em dia! Sem alertas no momento.</div>';
+  else al.innerHTML = alerts.join('');
+  // Tabela últimos processos
+  const tb = document.getElementById('dash-tbody-processos');
+  const last5 = store.processos.slice(-5).reverse();
+  if(!last5.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Nenhum processo ainda.</td></tr>'; return; }
+  tb.innerHTML = last5.map(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const t = store.tipos.find(t => t.id === p.tipoId)||{nome:'—'};
+    const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
+    return `<tr><td><strong style="color:var(--blue-600)">${p.numero}</strong></td><td>${c.nome}</td><td>${t.nome}</td><td><span class="badge ${st.cls}">${st.label}</span></td><td>${fmtMoney(p.valor)}</td></tr>`;
+  }).join('');
+}
+
+// ==================== RELATÓRIOS ====================
+function gerarRelatorio() {
+  const de = document.getElementById('rel-de').value;
+  const ate = document.getElementById('rel-ate').value;
+  let list = store.parcelas;
+  if(de) list = list.filter(p => p.vencimento >= de);
+  if(ate) list = list.filter(p => p.vencimento <= ate);
+  const pagos = list.filter(p => p.status === 'pago');
+  const vencidos = list.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
+  document.getElementById('rel-entradas').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0));
+  document.getElementById('rel-vencidos').textContent = fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0));
+  document.getElementById('rel-saldo').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0) - vencidos.reduce((s,p)=>s+p.valor,0));
+  const tb = document.getElementById('tbody-rel-fluxo');
+  list.sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+  if(!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum lançamento no período.</td></tr>'; return; }
+  tb.innerHTML = list.map(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+    const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
+    const st = getParcelaStatus(p);
+    const stLabel = st==='pago'?'Pago':st==='vencido'?'Vencido':'A Receber';
+    const stCls = st==='pago'?'badge-green':st==='vencido'?'badge-red':'badge-amber';
+    return `<tr>
+      <td>${fmtDate(p.vencimento)}</td>
+      <td>${fmtDate(p.dtPagamento)}</td>
+      <td>${c.nome}</td>
+      <td><strong style="color:var(--blue-600)">${pr.numero}</strong></td>
+      <td>${p.num}/${p.total}</td>
+      <td><strong>${fmtMoney(p.valor)}</strong></td>
+      <td><span class="badge ${stCls}">${stLabel}</span></td>
+    </tr>`;
+  }).join('');
+}
+function renderRelClientes() {
+  const tb = document.getElementById('tbody-rel-clientes');
+  if(!store.clientes.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:28px">Sem dados.</td></tr>'; return; }
+  tb.innerHTML = store.clientes.map(c => {
+    const procs = store.processos.filter(p => p.clienteId === c.id);
+    const totalContratado = procs.reduce((s,p)=>s+p.valor,0);
+    const parcelas = store.parcelas.filter(p => p.clienteId === c.id);
+    const pago = parcelas.filter(p=>p.status==='pago').reduce((s,p)=>s+p.valor,0);
+    const aberto = parcelas.filter(p=>p.status!=='pago').reduce((s,p)=>s+p.valor,0);
+    return `<tr>
+      <td><strong>${c.nome}</strong></td>
+      <td>${procs.length}</td>
+      <td>${fmtMoney(totalContratado)}</td>
+      <td style="color:var(--success)"><strong>${fmtMoney(pago)}</strong></td>
+      <td style="color:var(--warning)">${fmtMoney(aberto)}</td>
+      <td><span class="badge ${c.status==='ativo'?'badge-green':'badge-gray'}">${c.status==='ativo'?'Ativo':'Inativo'}</span></td>
+    </tr>`;
+  }).join('');
+}
+function renderRelProcessos() {
+  const tb = document.getElementById('tbody-rel-processos');
+  if(!store.processos.length) { tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:28px">Sem dados.</td></tr>'; return; }
+  tb.innerHTML = store.processos.map(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    const t = store.tipos.find(t=>t.id===p.tipoId)||{nome:'—'};
+    const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
+    const parc = store.parcelas.filter(pa=>pa.processoId===p.id);
+    const pago = parc.filter(pa=>pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
+    const aberto = parc.filter(pa=>pa.status!=='pago').reduce((s,pa)=>s+pa.valor,0);
+    return `<tr>
+      <td><strong style="color:var(--blue-600)">${p.numero}</strong></td>
+      <td>${c.nome}</td>
+      <td>${t.nome}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+      <td>${fmtDate(p.abertura)}</td>
+      <td><strong>${fmtMoney(p.valor)}</strong></td>
+      <td style="color:var(--success)">${fmtMoney(pago)}</td>
+      <td style="color:var(--warning)">${fmtMoney(aberto)}</td>
+    </tr>`;
+  }).join('');
+}
+function exportarCSV() {
+  const rows = [['Data Venc','Data Pgto','Cliente','Processo','Parcela','Valor','Status']];
+  store.parcelas.forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+    rows.push([p.vencimento, p.dtPagamento||'', c.nome, pr.numero, `${p.num}/${p.total}`, p.valor.toFixed(2), getParcelaStatus(p)]);
+  });
+  const csv = rows.map(r => r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fluxo_caixa_lexPro.csv';
+  a.click();
+  showToast('CSV exportado com sucesso!', 'success');
+}
+
+// ==================== INIT ====================
+function init() {
+  const now = new Date();
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  updateDashboard();
+  // Verificar parcelas vencidas
+  store.parcelas.forEach(p => {
+    if(p.status === 'pendente' && isVencido(p.vencimento)) p.status = 'pendente'; // mantém pendente, calculamos dinamicamente
+  });
+}
+init();
+</script>
+</body>
+</html>
