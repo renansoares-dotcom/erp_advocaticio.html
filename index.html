@@ -49,6 +49,9 @@ body {
   display: flex;
 }
 
+/* APP — oculto até login */
+#app-wrapper { display: none; width: 100%; }
+
 /* SIDEBAR */
 .sidebar {
   width: 240px;
@@ -379,9 +382,160 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+/* LOGIN */
+#login-screen {
+  position: fixed; inset: 0; z-index: 9000;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--blue-800) 60%, var(--blue-600) 100%);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#login-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 20%, rgba(55,138,221,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(55,138,221,0.12) 0%, transparent 50%);
+}
+.login-orb {
+  position: absolute; border-radius: 50%;
+  background: rgba(55,138,221,0.08); pointer-events: none;
+}
+.login-card {
+  background: white; border-radius: 24px;
+  width: 420px; max-width: 95vw;
+  padding: 40px 40px 36px;
+  box-shadow: 0 24px 80px rgba(7,29,59,0.45);
+  position: relative; z-index: 1;
+  animation: loginIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes loginIn {
+  from { transform: translateY(28px) scale(0.96); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.login-logo {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 30px;
+}
+.login-logo-icon {
+  width: 46px; height: 46px; border-radius: 13px;
+  background: linear-gradient(135deg, var(--blue-400), var(--blue-700));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: white;
+  box-shadow: 0 4px 16px rgba(24,95,165,0.35);
+}
+.login-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--navy); }
+.login-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.login-heading { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.login-desc { font-size: 13.5px; color: var(--text-secondary); margin-bottom: 28px; }
+.login-input-wrap { position: relative; margin-bottom: 14px; }
+.login-input-icon {
+  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; pointer-events: none; color: var(--text-muted);
+}
+.login-input {
+  width: 100%; padding: 11px 14px 11px 40px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text-primary);
+  outline: none; transition: border 0.18s, box-shadow 0.18s; background: white;
+}
+.login-input:focus { border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(55,138,221,0.14); }
+.login-eye {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 16px; color: var(--text-muted); transition: color 0.15s;
+  background: none; border: none; padding: 0;
+}
+.login-eye:hover { color: var(--blue-600); }
+.login-forgot { font-size: 12.5px; color: var(--blue-600); cursor: pointer; text-align: right; display: block; margin-bottom: 22px; font-weight: 500; }
+.login-forgot:hover { text-decoration: underline; }
+.login-btn {
+  width: 100%; padding: 12px; border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+  color: white; font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.18s;
+  box-shadow: 0 4px 16px rgba(24,95,165,0.3);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(24,95,165,0.4); }
+.login-btn:active { transform: none; }
+.login-error {
+  background: var(--danger-bg); border: 1px solid #FCA5A5;
+  border-radius: var(--radius); padding: 10px 14px;
+  font-size: 13px; color: var(--danger); margin-bottom: 14px; display: none;
+}
+.login-success {
+  background: var(--success-bg); border: 1px solid #A7F3D0;
+  border-radius: var(--radius); padding: 10px 14px;
+  font-size: 13px; color: var(--success); margin-bottom: 14px; display: none;
+}
+.login-divider { height: 1px; background: var(--border); margin: 22px 0; }
+.login-back { font-size: 12.5px; color: var(--text-muted); cursor: pointer; text-align: center; display: block; }
+.login-back:hover { color: var(--blue-600); }
+.login-panel { display: none; }
+.login-panel.active { display: block; }
 </style>
 </head>
 <body>
+
+<!-- ========== TELA DE LOGIN ========== -->
+<div id="login-screen">
+  <div class="login-orb" style="width:400px;height:400px;top:-120px;right:-80px"></div>
+  <div class="login-orb" style="width:280px;height:280px;bottom:-60px;left:-60px"></div>
+  <div class="login-orb" style="width:160px;height:160px;top:40%;left:10%"></div>
+
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">DV</div>
+      <div>
+        <div class="login-title">Diego Vila Nova</div>
+        <div class="login-sub">ERP Advocatício</div>
+      </div>
+    </div>
+
+    <!-- PAINEL: LOGIN -->
+    <div class="login-panel active" id="panel-login">
+      <div class="login-heading">Bem-vindo de volta</div>
+      <div class="login-desc">Faça login para acessar o sistema</div>
+      <div id="login-error" class="login-error">❌ Usuário ou senha incorretos.</div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">👤</span>
+        <input type="text" class="login-input" id="login-usuario" placeholder="Usuário" onkeydown="if(event.key==='Enter') fazerLogin()">
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input type="password" class="login-input" id="login-senha" placeholder="Senha" onkeydown="if(event.key==='Enter') fazerLogin()">
+        <button class="login-eye" onclick="toggleSenhaVisivel('login-senha',this)" tabindex="-1">👁</button>
+      </div>
+      <span class="login-forgot" onclick="mostrarPainel('panel-recuperar')">Esqueci minha senha</span>
+      <button class="login-btn" onclick="fazerLogin()">Entrar no Sistema →</button>
+      <div class="login-divider"></div>
+      <div style="text-align:center;font-size:11.5px;color:var(--text-muted)">Credenciais padrão: <strong>admin</strong> / <strong>admin123</strong></div>
+    </div>
+
+    <!-- PAINEL: RECUPERAR SENHA -->
+    <div class="login-panel" id="panel-recuperar">
+      <div class="login-heading">Recuperar Senha</div>
+      <div class="login-desc">Insira seu usuário e defina uma nova senha.</div>
+      <div id="rec-error" class="login-error"></div>
+      <div id="rec-success" class="login-success"></div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">👤</span>
+        <input type="text" class="login-input" id="rec-usuario" placeholder="Usuário">
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input type="password" class="login-input" id="rec-nova-senha" placeholder="Nova senha">
+        <button class="login-eye" onclick="toggleSenhaVisivel('rec-nova-senha',this)" tabindex="-1">👁</button>
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input type="password" class="login-input" id="rec-confirmar-senha" placeholder="Confirmar nova senha">
+        <button class="login-eye" onclick="toggleSenhaVisivel('rec-confirmar-senha',this)" tabindex="-1">👁</button>
+      </div>
+      <button class="login-btn" onclick="recuperarSenha()" style="margin-bottom:14px">Redefinir Senha</button>
+      <span class="login-back" onclick="mostrarPainel('panel-login')">← Voltar ao login</span>
+    </div>
+  </div>
+</div>
+
+<div id="app-wrapper">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -427,6 +581,12 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <span class="icon">📈</span> Relatórios
       </button>
     </div>
+    <div class="nav-section">
+      <span class="nav-label">Sistema</span>
+      <button class="nav-item" onclick="navigate('opcoes',this)">
+        <span class="icon">⚙️</span> Opções
+      </button>
+    </div>
   </nav>
 
   <div class="sidebar-footer">
@@ -438,6 +598,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
       <div style="margin-left:auto;color:rgba(255,255,255,0.35);font-size:14px">›</div>
     </div>
+    <button onclick="logout()" style="width:100%;margin-top:10px;padding:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(185,28,28,0.2)';this.style.color='#FCA5A5';this.style.borderColor='rgba(185,28,28,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)';this.style.borderColor='rgba(255,255,255,0.1)'">
+      🚪 Sair do Sistema
+    </button>
   </div>
 </aside>
 
@@ -796,6 +959,84 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
+    <!-- ========== OPÇÕES ========== -->
+    <div class="page" id="page-opcoes">
+      <div style="max-width:560px">
+
+        <!-- Alterar Senha -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <span class="card-title">🔐 Alterar Senha</span>
+          </div>
+          <div class="card-body">
+            <div id="opcoes-senha-error" class="login-error" style="font-size:13px"></div>
+            <div id="opcoes-senha-success" class="login-success" style="font-size:13px"></div>
+
+            <div class="form-group">
+              <label class="form-label">Senha Atual</label>
+              <div style="position:relative">
+                <input type="password" class="form-control" id="opcoes-senha-atual" placeholder="Digite sua senha atual" style="padding-right:40px">
+                <button onclick="toggleSenhaVisivel('opcoes-senha-atual',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-muted)">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nova Senha</label>
+              <div style="position:relative">
+                <input type="password" class="form-control" id="opcoes-senha-nova" placeholder="Mínimo 6 caracteres" style="padding-right:40px" oninput="avaliarForcaSenha(this.value)">
+                <button onclick="toggleSenhaVisivel('opcoes-senha-nova',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-muted)">👁</button>
+              </div>
+              <!-- Barra de força da senha -->
+              <div id="forca-wrap" style="display:none;margin-top:8px">
+                <div style="display:flex;gap:4px;margin-bottom:4px">
+                  <div id="forca-b1" style="height:4px;flex:1;border-radius:4px;background:var(--border);transition:background 0.3s"></div>
+                  <div id="forca-b2" style="height:4px;flex:1;border-radius:4px;background:var(--border);transition:background 0.3s"></div>
+                  <div id="forca-b3" style="height:4px;flex:1;border-radius:4px;background:var(--border);transition:background 0.3s"></div>
+                  <div id="forca-b4" style="height:4px;flex:1;border-radius:4px;background:var(--border);transition:background 0.3s"></div>
+                </div>
+                <div id="forca-label" style="font-size:11px;color:var(--text-muted)"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar Nova Senha</label>
+              <div style="position:relative">
+                <input type="password" class="form-control" id="opcoes-senha-confirmar" placeholder="Repita a nova senha" style="padding-right:40px">
+                <button onclick="toggleSenhaVisivel('opcoes-senha-confirmar',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-muted)">👁</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="alterarSenha()">🔐 Salvar Nova Senha</button>
+          </div>
+        </div>
+
+        <!-- Informações do sistema -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">ℹ️ Informações do Sistema</span>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+                <span style="font-size:13px;color:var(--text-secondary)">Sistema</span>
+                <span style="font-size:13px;font-weight:600">Diego Vila Nova — ERP Advocatício</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+                <span style="font-size:13px;color:var(--text-secondary)">Versão</span>
+                <span class="badge badge-blue">v1.0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+                <span style="font-size:13px;color:var(--text-secondary)">Usuário ativo</span>
+                <span style="font-size:13px;font-weight:600" id="opcoes-usuario-ativo">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+                <span style="font-size:13px;color:var(--text-secondary)">Consultora de Gestão</span>
+                <span style="font-size:13px;font-weight:600">Thalyta Richelly · (81) 99604-0412</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -903,7 +1144,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
         <div class="form-group">
           <label class="form-label">CPF / CNPJ *</label>
-          <input type="text" class="form-control" id="cliente-cpf" placeholder="000.000.000-00">
+          <input type="text" class="form-control" id="cliente-cpf" placeholder="000.000.000-00" oninput="mascaraCpfCnpj(this)" maxlength="18">
         </div>
       </div>
       <div class="form-row">
@@ -1054,16 +1295,55 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Data 1ª Parcela *</label>
-          <input type="date" class="form-control" id="proc-1a-parcela">
+          <input type="date" class="form-control" id="proc-1a-parcela" oninput="calcularParcelas()">
         </div>
         <div class="form-group">
           <label class="form-label">Valor por Parcela</label>
-          <input type="text" class="form-control" id="proc-valor-parcela" readonly style="background:var(--surface)">
+          <input type="text" class="form-control" id="proc-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600">
         </div>
+      </div>
+
+      <!-- GRID DE DATAS INDIVIDUAIS -->
+      <div id="proc-datas-container" style="display:none;margin-bottom:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted)">Datas de Vencimento por Parcela</div>
+          <span style="font-size:11px;color:var(--text-muted)">Edite individualmente se necessário</span>
+        </div>
+        <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--blue-800)">
+          💡 As datas são geradas automaticamente a partir da 1ª parcela, mas podem ser ajustadas individualmente.
+        </div>
+        <div id="proc-datas-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:200px;overflow-y:auto;padding-right:2px"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Descrição / Andamento Inicial</label>
         <textarea class="form-control" id="proc-descricao" placeholder="Descreva o processo, fatos relevantes..."></textarea>
+      </div>
+
+      <!-- LEMBRETE -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Lembrete</div>
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:500;color:var(--text-primary)">🔔 Ativar lembrete para este processo</div>
+          <button type="button" id="btn-toggle-lembrete" onclick="toggleLembrete()" style="width:46px;height:26px;border-radius:20px;border:none;cursor:pointer;transition:all 0.2s;background:var(--border);position:relative;flex-shrink:0">
+            <span id="toggle-knob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:all 0.2s"></span>
+          </button>
+        </div>
+        <div id="lembrete-fields" style="display:none">
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Data do Lembrete</label>
+              <input type="date" class="form-control" id="proc-lembrete-data">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Horário</label>
+              <input type="time" class="form-control" id="proc-lembrete-hora">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:10px;margin-bottom:0">
+            <label class="form-label">Mensagem do Lembrete</label>
+            <textarea class="form-control" id="proc-lembrete-msg" placeholder="Ex: Audiência marcada, prazo para recurso, reunião com cliente..." style="min-height:68px"></textarea>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1172,6 +1452,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+</div><!-- /app-wrapper -->
+
 <script>
 // ==================== DATA STORE ====================
 let store = {
@@ -1198,6 +1480,22 @@ loadData();
 // ==================== UTILS ====================
 function fmtMoney(v) {
   return 'R$ ' + (parseFloat(v)||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function mascaraCpfCnpj(input) {
+  let v = input.value.replace(/\D/g, '');
+  if(v.length <= 11) {
+    // CPF: 000.000.000-00
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  } else {
+    // CNPJ: 00.000.000/0000-00
+    v = v.replace(/(\d{2})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1/$2');
+    v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+  input.value = v;
 }
 function fmtDate(d) {
   if(!d) return '—';
@@ -1237,7 +1535,8 @@ const pageTitles = {
   clientes: 'Clientes',
   processos: 'Processos',
   financeiro: 'Financeiro',
-  relatorios: 'Relatórios'
+  relatorios: 'Relatórios',
+  opcoes: 'Opções'
 };
 const pageActions = {
   dashboard: 'Atualizar',
@@ -1245,7 +1544,8 @@ const pageActions = {
   clientes: '',
   processos: '',
   financeiro: '',
-  relatorios: '⬇ Exportar'
+  relatorios: '⬇ Exportar',
+  opcoes: ''
 };
 
 function navigate(page, btn) {
@@ -1284,6 +1584,73 @@ function refreshPage(page) {
   else if(page === 'processos') renderProcessos();
   else if(page === 'financeiro') { renderFinVisao(); renderParcelas(); updateParcelasSelect(); }
   else if(page === 'relatorios') { renderRelClientes(); renderRelProcessos(); }
+  else if(page === 'opcoes') renderOpcoes();
+}
+
+// ==================== OPÇÕES ====================
+function renderOpcoes() {
+  const session = localStorage.getItem(LOGIN_KEY);
+  if(session) {
+    const s = JSON.parse(session);
+    const el = document.getElementById('opcoes-usuario-ativo');
+    if(el) el.textContent = s.usuario;
+  }
+  // Limpar campos e mensagens
+  ['opcoes-senha-atual','opcoes-senha-nova','opcoes-senha-confirmar'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const errEl = document.getElementById('opcoes-senha-error');
+  const sucEl = document.getElementById('opcoes-senha-success');
+  if(errEl) errEl.style.display = 'none';
+  if(sucEl) sucEl.style.display = 'none';
+  document.getElementById('forca-wrap').style.display = 'none';
+}
+function avaliarForcaSenha(v) {
+  const wrap = document.getElementById('forca-wrap');
+  const lbl = document.getElementById('forca-label');
+  const bars = [1,2,3,4].map(i => document.getElementById('forca-b'+i));
+  if(!v) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  let score = 0;
+  if(v.length >= 6) score++;
+  if(v.length >= 10) score++;
+  if(/[A-Z]/.test(v) && /[0-9]/.test(v)) score++;
+  if(/[^A-Za-z0-9]/.test(v)) score++;
+  const colors = ['#EF4444','#F59E0B','#3B82F6','#10B981'];
+  const labels = ['Fraca','Razoável','Boa','Forte'];
+  bars.forEach((b,i) => { b.style.background = i < score ? colors[score-1] : 'var(--border)'; });
+  lbl.style.color = colors[score-1];
+  lbl.textContent = 'Força: ' + labels[score-1];
+}
+function alterarSenha() {
+  const atual = document.getElementById('opcoes-senha-atual').value;
+  const nova = document.getElementById('opcoes-senha-nova').value;
+  const confirmar = document.getElementById('opcoes-senha-confirmar').value;
+  const errEl = document.getElementById('opcoes-senha-error');
+  const sucEl = document.getElementById('opcoes-senha-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  if(!atual || !nova || !confirmar) {
+    errEl.textContent = '❌ Preencha todos os campos.'; errEl.style.display = 'block'; return;
+  }
+  if(nova.length < 6) {
+    errEl.textContent = '❌ A nova senha deve ter pelo menos 6 caracteres.'; errEl.style.display = 'block'; return;
+  }
+  if(nova !== confirmar) {
+    errEl.textContent = '❌ A nova senha e a confirmação não coincidem.'; errEl.style.display = 'block'; return;
+  }
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  const users = getUsers();
+  const user = users.find(u => u.usuario === session.usuario);
+  if(!user) { errEl.textContent = '❌ Sessão inválida. Faça login novamente.'; errEl.style.display = 'block'; return; }
+  if(user.senha !== atual) { errEl.textContent = '❌ Senha atual incorreta.'; errEl.style.display = 'block'; return; }
+  user.senha = nova;
+  saveUsers(users);
+  sucEl.textContent = '✅ Senha alterada com sucesso!';
+  sucEl.style.display = 'block';
+  ['opcoes-senha-atual','opcoes-senha-nova','opcoes-senha-confirmar'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('forca-wrap').style.display = 'none';
+  showToast('Senha alterada com sucesso!', 'success');
 }
 
 // ==================== TABS ====================
@@ -1310,10 +1677,12 @@ function switchTab(group, tab, btn) {
 }
 
 // ==================== MODAL ====================
-function openModal(id) {
-  if(id === 'modal-tipo') resetFormTipo();
-  if(id === 'modal-cliente') resetFormCliente();
-  if(id === 'modal-processo') resetFormProcesso();
+function openModal(id, reset = true) {
+  if(reset) {
+    if(id === 'modal-tipo') resetFormTipo();
+    if(id === 'modal-cliente') resetFormCliente();
+    if(id === 'modal-processo') resetFormProcesso();
+  }
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id) {
@@ -1406,7 +1775,7 @@ function editarTipo(id) {
     inputs.forEach((inp, i) => { if(t.datas[i]) inp.value = t.datas[i]; });
   }
   tipoCalcParcelas();
-  openModal('modal-tipo');
+  openModal('modal-tipo', false);
 }
 function excluirTipo(id) {
   if(!confirm('Excluir este tipo de processo?')) return;
@@ -1506,12 +1875,192 @@ function editarCliente(id) {
   document.getElementById('cliente-status').value = c.status||'ativo';
   document.getElementById('cliente-obs').value = c.obs||'';
   document.getElementById('cliente-dip').value = c.dip||'';
-  openModal('modal-cliente');
+  openModal('modal-cliente', false);
 }
 function excluirCliente(id) {
   if(!confirm('Excluir este cliente?')) return;
   store.clientes = store.clientes.filter(c => c.id !== id);
   saveData(); renderClientes(); showToast('Cliente excluído.');
+}
+function gerarFichaPDF(id) {
+  const c = store.clientes.find(c => c.id === id);
+  if(!c) return;
+  const tipo = store.tipos.find(t => t.id === c.tipoProcessoId);
+  const processos = store.processos.filter(p => p.clienteId === id);
+  const hoje = new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ficha — ${c.nome}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#fff; color:#0C1A2E; font-size:13px; }
+  .page { width:210mm; min-height:297mm; margin:0 auto; padding:12mm 14mm; }
+
+  /* CABEÇALHO */
+  .header { display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:3px solid #185FA5; margin-bottom:18px; }
+  .header-left { display:flex; align-items:center; gap:12px; }
+  .logo-box { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#378ADD,#185FA5); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:white; }
+  .escritorio-nome { font-size:18px; font-weight:700; color:#071D3B; }
+  .escritorio-sub { font-size:10px; color:#7A92AA; text-transform:uppercase; letter-spacing:1.5px; }
+  .header-right { text-align:right; }
+  .ficha-title { font-size:11px; font-weight:600; color:#185FA5; text-transform:uppercase; letter-spacing:1px; }
+  .ficha-data { font-size:11px; color:#7A92AA; margin-top:2px; }
+
+  /* STATUS BADGE */
+  .status-bar { display:flex; align-items:center; justify-content:space-between; background:#F4F8FD; border-radius:8px; padding:10px 14px; margin-bottom:18px; border:1px solid #DAEAF7; }
+  .status-nome { font-size:17px; font-weight:700; color:#071D3B; }
+  .status-cpf { font-size:12px; color:#4A6080; margin-top:2px; }
+  .badge { display:inline-flex; align-items:center; padding:3px 12px; border-radius:20px; font-size:11px; font-weight:600; }
+  .badge-green { background:#E2F5EC; color:#0B7B45; }
+  .badge-gray  { background:#F1F5F9; color:#475569; }
+  .badge-blue  { background:#E6F1FB; color:#185FA5; }
+
+  /* SEÇÕES */
+  .section { margin-bottom:16px; }
+  .section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:#185FA5; padding-bottom:5px; border-bottom:1.5px solid #DAEAF7; margin-bottom:10px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 20px; }
+  .field { }
+  .field-label { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:#7A92AA; margin-bottom:2px; }
+  .field-value { font-size:13px; color:#0C1A2E; font-weight:500; min-height:16px; }
+  .field-value.empty { color:#B5C4D4; font-style:italic; font-weight:400; }
+
+  /* TEXTAREA FIELDS */
+  .textarea-field { background:#F4F8FD; border:1px solid #DAEAF7; border-radius:6px; padding:8px 10px; min-height:52px; font-size:12.5px; color:#0C1A2E; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+  .textarea-field.empty { color:#B5C4D4; font-style:italic; }
+
+  /* PROCESSOS */
+  .proc-item { background:#F4F8FD; border:1px solid #DAEAF7; border-radius:8px; padding:9px 12px; margin-bottom:7px; display:grid; grid-template-columns:1fr auto; align-items:start; gap:8px; }
+  .proc-num { font-size:12px; font-weight:700; color:#185FA5; }
+  .proc-info { font-size:11.5px; color:#4A6080; margin-top:2px; }
+
+  /* RODAPÉ */
+  .footer { margin-top:auto; padding-top:12px; border-top:1px solid #DAEAF7; display:flex; justify-content:space-between; align-items:center; }
+  .footer-text { font-size:10px; color:#7A92AA; }
+  .footer-sign { width:160px; border-top:1px solid #0C1A2E; text-align:center; padding-top:4px; font-size:10px; color:#4A6080; }
+
+  @media print {
+    body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .page { padding:10mm 12mm; }
+    .no-print { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CABEÇALHO -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">DV</div>
+      <div>
+        <div class="escritorio-nome">Diego Vila Nova</div>
+        <div class="escritorio-sub">Advocacia &amp; Assessoria Jurídica</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="ficha-title">Ficha de Cadastro</div>
+      <div class="ficha-data">Emitida em ${hoje}</div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div>
+      <div class="status-nome">${c.nome}</div>
+      <div class="status-cpf">CPF/CNPJ: ${formatarCpfCnpj(c.cpf)}</div>
+    </div>
+    <span class="badge ${c.status==='ativo'?'badge-green':'badge-gray'}">${c.status==='ativo'?'✔ Ativo':'Inativo'}</span>
+  </div>
+
+  <!-- DADOS PESSOAIS -->
+  <div class="section">
+    <div class="section-title">Dados Pessoais</div>
+    <div class="grid-3">
+      <div class="field"><div class="field-label">Telefone</div><div class="field-value ${!c.tel?'empty':''}">${c.tel||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">E-mail</div><div class="field-value ${!c.email?'empty':''}">${c.email||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">Cidade / UF</div><div class="field-value ${!c.cidade?'empty':''}">${c.cidade||'Não informado'}</div></div>
+    </div>
+    <div style="margin-top:8px">
+      <div class="field"><div class="field-label">Endereço</div><div class="field-value ${!c.endereco?'empty':''}">${c.endereco||'Não informado'}</div></div>
+    </div>
+  </div>
+
+  <!-- INFORMAÇÕES DO PROCESSO -->
+  <div class="section">
+    <div class="section-title">Informações do Processo</div>
+    <div class="grid-2">
+      <div class="field"><div class="field-label">Natureza</div><div class="field-value ${!c.natureza?'empty':''}">${c.natureza||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">Benefício</div><div class="field-value ${!c.beneficio?'empty':''}">${c.beneficio||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">Senha do INSS</div><div class="field-value ${!c.senhaInss?'empty':''}">${c.senhaInss||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">Tipo de Processo</div><div class="field-value ${!tipo?'empty':''}">${tipo?tipo.nome:'Não vinculado'}</div></div>
+      <div class="field"><div class="field-label">Indicação</div><div class="field-value ${!c.indicacao?'empty':''}">${c.indicacao||'Não informado'}</div></div>
+      <div class="field"><div class="field-label">Responsável</div><div class="field-value ${!c.responsavel?'empty':''}">${c.responsavel||'Não informado'}</div></div>
+    </div>
+  </div>
+
+  ${processos.length ? `
+  <!-- PROCESSOS VINCULADOS -->
+  <div class="section">
+    <div class="section-title">Processos Vinculados</div>
+    ${processos.map(p => {
+      const t = store.tipos.find(t=>t.id===p.tipoId)||{nome:'—'};
+      const stL = {andamento:'Em Andamento',aguardando:'Aguardando',encerrado:'Encerrado',suspenso:'Suspenso'};
+      return `<div class="proc-item">
+        <div>
+          <div class="proc-num">${p.numero}</div>
+          <div class="proc-info">${t.nome} &nbsp;·&nbsp; ${p.adv||'Sem advogado'} &nbsp;·&nbsp; Abertura: ${fmtDate(p.abertura)}</div>
+        </div>
+        <span class="badge badge-blue">${stL[p.status]||p.status}</span>
+      </div>`;
+    }).join('')}
+  </div>` : ''}
+
+  <!-- OBSERVAÇÕES -->
+  ${c.obs ? `
+  <div class="section">
+    <div class="section-title">Observações</div>
+    <div class="textarea-field">${c.obs}</div>
+  </div>` : ''}
+
+  <!-- DIP -->
+  <div class="section">
+    <div class="section-title">DIP — Diário de Informações do Processo</div>
+    <div class="textarea-field ${!c.dip?'empty':''}">${c.dip||'Nenhum registro no DIP.'}</div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <div class="footer">
+    <div class="footer-text">Diego Vila Nova — Advocacia &amp; Assessoria Jurídica<br>Documento gerado em ${hoje}</div>
+    <div class="footer-sign">Responsável / Assinatura</div>
+  </div>
+
+</div>
+
+<!-- BOTÃO IMPRIMIR -->
+<div class="no-print" style="position:fixed;bottom:24px;right:24px;display:flex;gap:10px">
+  <button onclick="window.print()" style="padding:11px 24px;background:#185FA5;color:white;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(24,95,165,0.35)">🖨️ Imprimir / Salvar PDF</button>
+  <button onclick="window.close()" style="padding:11px 18px;background:#F4F8FD;color:#4A6080;border:1px solid #DAEAF7;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer">✕ Fechar</button>
+</div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  showToast('Ficha gerada! Use "Salvar como PDF" no diálogo de impressão.', 'success');
+}
+function formatarCpfCnpj(v) {
+  if(!v) return '—';
+  const d = v.replace(/\D/g,'');
+  if(d.length <= 11) {
+    return d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+  }
+  return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/, '$1.$2.$3/$4-$5');
 }
 function renderClientes(q = '') {
   const list = store.clientes.filter(c =>
@@ -1525,7 +2074,7 @@ function renderClientes(q = '') {
     return `<tr>
       <td>${i+1}</td>
       <td><strong>${c.nome}</strong>${c.indicacao?`<br><span style="font-size:10.5px;color:var(--text-muted)">Indicado por: ${c.indicacao}</span>`:''}</td>
-      <td>${c.cpf}</td>
+      <td>${formatarCpfCnpj(c.cpf)}</td>
       <td>${c.tel||'—'}</td>
       <td>${c.natureza ? `<span style="font-size:12.5px">${c.natureza}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
       <td>${c.beneficio ? `<span class="badge badge-navy">${c.beneficio}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
@@ -1534,6 +2083,7 @@ function renderClientes(q = '') {
       <td><span class="badge ${c.status==='ativo'?'badge-green':'badge-gray'}">${c.status==='ativo'?'Ativo':'Inativo'}</span></td>
       <td>
         <button class="btn btn-outline btn-sm" onclick="editarCliente(${c.id})" title="Editar">✏️</button>
+        <button class="btn btn-primary btn-sm" onclick="gerarFichaPDF(${c.id})" title="Gerar Ficha PDF">📄</button>
         <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})" title="Excluir">🗑</button>
       </td>
     </tr>`;
@@ -1544,13 +2094,31 @@ function renderClientes(q = '') {
 function resetFormProcesso() {
   document.getElementById('processo-edit-id').value = '';
   document.getElementById('modal-processo-title').textContent = 'Novo Processo';
-  ['proc-numero','proc-adv','proc-vara','proc-descricao','proc-valor-parcela'].forEach(id => document.getElementById(id).value = '');
+  ['proc-numero','proc-adv','proc-vara','proc-descricao','proc-valor-parcela',
+   'proc-lembrete-data','proc-lembrete-hora','proc-lembrete-msg'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('proc-parcelas').value = '1';
   document.getElementById('proc-abertura').value = today();
   document.getElementById('proc-1a-parcela').value = today();
   document.getElementById('proc-status').value = 'andamento';
+  document.getElementById('proc-datas-container').style.display = 'none';
+  document.getElementById('proc-datas-grid').innerHTML = '';
+  // Reset lembrete
+  setLembreteAtivo(false);
   populateClientesSelect();
   populateTiposProcSelect();
+}
+function setLembreteAtivo(ativo) {
+  const btn = document.getElementById('btn-toggle-lembrete');
+  const knob = document.getElementById('toggle-knob');
+  const fields = document.getElementById('lembrete-fields');
+  btn.dataset.ativo = ativo ? '1' : '0';
+  btn.style.background = ativo ? 'var(--blue-600)' : 'var(--border)';
+  knob.style.left = ativo ? '23px' : '3px';
+  fields.style.display = ativo ? 'block' : 'none';
+}
+function toggleLembrete() {
+  const atual = document.getElementById('btn-toggle-lembrete').dataset.ativo === '1';
+  setLembreteAtivo(!atual);
 }
 function populateClientesSelect() {
   const sel = document.getElementById('proc-cliente');
@@ -1590,7 +2158,35 @@ function preencherValorPorTipo() {
 function calcularParcelas() {
   const valor = parseFloat(document.getElementById('proc-valor').value)||0;
   const n = parseInt(document.getElementById('proc-parcelas').value)||1;
-  document.getElementById('proc-valor-parcela').value = n > 0 ? fmtMoney(valor/n) : '';
+  const dt1 = document.getElementById('proc-1a-parcela').value;
+  const vParc = n > 0 && valor > 0 ? parseFloat((valor/n).toFixed(2)) : 0;
+  document.getElementById('proc-valor-parcela').value = vParc > 0 ? fmtMoney(vParc) : '';
+
+  const container = document.getElementById('proc-datas-container');
+  const grid = document.getElementById('proc-datas-grid');
+  if(n < 1 || n > 60) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+
+  // Preservar datas já editadas manualmente
+  const existing = {};
+  grid.querySelectorAll('input[data-pidx]').forEach(inp => { existing[inp.dataset.pidx] = inp.value; });
+
+  grid.innerHTML = '';
+  for(let i = 0; i < n; i++) {
+    const auto = dt1 ? addMonths(dt1, i) : '';
+    const val = existing[i] !== undefined ? existing[i] : auto;
+    grid.innerHTML += `
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;transition:border 0.15s" onfocusin="this.style.borderColor='var(--blue-400)'" onfocusout="this.style.borderColor='var(--border)'">
+        <div style="font-size:10.5px;font-weight:600;color:var(--blue-600);margin-bottom:4px">
+          ${i+1}ª parcela ${vParc > 0 ? '· ' + fmtMoney(vParc) : ''}
+        </div>
+        <input type="date" class="form-control" style="padding:5px 8px;font-size:12px;border:none;background:transparent;padding-left:0" data-pidx="${i}" value="${val}">
+      </div>`;
+  }
+}
+function procGetDatas() {
+  const inputs = document.getElementById('proc-datas-grid').querySelectorAll('input[data-pidx]');
+  return Array.from(inputs).map(inp => inp.value);
 }
 
 const statusLabels = {
@@ -1628,17 +2224,26 @@ function salvarProcesso() {
     showToast('Processo atualizado!', 'success');
   } else {
     const pId = store.nextId.processo++;
-    store.processos.push({ id: pId, ...procData });
-    // Gerar parcelas
+    const lembreteAtivo = document.getElementById('btn-toggle-lembrete').dataset.ativo === '1';
+    const lembrete = lembreteAtivo ? {
+      ativo: true,
+      data: document.getElementById('proc-lembrete-data').value,
+      hora: document.getElementById('proc-lembrete-hora').value,
+      msg: document.getElementById('proc-lembrete-msg').value.trim()
+    } : { ativo: false };
+    store.processos.push({ id: pId, ...procData, lembrete });
+    // Gerar parcelas com datas customizadas
+    const datasCustom = procGetDatas();
     store.parcelas = store.parcelas.filter(p => p.processoId !== pId);
     for(let i = 0; i < nParcelas; i++) {
+      const dtVenc = datasCustom[i] || addMonths(dt1, i);
       store.parcelas.push({
         id: store.nextId.parcela++,
         processoId: pId,
         clienteId: cId,
         num: i+1,
         total: nParcelas,
-        vencimento: addMonths(dt1, i),
+        vencimento: dtVenc,
         valor: parseFloat((valor / nParcelas).toFixed(2)),
         status: 'pendente',
         dtPagamento: null,
@@ -1671,7 +2276,7 @@ function renderProcessos() {
     const pago = store.parcelas.filter(pa => pa.processoId===p.id && pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
     const pct = p.valor > 0 ? Math.min(100, Math.round(pago/p.valor*100)) : 0;
     return `<tr>
-      <td><strong style="color:var(--blue-600)">${p.numero}</strong></td>
+      <td><strong style="color:var(--blue-600)">${p.numero}</strong>${p.lembrete&&p.lembrete.ativo?` <span title="${(p.lembrete.msg||'Lembrete ativo').replace(/"/g,"'")}" style="cursor:default">🔔</span>`:''}</td>
       <td>${c.nome}</td>
       <td><span class="badge badge-navy">${t.nome}</span></td>
       <td>${p.adv||'—'}</td>
@@ -1938,6 +2543,19 @@ function updateDashboard() {
   if(v7.length) alerts.push(`<div class="alert alert-warning">⏰ <strong>${v7.length} parcela(s) vencem nos próximos 7 dias</strong></div>`);
   if(!alerts.length) al.innerHTML = '<div class="alert alert-success">✅ Tudo em dia! Sem alertas no momento.</div>';
   else al.innerHTML = alerts.join('');
+  // Lembretes ativos
+  const lembretes = store.processos.filter(p => p.lembrete && p.lembrete.ativo && p.lembrete.msg);
+  const lembreteContainer = document.getElementById('alertas-container');
+  if(lembretes.length) {
+    const lembreteHtml = lembretes.map(p => {
+      const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
+      const dtHora = [p.lembrete.data ? fmtDate(p.lembrete.data) : '', p.lembrete.hora || ''].filter(Boolean).join(' às ');
+      return `<div class="alert alert-info" style="margin-bottom:8px">
+        🔔 <div><strong>${p.numero} — ${c.nome}</strong>${dtHora?`<span style="color:var(--text-muted);font-size:11px;margin-left:6px">${dtHora}</span>`:''}<br><span style="font-size:12.5px">${p.lembrete.msg}</span></div>
+      </div>`;
+    }).join('');
+    lembreteContainer.innerHTML = (alerts.join('') || '') + lembreteHtml;
+  }
   // Tabela últimos processos
   const tb = document.getElementById('dash-tbody-processos');
   const last5 = store.processos.slice(-5).reverse();
@@ -2039,8 +2657,93 @@ function exportarCSV() {
   showToast('CSV exportado com sucesso!', 'success');
 }
 
+// ==================== LOGIN ====================
+const LOGIN_KEY = 'lexpro_auth';
+const USERS_KEY = 'lexpro_users';
+
+function getUsers() {
+  const saved = localStorage.getItem(USERS_KEY);
+  if(saved) return JSON.parse(saved);
+  // Usuário padrão
+  const defaults = [{ usuario: 'admin', senha: 'admin123' }];
+  localStorage.setItem(USERS_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+function mostrarPainel(id) {
+  document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('rec-error').style.display = 'none';
+  document.getElementById('rec-success').style.display = 'none';
+}
+
+function toggleSenhaVisivel(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if(inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function fazerLogin() {
+  const usuario = document.getElementById('login-usuario').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const errEl = document.getElementById('login-error');
+  if(!usuario || !senha) { errEl.style.display = 'block'; errEl.textContent = '❌ Preencha usuário e senha.'; return; }
+  const users = getUsers();
+  const found = users.find(u => u.usuario === usuario && u.senha === senha);
+  if(!found) { errEl.style.display = 'block'; errEl.textContent = '❌ Usuário ou senha incorretos.'; return; }
+  localStorage.setItem(LOGIN_KEY, JSON.stringify({ usuario, ts: Date.now() }));
+  const screen = document.getElementById('login-screen');
+  screen.style.transition = 'opacity 0.4s';
+  screen.style.opacity = '0';
+  setTimeout(() => {
+    screen.style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'flex';
+  }, 400);
+}
+
+function recuperarSenha() {
+  const usuario = document.getElementById('rec-usuario').value.trim();
+  const nova = document.getElementById('rec-nova-senha').value;
+  const confirmar = document.getElementById('rec-confirmar-senha').value;
+  const errEl = document.getElementById('rec-error');
+  const sucEl = document.getElementById('rec-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  if(!usuario || !nova || !confirmar) { errEl.textContent = '❌ Preencha todos os campos.'; errEl.style.display = 'block'; return; }
+  if(nova !== confirmar) { errEl.textContent = '❌ As senhas não coincidem.'; errEl.style.display = 'block'; return; }
+  if(nova.length < 6) { errEl.textContent = '❌ A senha deve ter pelo menos 6 caracteres.'; errEl.style.display = 'block'; return; }
+  const users = getUsers();
+  const user = users.find(u => u.usuario === usuario);
+  if(!user) { errEl.textContent = '❌ Usuário não encontrado.'; errEl.style.display = 'block'; return; }
+  user.senha = nova;
+  saveUsers(users);
+  sucEl.textContent = '✅ Senha redefinida com sucesso! Faça login.';
+  sucEl.style.display = 'block';
+  document.getElementById('rec-nova-senha').value = '';
+  document.getElementById('rec-confirmar-senha').value = '';
+  setTimeout(() => mostrarPainel('panel-login'), 2200);
+}
+
+function logout() {
+  localStorage.removeItem(LOGIN_KEY);
+  location.reload();
+}
+
+function checkLogin() {
+  const session = localStorage.getItem(LOGIN_KEY);
+  if(session) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'flex';
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-wrapper').style.display = 'none';
+  }
+}
+
 // ==================== INIT ====================
 function init() {
+  checkLogin();
   const now = new Date();
   document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   updateDashboard();
