@@ -378,6 +378,56 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   .grid-2 { grid-template-columns: 1fr; }
 }
 
+/* NOTIFICAÇÕES */
+.notif-btn {
+  position: relative; width: 38px; height: 38px;
+  border-radius: var(--radius); border: 1.5px solid var(--border);
+  background: white; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 17px; transition: all 0.18s; flex-shrink: 0;
+}
+.notif-btn:hover { background: var(--blue-50); border-color: var(--blue-300); }
+.notif-badge {
+  position: absolute; top: -5px; right: -5px;
+  background: var(--danger); color: white;
+  font-size: 10px; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white; display: none;
+}
+.notif-panel {
+  position: fixed; top: 64px; right: 24px;
+  width: 380px; max-height: 520px;
+  background: white; border-radius: var(--radius-xl);
+  border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+  z-index: 999; display: none; flex-direction: column;
+  animation: notifIn 0.2s ease;
+}
+.notif-panel.open { display: flex; }
+@keyframes notifIn { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.notif-header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.notif-list { overflow-y: auto; flex: 1; }
+.notif-item {
+  padding: 12px 18px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 12px; cursor: pointer; transition: background 0.15s;
+}
+.notif-item:hover { background: var(--surface); }
+.notif-item.unread { background: var(--blue-50); }
+.notif-item.unread:hover { background: #dbeafe; }
+.notif-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.notif-footer {
+  padding: 10px 18px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -617,9 +667,37 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-right">
       <span id="topbar-date" style="font-size:13px;color:var(--text-muted)"></span>
+      <!-- SINO DE NOTIFICAÇÕES -->
+      <div style="position:relative">
+        <button class="notif-btn" onclick="toggleNotifPanel()" id="notif-btn" title="Notificações">
+          🔔
+          <span class="notif-badge" id="notif-badge"></span>
+        </button>
+      </div>
       <button class="btn btn-primary" id="topbar-action-btn" onclick="topbarAction()">
         + Nova Entrada
       </button>
+    </div>
+  </div>
+
+  <!-- PAINEL DE NOTIFICAÇÕES -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-header">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">Notificações</div>
+        <div style="font-size:11.5px;color:var(--text-muted)" id="notif-sub">0 não lidas</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="marcarTodasLidas()" style="font-size:11.5px">Marcar todas lidas</button>
+        <button class="btn btn-ghost btn-icon" onclick="toggleNotifPanel()" style="font-size:14px">✕</button>
+      </div>
+    </div>
+    <div class="notif-list" id="notif-list">
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:32px 0">Sem notificações no momento.</div>
+    </div>
+    <div class="notif-footer">
+      <span style="font-size:12px;color:var(--text-muted)" id="notif-total">0 notificação(ões)</span>
+      <button class="btn btn-danger btn-sm" onclick="limparNotificacoes()" style="font-size:11.5px">🗑 Limpar todas</button>
     </div>
   </div>
 
@@ -676,6 +754,53 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0">Sem alertas no momento.</div>
           </div>
         </div>
+      </div>
+
+      <!-- GRÁFICO RECEITA MENSAL -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header">
+          <span class="card-title">📈 Receita Mensal — Últimos 6 Meses</span>
+          <div style="display:flex;gap:8px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)">
+              <div style="width:10px;height:10px;border-radius:2px;background:var(--blue-600)"></div> Recebido
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)">
+              <div style="width:10px;height:10px;border-radius:2px;background:#E2E8F0"></div> A Receber
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="grafico-receita" style="height:200px;display:flex;align-items:flex-end;gap:6px;padding:0 4px">
+            <div style="color:var(--text-muted);font-size:13px;text-align:center;width:100%;padding:60px 0">Sem dados financeiros ainda.</div>
+          </div>
+          <div id="grafico-receita-labels" style="display:flex;gap:6px;margin-top:6px;padding:0 4px"></div>
+          <div id="grafico-receita-totais" style="display:flex;justify-content:space-around;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"></div>
+        </div>
+      </div>
+
+      <!-- LINHA: Top Clientes + Inadimplência -->
+      <div class="grid-2" style="margin-top:20px">
+
+        <!-- Top Clientes -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🏆 Top Clientes por Valor</span>
+          </div>
+          <div class="card-body" id="top-clientes-container">
+            <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem dados.</div>
+          </div>
+        </div>
+
+        <!-- Inadimplência -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Inadimplência</span>
+          </div>
+          <div class="card-body" id="inadimplencia-container">
+            <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem parcelas vencidas.</div>
+          </div>
+        </div>
+
       </div>
 
       <div style="margin-top:20px">
@@ -1056,25 +1181,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
               <!-- Variáveis disponíveis -->
               <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:10px 12px;margin-bottom:14px">
                 <div style="font-size:11px;font-weight:700;color:var(--blue-700);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Variáveis de Auto Preenchimento — clique para inserir</div>
-                <div style="display:flex;flex-wrap:wrap;gap:5px">
-                  ${[
-                    ['{{NOME}}','Nome do Cliente'],
-                    ['{{CPF}}','CPF/CNPJ'],
-                    ['{{TELEFONE}}','Telefone'],
-                    ['{{EMAIL}}','E-mail'],
-                    ['{{ENDERECO}}','Endereço'],
-                    ['{{CIDADE}}','Cidade/UF'],
-                    ['{{NATUREZA}}','Natureza'],
-                    ['{{BENEFICIO}}','Benefício'],
-                    ['{{RESPONSAVEL}}','Responsável'],
-                    ['{{TIPO_PROCESSO}}','Tipo de Processo'],
-                    ['{{VALOR_TOTAL}}','Valor Total'],
-                    ['{{PARCELAS}}','Nº Parcelas'],
-                    ['{{VALOR_PARCELA}}','Valor Parcela'],
-                    ['{{DATA_HOJE}}','Data de Hoje'],
-                    ['{{ESCRITORIO}}','Nome Escritório'],
-                  ].map(([v,l]) => `<button onclick="inserirVariavel('${v}')" style="padding:3px 8px;border-radius:6px;border:1px solid var(--blue-200);background:white;color:var(--blue-700);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.background='var(--blue-600)';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--blue-700)'" title="${l}">${v}</button>`).join('')}
-                </div>
+                <div id="vars-container" style="display:flex;flex-wrap:wrap;gap:5px"></div>
               </div>
 
               <div class="form-group">
@@ -1167,8 +1274,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
                 <div id="historico-backups" style="font-size:12.5px;color:var(--text-muted)">Nenhum backup exportado ainda.</div>
               </div>
 
-            </div>
-          </div>
+            </div><!-- /card-body backup -->
+          </div><!-- /card backup -->
+        </div><!-- /max-width sistema -->
+      </div><!-- /opt-sistema -->
 
       <!-- USUÁRIOS -->
       <div class="tab-content" id="opt-usuarios">
@@ -1207,7 +1316,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
-    </div>
+    </div><!-- /page-opcoes -->
 
     <!-- ========== AGENDA ========== -->
     <div class="page" id="page-agenda">
@@ -1227,9 +1336,13 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <div class="card-body" style="padding:12px">
             <!-- Cabeçalho dias da semana -->
             <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">
-              ${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d =>
-                `<div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">${d}</div>`
-              ).join('')}
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Dom</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Seg</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Ter</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Qua</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Qui</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Sex</div>
+              <div style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:6px 0">Sáb</div>
             </div>
             <!-- Grade do calendário -->
             <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
@@ -1264,12 +1377,59 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
         </div>
       </div>
-    </div>
+    </div><!-- /page-agenda -->
 
   </div><!-- /content -->
 </div><!-- /main -->
 
 <!-- ===== MODAIS ===== -->
+
+<!-- MODAL DOCUMENTOS -->
+<div class="modal-overlay" id="modal-documentos">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <div>
+        <span class="modal-title" id="doc-modal-title">Documentos do Processo</span>
+        <div id="doc-modal-sub" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
+      </div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-documentos')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="doc-processo-id">
+
+      <!-- Upload área -->
+      <div id="doc-upload-area" style="border:2px dashed var(--blue-200);border-radius:var(--radius-lg);padding:24px;text-align:center;cursor:pointer;transition:all 0.18s;margin-bottom:18px;background:var(--blue-50)"
+        onclick="document.getElementById('doc-file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--blue-600)';this.style.background='#dbeafe'"
+        ondragleave="this.style.borderColor='var(--blue-200)';this.style.background='var(--blue-50)'"
+        ondrop="event.preventDefault();this.style.borderColor='var(--blue-200)';this.style.background='var(--blue-50)';handleDocDrop(event)">
+        <div style="font-size:28px;margin-bottom:8px">📎</div>
+        <div style="font-size:14px;font-weight:600;color:var(--blue-700);margin-bottom:4px">Clique ou arraste arquivos aqui</div>
+        <div style="font-size:12px;color:var(--text-muted)">PDF, Word, Excel, imagens — qualquer formato</div>
+        <input type="file" id="doc-file-input" multiple style="display:none" onchange="handleDocFiles(this.files)">
+      </div>
+
+      <!-- Filtro de categoria -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="doc-filtros">
+        <button class="btn btn-primary btn-sm" onclick="filtrarDocs('')" id="doc-filtro-todos">Todos</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocs('peticao')" id="doc-filtro-peticao">⚖️ Petições</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocs('decisao')" id="doc-filtro-decisao">📜 Decisões</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocs('comprovante')" id="doc-filtro-comprovante">🧾 Comprovantes</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocs('contrato')" id="doc-filtro-contrato">📋 Contratos</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocs('outro')" id="doc-filtro-outro">📁 Outros</button>
+      </div>
+
+      <!-- Lista de documentos -->
+      <div id="doc-lista">
+        <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px 0">Nenhum documento anexado a este processo.</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <span id="doc-contador" style="font-size:12.5px;color:var(--text-muted)">0 documento(s)</span>
+      <button class="btn btn-outline" onclick="closeModal('modal-documentos')">Fechar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL EVENTO AGENDA -->
 <div class="modal-overlay" id="modal-evento">
@@ -1320,10 +1480,15 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Prioridade</label>
         <div style="display:flex;gap:8px">
-          ${[['normal','🟢 Normal','#0B7B45','#E2F5EC'],['atencao','🟡 Atenção','#92400E','#FEF3C7'],['urgente','🔴 Urgente','#B91C1C','#FEE2E2']].map(([v,l,c,bg]) =>
-            `<label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:var(--radius);border:1.5px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;transition:all 0.15s" id="prio-label-${v}">
-              <input type="radio" name="evento-prioridade" value="${v}" style="display:none" onchange="selecionarPrioridade('${v}','${c}','${bg}')"> ${l}
-            </label>`).join('')}
+          <label id="prio-label-normal" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:var(--radius);border:1.5px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;transition:all 0.15s">
+            <input type="radio" name="evento-prioridade" value="normal" style="display:none" onchange="selecionarPrioridade('normal','#0B7B45','#E2F5EC')"> 🟢 Normal
+          </label>
+          <label id="prio-label-atencao" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:var(--radius);border:1.5px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;transition:all 0.15s">
+            <input type="radio" name="evento-prioridade" value="atencao" style="display:none" onchange="selecionarPrioridade('atencao','#92400E','#FEF3C7')"> 🟡 Atenção
+          </label>
+          <label id="prio-label-urgente" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:var(--radius);border:1.5px solid var(--border);cursor:pointer;font-size:12.5px;font-weight:500;transition:all 0.15s">
+            <input type="radio" name="evento-prioridade" value="urgente" style="display:none" onchange="selecionarPrioridade('urgente','#B91C1C','#FEE2E2')"> 🔴 Urgente
+          </label>
         </div>
       </div>
     </div>
@@ -1838,8 +2003,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 // ==================== DATA STORE ====================
 let store = {
   tipos: [], clientes: [], processos: [], parcelas: [],
-  andamentos: {}, modelos: [], eventos: [],
-  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1 }
+  andamentos: {}, modelos: [], eventos: [], documentos: {},
+  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1 }
 };
 
 // Carregar do localStorage
@@ -1956,7 +2121,161 @@ function refreshPage(page) {
   else if(page === 'opcoes') renderOpcoes();
 }
 
-// ==================== AGENDA ====================
+// ==================== DOCUMENTOS ====================
+let docFiltroAtual = '';
+
+const DOC_TIPOS = {
+  peticao:    { label: 'Petição',     icon: '⚖️', cor: '#185FA5', bg: '#E6F1FB' },
+  decisao:    { label: 'Decisão',     icon: '📜', cor: '#7C3AED', bg: '#EDE9FE' },
+  comprovante:{ label: 'Comprovante', icon: '🧾', cor: '#0B7B45', bg: '#E2F5EC' },
+  contrato:   { label: 'Contrato',    icon: '📋', cor: '#92400E', bg: '#FEF3C7' },
+  outro:      { label: 'Outro',       icon: '📁', cor: '#475569', bg: '#F1F5F9' }
+};
+
+const ICONE_EXT = {
+  pdf: '📄', doc: '📝', docx: '📝', xls: '📊', xlsx: '📊',
+  jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️',
+  zip: '🗜️', rar: '🗜️', mp4: '🎥', mp3: '🎵', txt: '📃'
+};
+
+function getDocExt(nome) {
+  return (nome.split('.').pop()||'').toLowerCase();
+}
+function getDocIcone(nome) {
+  return ICONE_EXT[getDocExt(nome)] || '📎';
+}
+function formatBytes(bytes) {
+  if(!bytes) return '';
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function getDocs(processoId) {
+  if(!store.documentos) store.documentos = {};
+  if(!store.documentos[processoId]) store.documentos[processoId] = [];
+  return store.documentos[processoId];
+}
+
+function abrirDocumentos(processoId) {
+  const p = store.processos.find(p => p.id === processoId);
+  const c = store.clientes.find(c => c.id === p?.clienteId)||{nome:'—'};
+  document.getElementById('doc-processo-id').value = processoId;
+  document.getElementById('doc-modal-title').textContent = '📁 Documentos — ' + (p?.numero||'');
+  document.getElementById('doc-modal-sub').textContent = c.nome;
+  docFiltroAtual = '';
+  renderDocLista(processoId);
+  openModal('modal-documentos', false);
+}
+
+function handleDocFiles(files) {
+  const processoId = parseInt(document.getElementById('doc-processo-id').value);
+  if(!files || !files.length) return;
+  if(!store.documentos) store.documentos = {};
+  if(!store.documentos[processoId]) store.documentos[processoId] = [];
+  if(!store.nextId.doc) store.nextId.doc = 1;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      store.documentos[processoId].push({
+        id: store.nextId.doc++,
+        nome: file.name,
+        tamanho: file.size,
+        tipo: 'outro',
+        data: today(),
+        dataStr: new Date().toLocaleString('pt-BR'),
+        base64: e.target.result,
+        obs: ''
+      });
+      saveData();
+      renderDocLista(processoId);
+      showToast(file.name + ' adicionado!', 'success');
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('doc-file-input').value = '';
+}
+
+function handleDocDrop(event) {
+  handleDocFiles(event.dataTransfer.files);
+}
+
+function filtrarDocs(tipo) {
+  docFiltroAtual = tipo;
+  const processoId = parseInt(document.getElementById('doc-processo-id').value);
+  // Atualizar botões
+  document.querySelectorAll('[id^="doc-filtro-"]').forEach(b => {
+    b.className = 'btn btn-outline btn-sm';
+  });
+  const btnId = tipo ? 'doc-filtro-' + tipo : 'doc-filtro-todos';
+  const btn = document.getElementById(btnId);
+  if(btn) btn.className = 'btn btn-primary btn-sm';
+  renderDocLista(processoId);
+}
+
+function renderDocLista(processoId) {
+  let docs = getDocs(processoId);
+  if(docFiltroAtual) docs = docs.filter(d => d.tipo === docFiltroAtual);
+  docs = docs.slice().sort((a,b) => b.id - a.id);
+
+  const total = getDocs(processoId).length;
+  document.getElementById('doc-contador').textContent = total + ' documento(s)';
+
+  const el = document.getElementById('doc-lista');
+  if(!docs.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px 0">' +
+      (docFiltroAtual ? 'Nenhum documento nesta categoria.' : 'Nenhum documento anexado a este processo.') +
+      '</div>';
+    return;
+  }
+
+  el.innerHTML = docs.map(doc => {
+    const t = DOC_TIPOS[doc.tipo] || DOC_TIPOS.outro;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius);border:1px solid var(--border);background:white;margin-bottom:7px">
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${getDocIcone(doc.nome)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${doc.nome}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">
+          <span style="padding:1px 8px;border-radius:10px;font-size:10.5px;font-weight:600;background:${t.bg};color:${t.cor}">${t.icon} ${t.label}</span>
+          <span style="font-size:11px;color:var(--text-muted)">${doc.dataStr||fmtDate(doc.data)}</span>
+          ${doc.tamanho ? `<span style="font-size:11px;color:var(--text-muted)">${formatBytes(doc.tamanho)}</span>` : ''}
+        </div>
+        ${doc.obs ? `<div style="font-size:11.5px;color:var(--text-secondary);margin-top:3px">${doc.obs}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        <select onchange="mudarTipoDoc(${processoId},${doc.id},this.value)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:white;color:var(--text-secondary);cursor:pointer">
+          ${Object.entries(DOC_TIPOS).map(([k,v]) => `<option value="${k}" ${doc.tipo===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}
+        </select>
+        <div style="display:flex;gap:4px">
+          ${doc.base64 ? `<button class="btn btn-outline btn-sm" onclick="baixarDoc(${processoId},${doc.id})" title="Baixar">⬇️</button>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="excluirDoc(${processoId},${doc.id})" title="Excluir">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mudarTipoDoc(processoId, docId, tipo) {
+  const doc = getDocs(processoId).find(d => d.id === docId);
+  if(doc) { doc.tipo = tipo; saveData(); renderDocLista(processoId); }
+}
+
+function baixarDoc(processoId, docId) {
+  const doc = getDocs(processoId).find(d => d.id === docId);
+  if(!doc || !doc.base64) return;
+  const a = document.createElement('a');
+  a.href = doc.base64;
+  a.download = doc.nome;
+  a.click();
+}
+
+function excluirDoc(processoId, docId) {
+  if(!confirm('Excluir este documento?')) return;
+  store.documentos[processoId] = store.documentos[processoId].filter(d => d.id !== docId);
+  saveData(); renderDocLista(processoId);
+  showToast('Documento excluído.');
+}
 let calAno = new Date().getFullYear();
 let calMes = new Date().getMonth();
 let calDiaSel = null;
@@ -1989,50 +2308,87 @@ function renderAgenda() {
 
 function renderCalendario() {
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('cal-titulo').textContent = `${meses[calMes]} ${calAno}`;
+  document.getElementById('cal-titulo').textContent = meses[calMes] + ' ' + calAno;
 
   const grid = document.getElementById('cal-grid');
+  if(!grid) return;
+
   const hoje = new Date();
-  const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+  const hojeStr = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
   const primeiroDia = new Date(calAno, calMes, 1).getDay();
   const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
   const eventos = getEventos();
 
-  let html = '';
-  // Células vazias antes do dia 1
+  grid.innerHTML = '';
+
+  // Células vazias
   for(let i = 0; i < primeiroDia; i++) {
-    html += `<div style="min-height:72px;border-radius:var(--radius);background:transparent"></div>`;
+    const vazio = document.createElement('div');
+    vazio.style.minHeight = '72px';
+    grid.appendChild(vazio);
   }
+
+  // Dias do mês
   for(let d = 1; d <= diasNoMes; d++) {
-    const dateStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dateStr = calAno + '-' + String(calMes+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     const evsDia = eventos.filter(e => e.data === dateStr);
     const isHoje = dateStr === hojeStr;
-    const isSel = dateStr === calDiaSel;
+    const isSel  = dateStr === calDiaSel;
+
+    const cell = document.createElement('div');
+    cell.style.cssText = 'min-height:72px;border-radius:10px;padding:6px;cursor:pointer;transition:all 0.15s;position:relative;border:2px solid ' +
+      (isSel ? 'var(--blue-400)' : isHoje ? 'var(--blue-200)' : 'var(--border)') + ';background:' +
+      (isSel ? 'var(--blue-50)' : isHoje ? '#F0F7FF' : 'white');
+
+    cell.onmouseover = function() { this.style.borderColor = 'var(--blue-300)'; this.style.background = 'var(--blue-50)'; };
+    cell.onmouseout  = function() {
+      this.style.borderColor = isSel ? 'var(--blue-400)' : isHoje ? 'var(--blue-200)' : 'var(--border)';
+      this.style.background  = isSel ? 'var(--blue-50)'  : isHoje ? '#F0F7FF'         : 'white';
+    };
+    cell.onclick = function() { selecionarDia(dateStr); };
+
+    // Número do dia
+    const numDiv = document.createElement('div');
+    numDiv.style.cssText = 'font-size:13px;font-weight:' + (isHoje?'700':'500') + ';color:' +
+      (isHoje ? 'var(--blue-600)' : isSel ? 'var(--blue-700)' : 'var(--text-primary)') +
+      ';margin-bottom:3px;display:flex;align-items:center;justify-content:space-between';
+    numDiv.textContent = d;
+    if(isHoje) {
+      const dot = document.createElement('span');
+      dot.style.cssText = 'width:6px;height:6px;border-radius:50%;background:var(--blue-600);display:inline-block';
+      numDiv.appendChild(dot);
+    }
+    cell.appendChild(numDiv);
+
+    // Eventos do dia
+    const evDiv = document.createElement('div');
+    evDiv.style.cssText = 'display:flex;flex-direction:column;gap:2px';
+    evsDia.slice(0,2).forEach(e => {
+      const t = TIPO_EVENTO[e.tipo] || TIPO_EVENTO.outro;
+      const tag = document.createElement('div');
+      tag.style.cssText = 'font-size:10px;padding:2px 5px;border-radius:4px;background:' + t.bg + ';color:' + t.cor + ';font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      tag.textContent = t.icon + ' ' + e.titulo;
+      evDiv.appendChild(tag);
+    });
+    if(evsDia.length > 2) {
+      const mais = document.createElement('div');
+      mais.style.cssText = 'font-size:10px;color:var(--text-muted);padding-left:2px';
+      mais.textContent = '+' + (evsDia.length-2) + ' mais';
+      evDiv.appendChild(mais);
+    }
+    cell.appendChild(evDiv);
+
+    // Indicador de urgência
     const temUrgente = evsDia.some(e => e.prioridade === 'urgente');
     const temAtencao = evsDia.some(e => e.prioridade === 'atencao');
+    if(temUrgente || temAtencao) {
+      const dot = document.createElement('div');
+      dot.style.cssText = 'position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:' + (temUrgente ? '#B91C1C' : '#F59E0B');
+      cell.appendChild(dot);
+    }
 
-    html += `<div onclick="selecionarDia('${dateStr}')" style="
-      min-height:72px;border-radius:var(--radius);padding:6px;cursor:pointer;
-      border:2px solid ${isSel ? 'var(--blue-400)' : isHoje ? 'var(--blue-200)' : 'var(--border)'};
-      background:${isSel ? 'var(--blue-50)' : isHoje ? '#F0F7FF' : 'white'};
-      transition:all 0.15s;position:relative
-    " onmouseover="this.style.borderColor='var(--blue-300)';this.style.background='var(--blue-50)'"
-       onmouseout="this.style.borderColor='${isSel?'var(--blue-400)':isHoje?'var(--blue-200)':'var(--border)'}';this.style.background='${isSel?'var(--blue-50)':isHoje?'#F0F7FF':'white'}'">
-      <div style="font-size:13px;font-weight:${isHoje?'700':'500'};color:${isHoje?'var(--blue-600)':isSel?'var(--blue-700)':'var(--text-primary)'};margin-bottom:3px;display:flex;align-items:center;justify-content:space-between">
-        ${d}
-        ${isHoje ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--blue-600);display:inline-block"></span>' : ''}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:2px">
-        ${evsDia.slice(0,2).map(e => {
-          const t = TIPO_EVENTO[e.tipo]||TIPO_EVENTO.outro;
-          return `<div style="font-size:10px;padding:2px 5px;border-radius:4px;background:${t.bg};color:${t.cor};font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.icon} ${e.titulo}</div>`;
-        }).join('')}
-        ${evsDia.length > 2 ? `<div style="font-size:10px;color:var(--text-muted);padding-left:2px">+${evsDia.length-2} mais</div>` : ''}
-      </div>
-      ${temUrgente ? '<div style="position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:#B91C1C"></div>' : temAtencao ? '<div style="position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:#F59E0B"></div>' : ''}
-    </div>`;
+    grid.appendChild(cell);
   }
-  grid.innerHTML = html;
 }
 
 function selecionarDia(dateStr) {
@@ -2204,6 +2560,107 @@ function populateProcessosSelect() {
   });
   sel.value = cur;
 }
+
+// ==================== NOTIFICAÇÕES ====================
+const NOTIF_KEY = 'lexpro_notifs';
+const NOTIF_TIPOS = {
+  parcela_vencida: { icon: '⚠️', cor: '#B91C1C', bg: '#FEE2E2' },
+  vence_hoje:      { icon: '🔔', cor: '#92400E', bg: '#FEF3C7' },
+  vence_amanha:    { icon: '⏰', cor: '#92400E', bg: '#FEF3C7' },
+  vence_semana:    { icon: '📅', cor: '#185FA5', bg: '#E6F1FB' },
+  lembrete:        { icon: '📌', cor: '#7C3AED', bg: '#EDE9FE' },
+  pagamento:       { icon: '✅', cor: '#0B7B45', bg: '#E2F5EC' },
+};
+function getNotifs() { try { return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]'); } catch(e) { return []; } }
+function saveNotifs(n) { localStorage.setItem(NOTIF_KEY, JSON.stringify(n.slice(0,50))); }
+function addNotif(tipo, titulo, desc, link) {
+  const notifs = getNotifs(); const hoje = today();
+  if(notifs.find(n => n.tipo===tipo && n.titulo===titulo && n.data===hoje)) return;
+  notifs.unshift({ id: Date.now(), tipo, titulo, desc: desc||'', link: link||'', data: hoje, hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), lida: false });
+  saveNotifs(notifs);
+}
+function gerarNotificacoesAutomaticas() {
+  const hoje = today();
+  const am = new Date(); am.setDate(am.getDate()+1); const amStr = am.toISOString().split('T')[0];
+  const d7 = new Date(); d7.setDate(d7.getDate()+7); const d7s = d7.toISOString().split('T')[0];
+  store.parcelas.filter(p => p.status!=='pago' && isVencido(p.vencimento)).forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'?'};
+    addNotif('parcela_vencida','Parcela vencida — '+c.nome,'Processo '+pr.numero+' · '+p.num+'/'+p.total+' · '+fmtMoney(p.valor)+' · Venceu '+fmtDate(p.vencimento),'financeiro');
+  });
+  store.parcelas.filter(p => p.status!=='pago' && p.vencimento===hoje).forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'?'};
+    addNotif('vence_hoje','Vence hoje — '+c.nome,'Processo '+pr.numero+' · '+p.num+'/'+p.total+' · '+fmtMoney(p.valor),'financeiro');
+  });
+  store.parcelas.filter(p => p.status!=='pago' && p.vencimento===amStr).forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'?'};
+    addNotif('vence_amanha','Vence amanhã — '+c.nome,'Processo '+pr.numero+' · '+p.num+'/'+p.total+' · '+fmtMoney(p.valor),'financeiro');
+  });
+  store.parcelas.filter(p => p.status!=='pago' && p.vencimento>amStr && p.vencimento<=d7s).forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'?'};
+    addNotif('vence_semana','Vence em breve — '+c.nome,'Processo '+pr.numero+' · Vence '+fmtDate(p.vencimento)+' · '+fmtMoney(p.valor),'financeiro');
+  });
+  store.processos.filter(p=>p.lembrete&&p.lembrete.ativo&&p.lembrete.data===hoje).forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+    addNotif('lembrete','Lembrete — '+p.numero,c.nome+' · '+(p.lembrete.msg||''),'processos');
+  });
+  (store.eventos||[]).filter(e=>e.data===hoje).forEach(e => {
+    const ti = (typeof TIPO_EVENTO!=='undefined'&&TIPO_EVENTO[e.tipo])||{icon:'📅'};
+    addNotif('lembrete',ti.icon+' Hoje: '+e.titulo,e.hora?'às '+e.hora+(e.obs?' · '+e.obs:''):(e.obs||''),'agenda');
+  });
+  atualizarBadgeNotif(); renderNotifList();
+}
+function atualizarBadgeNotif() {
+  const notifs = getNotifs();
+  const nao = notifs.filter(n=>!n.lida).length;
+  const badge = document.getElementById('notif-badge');
+  if(badge) { badge.textContent = nao>9?'9+':nao; badge.style.display = nao>0?'flex':'none'; }
+  const sub = document.getElementById('notif-sub'); if(sub) sub.textContent = nao+' não lida(s)';
+  const tot = document.getElementById('notif-total'); if(tot) tot.textContent = notifs.length+' notificação(ões)';
+}
+function renderNotifList() {
+  const notifs = getNotifs(); const el = document.getElementById('notif-list'); if(!el) return;
+  if(!notifs.length) { el.innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:32px 0">✅ Sem notificações.</div>'; return; }
+  el.innerHTML = notifs.map(n => {
+    const t = NOTIF_TIPOS[n.tipo]||NOTIF_TIPOS.lembrete;
+    return '<div class="notif-item '+(n.lida?'':'unread')+'" onclick="clicarNotif('+n.id+')">' +
+      '<div class="notif-icon" style="background:'+t.bg+';color:'+t.cor+'">'+t.icon+'</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:'+(n.lida?400:600)+';color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n.titulo+'</div>' +
+        '<div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n.desc+'</div>' +
+        '<div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">'+fmtDate(n.data)+' às '+n.hora+'</div>' +
+      '</div>' +
+      (!n.lida?'<div style="width:8px;height:8px;border-radius:50%;background:var(--blue-600);flex-shrink:0;margin-top:4px"></div>':'')+
+    '</div>';
+  }).join('');
+}
+function clicarNotif(id) {
+  const notifs=getNotifs(); const n=notifs.find(n=>n.id===id);
+  if(n){n.lida=true;saveNotifs(notifs);atualizarBadgeNotif();renderNotifList();}
+  if(n&&n.link){toggleNotifPanel();const btn=document.querySelector('.nav-item[onclick*="\''+n.link+'\'"]');navigate(n.link,btn);}
+}
+function marcarTodasLidas(){const n=getNotifs().map(n=>({...n,lida:true}));saveNotifs(n);atualizarBadgeNotif();renderNotifList();showToast('Todas marcadas como lidas!','success');}
+function limparNotificacoes(){if(!confirm('Limpar todas as notificações?'))return;saveNotifs([]);atualizarBadgeNotif();renderNotifList();showToast('Notificações limpas.');}
+function toggleNotifPanel(){
+  const panel=document.getElementById('notif-panel'); if(!panel)return;
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){renderNotifList();atualizarBadgeNotif();}
+}
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notif-panel');const btn=document.getElementById('notif-btn');
+  if(panel&&panel.classList.contains('open')&&btn&&!panel.contains(e.target)&&!btn.contains(e.target))panel.classList.remove('open');
+});
+function notifPagamentoConfirmado(pid){
+  const p=store.parcelas.find(p=>p.id===pid); if(!p)return;
+  const c=store.clientes.find(c=>c.id===p.clienteId)||{nome:'?'};
+  const pr=store.processos.find(pr=>pr.id===p.processoId)||{numero:'?'};
+  addNotif('pagamento','Pagamento confirmado — '+c.nome,'Processo '+pr.numero+' · '+p.num+'/'+p.total+' · '+fmtMoney(p.valor),'financeiro');
+  atualizarBadgeNotif();
+}
+
 const BACKUP_KEY = 'lexpro_backups_hist';
 
 function getHistoricoBackups() {
@@ -2462,12 +2919,32 @@ function renderOpcoes() {
   if(tabUsuarios) tabUsuarios.style.display = pode('gerenciarUsuarios') ? '' : 'none';
 }
 
+function renderVarsContainer() {
+  const el = document.getElementById('vars-container');
+  if(!el) return;
+  const vars = [
+    ['{{NOME}}','Nome do Cliente'],['{{CPF}}','CPF/CNPJ'],['{{TELEFONE}}','Telefone'],
+    ['{{EMAIL}}','E-mail'],['{{ENDERECO}}','Endereço'],['{{CIDADE}}','Cidade/UF'],
+    ['{{NATUREZA}}','Natureza'],['{{BENEFICIO}}','Benefício'],['{{RESPONSAVEL}}','Responsável'],
+    ['{{TIPO_PROCESSO}}','Tipo de Processo'],['{{VALOR_TOTAL}}','Valor Total'],
+    ['{{PARCELAS}}','Nº Parcelas'],['{{VALOR_PARCELA}}','Valor Parcela'],
+    ['{{DATA_HOJE}}','Data de Hoje'],['{{ESCRITORIO}}','Nome Escritório']
+  ];
+  el.innerHTML = vars.map(([v,l]) =>
+    `<button onclick="inserirVariavel('${v}')" title="${l}"
+      style="padding:3px 8px;border-radius:6px;border:1px solid var(--blue-200);background:white;color:var(--blue-700);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s"
+      onmouseover="this.style.background='var(--blue-600)';this.style.color='white'"
+      onmouseout="this.style.background='white';this.style.color='var(--blue-700)'">${v}</button>`
+  ).join('');
+}
+
 function novoModelo() {
   document.getElementById('modelo-edit-id').value = '';
   document.getElementById('editor-modelo-title').textContent = 'Novo Modelo';
   document.getElementById('modelo-nome').value = '';
   document.getElementById('modelo-texto').value = '';
   populateTiposSelect('modelo-tipo');
+  renderVarsContainer();
   document.getElementById('card-editor-modelo').style.display = 'block';
 }
 function fecharEditorModelo() {
@@ -2509,6 +2986,7 @@ function editarModelo(id) {
   document.getElementById('modelo-texto').value = m.texto;
   populateTiposSelect('modelo-tipo');
   document.getElementById('modelo-tipo').value = m.tipoId||'';
+  renderVarsContainer();
   document.getElementById('card-editor-modelo').style.display = 'block';
 }
 function excluirModelo(id) {
@@ -3372,6 +3850,7 @@ function renderProcessos() {
     const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
     const pago = store.parcelas.filter(pa => pa.processoId===p.id && pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
     const pct = p.valor > 0 ? Math.min(100, Math.round(pago/p.valor*100)) : 0;
+    const numDocs = ((store.documentos||{})[p.id]||[]).length;
     return `<tr>
       <td><strong style="color:var(--blue-600)">${p.numero}</strong>${p.lembrete&&p.lembrete.ativo?` <span title="${(p.lembrete.msg||'Lembrete ativo').replace(/"/g,"'")}" style="cursor:default">🔔</span>`:''}</td>
       <td>${c.nome}</td>
@@ -3387,6 +3866,7 @@ function renderProcessos() {
       <td style="white-space:nowrap">
         <button class="btn btn-outline btn-sm" onclick="verDetalhe(${p.id})" title="Detalhes">🔍</button>
         <button class="btn btn-outline btn-sm" onclick="atualizarAndamento(${p.id})" title="Andamento">📝</button>
+        <button class="btn btn-outline btn-sm" onclick="abrirDocumentos(${p.id})" title="Documentos" style="background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200)">📁 ${numDocs > 0 ? numDocs : ''}</button>
         <button class="btn btn-danger btn-sm" onclick="excluirProcesso(${p.id})" title="Excluir">🗑</button>
       </td>
     </tr>`;
@@ -3574,6 +4054,7 @@ function confirmarPagamento() {
   if(!id) { showToast('Selecione uma parcela.', 'error'); return; }
   const p = store.parcelas.find(p => p.id === id);
   p.status = 'pago'; p.dtPagamento = dt; p.obs = obs;
+  notifPagamentoConfirmado(p.id);
   saveData(); updateParcelasSelect(); renderFinVisao();
   showToast('Pagamento confirmado!', 'success');
 }
@@ -3663,9 +4144,150 @@ function updateDashboard() {
     const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
     return `<tr><td><strong style="color:var(--blue-600)">${p.numero}</strong></td><td>${c.nome}</td><td>${t.nome}</td><td><span class="badge ${st.cls}">${st.label}</span></td><td>${fmtMoney(p.valor)}</td></tr>`;
   }).join('');
+
+  renderGraficoReceita();
+  renderTopClientes();
+  renderInadimplencia();
 }
 
-// ==================== RELATÓRIOS ====================
+// ==================== GRÁFICOS DASHBOARD ====================
+function renderGraficoReceita() {
+  const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hoje = new Date();
+  const meses = [];
+  for(let i = 5; i >= 0; i--) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+    meses.push({ ano: d.getFullYear(), mes: d.getMonth(), label: mesesNomes[d.getMonth()] + '/' + String(d.getFullYear()).slice(2) });
+  }
+
+  const dados = meses.map(m => {
+    const prefix = m.ano + '-' + String(m.mes+1).padStart(2,'0');
+    const recebido = store.parcelas
+      .filter(p => p.status === 'pago' && (p.dtPagamento||'').startsWith(prefix))
+      .reduce((s,p) => s+p.valor, 0);
+    const aReceber = store.parcelas
+      .filter(p => p.status !== 'pago' && (p.vencimento||'').startsWith(prefix))
+      .reduce((s,p) => s+p.valor, 0);
+    return { ...m, recebido, aReceber };
+  });
+
+  const maxVal = Math.max(...dados.map(d => d.recebido + d.aReceber), 1);
+  const grafico = document.getElementById('grafico-receita');
+  const labels = document.getElementById('grafico-receita-labels');
+  const totais = document.getElementById('grafico-receita-totais');
+
+  if(!grafico) return;
+
+  // Verificar se há dados
+  const temDados = dados.some(d => d.recebido > 0 || d.aReceber > 0);
+  if(!temDados) {
+    grafico.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;width:100%;padding:60px 0">Sem dados financeiros ainda.</div>';
+    if(labels) labels.innerHTML = '';
+    if(totais) totais.innerHTML = '';
+    return;
+  }
+
+  // Montar barras
+  grafico.style.display = 'flex';
+  grafico.innerHTML = dados.map(d => {
+    const hRec = maxVal > 0 ? Math.max(Math.round((d.recebido / maxVal) * 170), d.recebido > 0 ? 4 : 0) : 0;
+    const hAR  = maxVal > 0 ? Math.max(Math.round((d.aReceber / maxVal) * 170), d.aReceber > 0 ? 4 : 0) : 0;
+    const isMesAtual = d.ano === hoje.getFullYear() && d.mes === hoje.getMonth();
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+      <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:180px;gap:2px">
+        ${d.aReceber > 0 ? `<div title="A Receber: ${fmtMoney(d.aReceber)}" style="width:70%;background:#E2E8F0;border-radius:4px 4px 0 0;height:${hAR}px;transition:height 0.4s;cursor:default"></div>` : ''}
+        ${d.recebido > 0 ? `<div title="Recebido: ${fmtMoney(d.recebido)}" style="width:70%;background:${isMesAtual?'var(--blue-400)':'var(--blue-600)'};border-radius:${d.aReceber>0?'0':'4px 4px'} 0 0;height:${hRec}px;transition:height 0.4s;cursor:default"></div>` : ''}
+        ${d.recebido === 0 && d.aReceber === 0 ? `<div style="width:70%;background:var(--border);border-radius:4px 4px 0 0;height:4px"></div>` : ''}
+      </div>
+      <div style="font-size:10px;color:${isMesAtual?'var(--blue-600)':'var(--text-muted)'};font-weight:${isMesAtual?'700':'400'};text-align:center">${d.label}</div>
+    </div>`;
+  }).join('');
+
+  if(labels) labels.innerHTML = '';
+
+  // Totais resumo
+  const totalRec = dados.reduce((s,d) => s+d.recebido, 0);
+  const totalAR  = dados.reduce((s,d) => s+d.aReceber, 0);
+  const mesAtual = dados[dados.length-1];
+  if(totais) totais.innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Recebido (6 meses)</div>
+      <div style="font-size:16px;font-weight:700;color:var(--blue-600)">${fmtMoney(totalRec)}</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Mês Atual</div>
+      <div style="font-size:16px;font-weight:700;color:var(--success)">${fmtMoney(mesAtual.recebido)}</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">A Receber (pendente)</div>
+      <div style="font-size:16px;font-weight:700;color:var(--warning)">${fmtMoney(totalAR)}</div>
+    </div>`;
+}
+
+function renderTopClientes() {
+  const el = document.getElementById('top-clientes-container');
+  if(!el) return;
+  if(!store.clientes.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem dados.</div>'; return; }
+
+  const ranking = store.clientes.map(c => {
+    const procs = store.processos.filter(p => p.clienteId === c.id);
+    const pago = store.parcelas.filter(p => p.clienteId === c.id && p.status === 'pago').reduce((s,p) => s+p.valor, 0);
+    const total = procs.reduce((s,p) => s+p.valor, 0);
+    return { nome: c.nome, total, pago, procs: procs.length };
+  }).filter(c => c.total > 0).sort((a,b) => b.total - a.total).slice(0, 5);
+
+  if(!ranking.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem dados ainda.</div>'; return; }
+
+  const maxTotal = ranking[0].total;
+  el.innerHTML = ranking.map((c,i) => {
+    const pct = Math.round((c.total / maxTotal) * 100);
+    const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px">
+          <span>${medals[i]}</span> ${c.nome}
+          <span style="font-size:11px;color:var(--text-muted)">${c.procs} processo(s)</span>
+        </div>
+        <span style="font-size:12.5px;font-weight:700;color:var(--blue-600)">${fmtMoney(c.total)}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div style="font-size:11px;color:var(--success);margin-top:2px">Pago: ${fmtMoney(c.pago)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderInadimplencia() {
+  const el = document.getElementById('inadimplencia-container');
+  if(!el) return;
+  const vencidas = store.parcelas.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
+  if(!vencidas.length) { el.innerHTML = '<div class="alert alert-success">✅ Sem inadimplência no momento.</div>'; return; }
+
+  // Agrupar por cliente
+  const porCliente = {};
+  vencidas.forEach(p => {
+    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—', id:0};
+    if(!porCliente[c.id]) porCliente[c.id] = { nome: c.nome, total: 0, qtd: 0 };
+    porCliente[c.id].total += p.valor;
+    porCliente[c.id].qtd++;
+  });
+
+  const totalGeral = vencidas.reduce((s,p) => s+p.valor, 0);
+  const lista = Object.values(porCliente).sort((a,b) => b.total - a.total).slice(0,5);
+
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--danger-bg);border-radius:var(--radius);margin-bottom:12px">
+    <span style="font-size:13px;font-weight:600;color:var(--danger)">Total Vencido</span>
+    <span style="font-size:15px;font-weight:700;color:var(--danger)">${fmtMoney(totalGeral)}</span>
+  </div>` + lista.map(c => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <div>
+        <div style="font-weight:500">${c.nome}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${c.qtd} parcela(s) em atraso</div>
+      </div>
+      <span style="font-weight:700;color:var(--danger)">${fmtMoney(c.total)}</span>
+    </div>`).join('');
+}
 function gerarRelatorio() {
   const de = document.getElementById('rel-de').value;
   const ate = document.getElementById('rel-ate').value;
@@ -3762,17 +4384,17 @@ const USERS_KEY = 'lexpro_users';
 const PERFIS = {
   admin: {
     label: 'Administrador', cor: '#185FA5', bg: '#E6F1FB',
-    paginas: ['dashboard','tipos','clientes','processos','financeiro','relatorios','opcoes'],
+    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios','opcoes'],
     pode: { editarClientes:true, excluirClientes:true, verFinanceiro:true, gerenciarUsuarios:true, verOpcoes:true, exportarRelatorio:true }
   },
   advogado: {
     label: 'Advogado', cor: '#0B7B45', bg: '#E2F5EC',
-    paginas: ['dashboard','tipos','clientes','processos','financeiro','relatorios'],
+    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios'],
     pode: { editarClientes:true, excluirClientes:false, verFinanceiro:true, gerenciarUsuarios:false, verOpcoes:false, exportarRelatorio:true }
   },
   secretaria: {
     label: 'Secretária', cor: '#92400E', bg: '#FEF3C7',
-    paginas: ['dashboard','clientes','processos'],
+    paginas: ['dashboard','clientes','processos','agenda'],
     pode: { editarClientes:true, excluirClientes:false, verFinanceiro:false, gerenciarUsuarios:false, verOpcoes:false, exportarRelatorio:false }
   }
 };
@@ -3935,8 +4557,11 @@ function init() {
   document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   if(!store.eventos) store.eventos = [];
   if(!store.nextId.evento) store.nextId.evento = 1;
+  if(!store.documentos) store.documentos = {};
+  if(!store.nextId.doc) store.nextId.doc = 1;
   updateDashboard();
   atualizarBadgeAgenda();
+  gerarNotificacoesAutomaticas();
 }
 init();
 </script>
