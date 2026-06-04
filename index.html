@@ -2201,20 +2201,28 @@ const SB_TABLE = 'erp_data';
 
 // Inicializar cliente Supabase via CDN
 let _sb = null;
-function getSB() {
-  if(!_sb && window.supabase) {
-    _sb = window.supabase.createClient(SB_URL, SB_ANON);
+async function getSB() {
+  if(_sb) return _sb;
+  // Aguardar SDK carregar (até 5 segundos)
+  for(let i = 0; i < 50; i++) {
+    if(window.supabase) {
+      _sb = window.supabase.createClient(SB_URL, SB_ANON);
+      return _sb;
+    }
+    await new Promise(r => setTimeout(r, 100));
   }
-  return _sb;
+  console.warn('SDK Supabase não carregou');
+  return null;
 }
 
 async function sbSave() {
   try {
-    const sb = getSB();
+    const sb = await getSB();
     const payload = { id: 1, data: JSON.stringify(store), updated_at: new Date().toISOString() };
     if(sb) {
       const { error } = await sb.from(SB_TABLE).upsert(payload, { onConflict: 'id' });
       if(error) console.warn('Supabase save error:', error.message);
+      else console.log('✅ Salvo no Supabase');
     }
     localStorage.setItem('lexpro_erp', JSON.stringify(store));
   } catch(e) {
@@ -2225,10 +2233,12 @@ async function sbSave() {
 
 async function sbLoad() {
   try {
-    const sb = getSB();
+    const sb = await getSB();
     if(sb) {
+      console.log('🔄 Carregando do Supabase...');
       const { data, error } = await sb.from(SB_TABLE).select('data').eq('id', 1).single();
-      if(!error && data && data.data) {
+      if(error) { console.warn('Supabase load error:', error.message); }
+      else if(data && data.data) {
         store = JSON.parse(data.data);
         if(!store.modelos)    store.modelos    = [];
         if(!store.eventos)    store.eventos    = [];
@@ -2238,6 +2248,7 @@ async function sbLoad() {
         if(!store.nextId.evento) store.nextId.evento = 1;
         if(!store.nextId.doc)    store.nextId.doc    = 1;
         localStorage.setItem('lexpro_erp', JSON.stringify(store));
+        console.log('✅ Dados carregados do Supabase!');
         return true;
       }
     }
@@ -2245,6 +2256,7 @@ async function sbLoad() {
     console.warn('Supabase offline, carregando local:', e.message);
   }
   // Fallback: localStorage
+  console.log('📦 Carregando do localStorage...');
   const saved = localStorage.getItem('lexpro_erp');
   if(saved) { try { store = JSON.parse(saved); } catch(e) {} }
   return false;
@@ -2254,7 +2266,7 @@ async function sbLoad() {
 function saveData() {
   const btn = document.getElementById('notif-btn');
   if(btn) { btn.style.borderColor = 'var(--gold)'; setTimeout(() => { btn.style.borderColor = ''; }, 1500); }
-  sbSave();
+  sbSave(); // async mas não precisa aguardar
 }
 function loadData() { /* substituído por sbLoad no init */ }
 
