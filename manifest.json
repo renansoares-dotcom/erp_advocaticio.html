@@ -1,32 +1,78 @@
 {
-  "name": "Diego Vila Nova — ERP Advocatício",
+  "name": "Diego Vila Nova ERP",
   "short_name": "DVN ERP",
-  "description": "Sistema de Gestão — Diego Vila Nova Advocacia e Consultoria Jurídica · OAB/PE 51.493",
-  "start_url": "./",
-  "scope": "./",
+  "description": "Sistema de Gestão - Diego Vila Nova Advocacia e Consultoria Jurídica OAB/PE 51.493",
+  "start_url": "/erp_advocaticio.html/",
+  "scope": "/erp_advocaticio.html/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "background_color": "#1A2E45",
   "theme_color": "#1A2E45",
   "lang": "pt-BR",
-  "categories": ["business", "productivity"],
   "icons": [
-    { "src": "icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "/erp_advocaticio.html/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "screenshots": [
     {
-      "src": "icon-512x512.png",
+      "src": "/erp_advocaticio.html/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Dashboard do sistema"
+      "label": "Dashboard DVN ERP"
+    },
+    {
+      "src": "/erp_advocaticio.html/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard DVN ERP"
     }
   ]
 }
