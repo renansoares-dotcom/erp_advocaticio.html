@@ -729,45 +729,89 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="login-panel active" id="panel-login">
       <div class="login-heading">Bem-vindo de volta</div>
       <div class="login-desc">Faça login para acessar o sistema</div>
-      <div id="login-error" class="login-error">❌ Usuário ou senha incorretos.</div>
+      <div id="login-error" class="login-error"></div>
+      <div id="login-success" class="login-success"></div>
       <div class="login-input-wrap">
-        <span class="login-input-icon">👤</span>
-        <input type="text" class="login-input" id="login-usuario" placeholder="Usuário" onkeydown="if(event.key==='Enter') fazerLogin()">
+        <span class="login-input-icon">✉️</span>
+        <input type="email" class="login-input" id="login-email" placeholder="Seu e-mail" onkeydown="if(event.key==='Enter') fazerLogin()">
       </div>
       <div class="login-input-wrap">
         <span class="login-input-icon">🔒</span>
-        <input type="password" class="login-input" id="login-senha" placeholder="Senha" onkeydown="if(event.key==='Enter') fazerLogin()">
+        <input type="password" class="login-input" id="login-senha" placeholder="Sua senha" onkeydown="if(event.key==='Enter') fazerLogin()">
         <button class="login-eye" onclick="toggleSenhaVisivel('login-senha',this)" tabindex="-1">👁</button>
       </div>
-      <span class="login-forgot" onclick="mostrarPainel('panel-recuperar')">Esqueci minha senha</span>
+      <!-- Lembrar-me -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-secondary)">
+          <input type="checkbox" id="login-lembrar" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer">
+          Lembrar meu acesso
+        </label>
+        <span class="login-forgot" onclick="mostrarPainel('panel-recuperar')" style="margin-bottom:0">Esqueci a senha</span>
+      </div>
       <button class="login-btn" onclick="fazerLogin()">Entrar no Sistema →</button>
       <div class="login-divider"></div>
-      <div style="text-align:center;font-size:11.5px;color:var(--text-muted)">Credenciais padrão: <strong>admin</strong> / <strong>admin123</strong></div>
+      <div style="text-align:center">
+        <span style="font-size:12.5px;color:var(--text-muted)">Não tem conta? </span>
+        <span style="font-size:12.5px;color:var(--blue-600);cursor:pointer;font-weight:600" onclick="mostrarPainel('panel-cadastro')">Cadastre-se</span>
+      </div>
+    </div>
+
+    <!-- PAINEL: CADASTRO -->
+    <div class="login-panel" id="panel-cadastro">
+      <div class="login-heading">Criar Conta</div>
+      <div class="login-desc">Preencha os dados para solicitar acesso</div>
+      <div id="cad-error" class="login-error"></div>
+      <div id="cad-success" class="login-success"></div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">👤</span>
+        <input type="text" class="login-input" id="cad-nome" placeholder="Nome completo">
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">✉️</span>
+        <input type="email" class="login-input" id="cad-email" placeholder="Seu e-mail">
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input type="password" class="login-input" id="cad-senha" placeholder="Criar senha (mín. 6 caracteres)">
+        <button class="login-eye" onclick="toggleSenhaVisivel('cad-senha',this)" tabindex="-1">👁</button>
+      </div>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔒</span>
+        <input type="password" class="login-input" id="cad-confirmar" placeholder="Confirmar senha">
+        <button class="login-eye" onclick="toggleSenhaVisivel('cad-confirmar',this)" tabindex="-1">👁</button>
+      </div>
+      <button class="login-btn" onclick="cadastrarUsuario()" style="margin-bottom:14px">Solicitar Acesso</button>
+      <span class="login-back" onclick="mostrarPainel('panel-login')">← Voltar ao login</span>
     </div>
 
     <!-- PAINEL: RECUPERAR SENHA -->
     <div class="login-panel" id="panel-recuperar">
       <div class="login-heading">Recuperar Senha</div>
-      <div class="login-desc">Insira seu usuário e defina uma nova senha.</div>
+      <div class="login-desc">Enviaremos um link de redefinição para seu e-mail.</div>
       <div id="rec-error" class="login-error"></div>
       <div id="rec-success" class="login-success"></div>
       <div class="login-input-wrap">
-        <span class="login-input-icon">👤</span>
-        <input type="text" class="login-input" id="rec-usuario" placeholder="Usuário">
+        <span class="login-input-icon">✉️</span>
+        <input type="email" class="login-input" id="rec-email" placeholder="Seu e-mail cadastrado">
       </div>
-      <div class="login-input-wrap">
-        <span class="login-input-icon">🔒</span>
-        <input type="password" class="login-input" id="rec-nova-senha" placeholder="Nova senha">
-        <button class="login-eye" onclick="toggleSenhaVisivel('rec-nova-senha',this)" tabindex="-1">👁</button>
-      </div>
-      <div class="login-input-wrap">
-        <span class="login-input-icon">🔒</span>
-        <input type="password" class="login-input" id="rec-confirmar-senha" placeholder="Confirmar nova senha">
-        <button class="login-eye" onclick="toggleSenhaVisivel('rec-confirmar-senha',this)" tabindex="-1">👁</button>
-      </div>
-      <button class="login-btn" onclick="recuperarSenha()" style="margin-bottom:14px">Redefinir Senha</button>
+      <button class="login-btn" onclick="recuperarSenha()" style="margin-bottom:14px">📧 Enviar Link de Redefinição</button>
       <span class="login-back" onclick="mostrarPainel('panel-login')">← Voltar ao login</span>
     </div>
+
+    <!-- PAINEL: CONFIRMAR EMAIL -->
+    <div class="login-panel" id="panel-confirmar">
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:48px;margin-bottom:16px">📧</div>
+        <div class="login-heading">Verifique seu e-mail</div>
+        <div class="login-desc" style="margin-bottom:24px">Enviamos um link de confirmação para <strong id="confirmar-email-dest"></strong>. Clique no link para ativar sua conta.</div>
+        <div style="background:var(--surface);border-radius:var(--radius);padding:12px;font-size:12.5px;color:var(--text-muted);margin-bottom:20px">
+          Não recebeu? Verifique a pasta de spam ou
+          <span style="color:var(--blue-600);cursor:pointer;font-weight:500" onclick="reenviarConfirmacao()">clique aqui para reenviar</span>
+        </div>
+        <span class="login-back" onclick="mostrarPainel('panel-login')">← Voltar ao login</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1475,6 +1519,13 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <div style="flex:1"><div style="font-size:13px;color:var(--text-secondary)">Gerencie os usuários com acesso ao sistema e seus níveis de permissão.</div></div>
             <button class="btn btn-primary" onclick="openModal('modal-usuario')">+ Novo Usuário</button>
           </div>
+
+          <!-- Alerta de usuários pendentes -->
+          <div id="alerta-pendentes" style="display:none" class="alert alert-warning" style="margin-bottom:16px">
+            ⏳ <strong id="qtd-pendentes">0</strong> usuário(s) aguardando aprovação de perfil.
+          </div>
+
+          <!-- Legenda de perfis -->
           <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius);border:1px solid #E6F1FB;background:#E6F1FB">
               <div style="width:8px;height:8px;border-radius:50%;background:#185FA5"></div>
@@ -1489,12 +1540,15 @@ textarea.form-control { resize: vertical; min-height: 80px; }
               <div><div style="font-size:12px;font-weight:600;color:#92400E">Secretária</div><div style="font-size:10.5px;color:var(--text-muted)">Clientes e Processos</div></div>
             </div>
           </div>
+
           <div class="card">
             <div class="table-wrap">
               <table class="data-table">
-                <thead><tr><th>#</th><th>Nome</th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr>
+                  <th>#</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Cadastro</th><th>Ações</th>
+                </tr></thead>
                 <tbody id="tbody-usuarios">
-                  <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:28px">Carregando...</td></tr>
+                  <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Carregando...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1687,52 +1741,128 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 <!-- MODAL USUARIO -->
 <div class="modal-overlay" id="modal-usuario">
-  <div class="modal" style="width:480px">
+  <div class="modal" style="width:580px">
     <div class="modal-header">
       <span class="modal-title" id="modal-usuario-title">Novo Usuário</span>
       <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-usuario')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="usuario-edit-id">
+
+      <!-- Dados básicos -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Dados do Usuário</div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Nome Completo *</label>
           <input type="text" class="form-control" id="usuario-nome" placeholder="Ex: Ana Paula">
         </div>
         <div class="form-group">
-          <label class="form-label">Login (usuário) *</label>
+          <label class="form-label">Login *</label>
           <input type="text" class="form-control" id="usuario-login" placeholder="Ex: anapaula">
         </div>
       </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input type="email" class="form-control" id="usuario-email" placeholder="email@exemplo.com">
+      </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Senha *</label>
+          <label class="form-label">Senha <span id="senha-label-obs" style="font-weight:400;color:var(--text-muted);display:none">(em branco = manter)</span></label>
           <div style="position:relative">
             <input type="password" class="form-control" id="usuario-senha" placeholder="Mínimo 6 caracteres" style="padding-right:38px">
             <button onclick="toggleSenhaVisivel('usuario-senha',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-muted)">👁</button>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Perfil de Acesso *</label>
-          <select class="form-control" id="usuario-perfil">
-            <option value="admin">👑 Administrador</option>
-            <option value="advogado">⚖️ Advogado</option>
-            <option value="secretaria">📋 Secretária</option>
+          <label class="form-label">Status</label>
+          <select class="form-control" id="usuario-ativo">
+            <option value="true">✅ Ativo</option>
+            <option value="false">❌ Inativo</option>
           </select>
         </div>
       </div>
-      <!-- Preview de permissões -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-top:4px">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Permissões do perfil selecionado</div>
-        <div id="preview-permissoes" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:12px"></div>
+
+      <!-- Perfil -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Perfil e Permissões</div>
+
+      <div class="form-row" style="align-items:end">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Perfil Base</label>
+          <select class="form-control" id="usuario-perfil" onchange="onPerfilChange(this.value)">
+            <option value="admin">👑 Administrador</option>
+            <option value="advogado">⚖️ Advogado</option>
+            <option value="secretaria">📋 Secretária</option>
+            <option value="custom">⚙️ Personalizado</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Aprovado</label>
+          <select class="form-control" id="usuario-aprovado">
+            <option value="true">✅ Aprovado</option>
+            <option value="false">⏳ Pendente</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group" style="margin-top:14px;margin-bottom:0">
-        <label class="form-label">Status</label>
-        <select class="form-control" id="usuario-ativo">
-          <option value="true">Ativo</option>
-          <option value="false">Inativo</option>
-        </select>
+
+      <!-- Nome do perfil personalizado -->
+      <div class="form-group" id="bloco-nome-perfil" style="display:none;margin-top:10px">
+        <label class="form-label">Nome do Perfil Personalizado *</label>
+        <input type="text" class="form-control" id="usuario-perfil-nome" placeholder="Ex: Estagiário, Contador, Paralegal...">
       </div>
+
+      <!-- Permissões customizáveis -->
+      <div id="bloco-permissoes-custom" style="margin-top:14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px">
+        <div style="font-size:11.5px;font-weight:600;color:var(--text-secondary);margin-bottom:12px">📋 Páginas com acesso</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px" id="grid-paginas">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-dashboard" style="accent-color:var(--navy)"> 📊 Dashboard
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-clientes" style="accent-color:var(--navy)"> 👤 Clientes
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-tipos" style="accent-color:var(--navy)"> 📋 Tipos de Processo
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-processos" style="accent-color:var(--navy)"> ⚖️ Processos
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-agenda" style="accent-color:var(--navy)"> 📅 Agenda
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-financeiro" style="accent-color:var(--navy)"> 💰 Financeiro
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-relatorios" style="accent-color:var(--navy)"> 📈 Relatórios
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-opcoes" style="accent-color:var(--navy)"> ⚙️ Opções
+          </label>
+        </div>
+
+        <div style="font-size:11.5px;font-weight:600;color:var(--text-secondary);margin-bottom:10px">🔒 Ações permitidas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="grid-acoes">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-editarClientes" style="accent-color:var(--navy)"> ✏️ Editar clientes
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-excluirClientes" style="accent-color:var(--navy)"> 🗑 Excluir clientes
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-verFinanceiro" style="accent-color:var(--navy)"> 💰 Ver financeiro
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-exportarRelatorio" style="accent-color:var(--navy)"> ⬇️ Exportar relatórios
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-gerenciarUsuarios" style="accent-color:var(--navy)"> 👥 Gerenciar usuários
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="pode-verOpcoes" style="accent-color:var(--navy)"> ⚙️ Acessar opções
+          </label>
+        </div>
+      </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-usuario')">Cancelar</button>
@@ -3045,70 +3175,145 @@ function renderUsuarios() {
   const conteudo = document.getElementById('bloco-usuarios-conteudo');
   if(!tb) return;
 
-  // Forçar perfil correto — não depende de sessão, sempre mostra para admin
-  const perfil = getPerfilAtual();
-  const isAdmin = perfil === 'admin';
-
+  const isAdmin = getPerfilAtual() === 'admin';
   if(restrito) restrito.style.display = isAdmin ? 'none' : 'block';
-  if(conteudo) conteudo.style.display = 'block'; // sempre visível, tabela mostrará aviso se não admin
+  if(conteudo) conteudo.style.display = 'block';
 
   const users = getUsers();
   const euSou = getUsuarioAtual();
 
+  // Contar pendentes (secretaria sem aprovação explícita)
+  const pendentes = users.filter(u => u.perfil === 'secretaria' && !u.aprovado).length;
+  const alertaPend = document.getElementById('alerta-pendentes');
+  const qtdPend = document.getElementById('qtd-pendentes');
+  if(alertaPend) alertaPend.style.display = pendentes > 0 ? 'flex' : 'none';
+  if(qtdPend) qtdPend.textContent = pendentes;
+
   if(!users.length) {
-    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum usuário encontrado.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum usuário encontrado.</td></tr>';
     return;
   }
 
   tb.innerHTML = users.map((u, i) => {
-    const perfKey = u.perfil || 'admin';
-    const p = PERFIS[perfKey] || PERFIS.admin;
-    const sou = u.usuario === euSou;
-    return `<tr>
+    const perfKey = u.perfil || 'secretaria';
+    const p = PERFIS[perfKey] || PERFIS.secretaria;
+    const sou = (u.email === euSou || u.usuario === euSou);
+    const isPendente = perfKey === 'secretaria' && !u.aprovado;
+    const dataCad = u.dataCadastro ? new Date(u.dataCadastro).toLocaleDateString('pt-BR') : '—';
+
+    return `<tr style="${isPendente ? 'background:var(--warning-bg)' : ''}">
       <td>${i + 1}</td>
       <td>
         <strong>${u.nome || u.usuario}</strong>
         ${sou ? ' <span class="badge badge-blue" style="font-size:10px">Você</span>' : ''}
+        ${isPendente ? ' <span class="badge badge-amber" style="font-size:10px">⏳ Pendente</span>' : ''}
       </td>
-      <td style="color:var(--text-muted)">${u.usuario}</td>
+      <td style="color:var(--text-muted);font-size:12px">${u.email || u.usuario}</td>
       <td>
-        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:20px;font-size:11.5px;font-weight:600;background:${p.bg};color:${p.cor}">
-          ${p.label}
-        </span>
+        <select onchange="alterarPerfilUsuario(${u.id}, this.value)"
+          style="padding:4px 8px;border-radius:6px;border:1.5px solid ${p.cor};background:${p.bg};color:${p.cor};font-size:12px;font-weight:600;cursor:pointer"
+          ${sou ? 'disabled' : ''}>
+          <option value="admin"    ${perfKey==='admin'    ?'selected':''}>👑 Administrador</option>
+          <option value="advogado" ${perfKey==='advogado' ?'selected':''}>⚖️ Advogado</option>
+          <option value="secretaria" ${perfKey==='secretaria'?'selected':''}>📋 Secretária</option>
+          <option value="custom"   ${perfKey==='custom'   ?'selected':''}>⚙️ ${u.perfilNome||'Personalizado'}</option>
+        </select>
       </td>
       <td>
         <span class="badge ${u.ativo !== false ? 'badge-green' : 'badge-gray'}">
           ${u.ativo !== false ? 'Ativo' : 'Inativo'}
         </span>
       </td>
+      <td style="font-size:12px;color:var(--text-muted)">${dataCad}</td>
       <td style="white-space:nowrap">
+        ${isPendente ? `<button class="btn btn-primary btn-sm" onclick="aprovarUsuario(${u.id})" title="Aprovar acesso">✅ Aprovar</button>` : ''}
         <button class="btn btn-outline btn-sm" onclick="editarUsuario(${u.id})" title="Editar">✏️</button>
         ${!sou ? `<button class="btn btn-danger btn-sm" onclick="excluirUsuario(${u.id})" title="Excluir">🗑</button>` : ''}
       </td>
     </tr>`;
   }).join('');
 }
+function alterarPerfilUsuario(id, novoPerfil) {
+  const users = getUsers();
+  const u = users.find(u => u.id === id);
+  if(!u) return;
+  u.perfil = novoPerfil;
+  u.aprovado = true;
+  saveUsers(users);
+  renderUsuarios();
+  showToast(`Perfil de ${u.nome||u.usuario} alterado para ${PERFIS[novoPerfil]?.label||novoPerfil}!`, 'success');
+}
+
+function aprovarUsuario(id) {
+  const users = getUsers();
+  const u = users.find(u => u.id === id);
+  if(!u) return;
+  u.aprovado = true;
+  saveUsers(users);
+  renderUsuarios();
+  showToast(`✅ ${u.nome||u.usuario} aprovado com sucesso!`, 'success');
+}
+
+// Páginas e ações disponíveis
+const TODAS_PAGINAS = ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios','opcoes'];
+const TODAS_ACOES = ['editarClientes','excluirClientes','verFinanceiro','exportarRelatorio','gerenciarUsuarios','verOpcoes'];
+
+function onPerfilChange(val) {
+  // Mostrar campo de nome apenas para personalizado
+  const blocoNome = document.getElementById('bloco-nome-perfil');
+  if(blocoNome) blocoNome.style.display = val === 'custom' ? 'block' : 'none';
+  // Preencher checkboxes com perfil base
+  const p = PERFIS[val];
+  if(p) preencherCheckboxes(p.paginas, p.pode);
+  else if(val === 'custom') preencherCheckboxes([], {}); // Personalizado começa vazio
+}
+function preencherCheckboxes(paginas, pode) {
+  TODAS_PAGINAS.forEach(pg => { const el = document.getElementById('perm-'+pg); if(el) el.checked = (paginas||[]).includes(pg); });
+  TODAS_ACOES.forEach(ac => { const el = document.getElementById('pode-'+ac); if(el) el.checked = !!(pode && pode[ac]); });
+}
+function lerCheckboxes() {
+  const paginas = TODAS_PAGINAS.filter(pg => { const el = document.getElementById('perm-'+pg); return el && el.checked; });
+  const pode = {};
+  TODAS_ACOES.forEach(ac => { const el = document.getElementById('pode-'+ac); pode[ac] = !!(el && el.checked); });
+  return { paginas, pode };
+}
+function atualizarPreviewPermissoes(perfil) { onPerfilChange(perfil); }
+document.addEventListener('change', e => { if(e.target.id === 'usuario-perfil') onPerfilChange(e.target.value); });
+
+function getPermissoesEfetivas(u) {
+  const base = PERFIS[u.perfil] || PERFIS.secretaria;
+  const label = u.perfil === 'custom' ? (u.perfilNome || 'Personalizado') : base.label;
+  return { paginas: u.paginasCustom || base.paginas, pode: u.podeCustom || base.pode, label, cor: base.cor, bg: base.bg };
+}
+
 function salvarUsuario() {
   const nome = document.getElementById('usuario-nome').value.trim();
   const login = document.getElementById('usuario-login').value.trim().toLowerCase();
+  const email = document.getElementById('usuario-email').value.trim().toLowerCase();
   const senha = document.getElementById('usuario-senha').value;
   const perfil = document.getElementById('usuario-perfil').value;
+  const perfilNome = perfil === 'custom' ? (document.getElementById('usuario-perfil-nome').value.trim() || 'Personalizado') : '';
   const ativo = document.getElementById('usuario-ativo').value === 'true';
+  const aprovado = document.getElementById('usuario-aprovado').value === 'true';
   const editId = document.getElementById('usuario-edit-id').value;
   if(!nome || !login) { showToast('Nome e login são obrigatórios.', 'error'); return; }
   if(!editId && senha.length < 6) { showToast('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
+  const { paginas, pode } = lerCheckboxes();
   const users = getUsers();
   if(editId) {
     const u = users.find(u => u.id == editId);
     if(!u) return;
     if(users.find(x => x.usuario === login && x.id != editId)) { showToast('Este login já está em uso.', 'error'); return; }
-    u.nome = nome; u.usuario = login; u.perfil = perfil; u.ativo = ativo;
+    u.nome = nome; u.usuario = login; u.email = email||u.email;
+    u.perfil = perfil; u.perfilNome = perfilNome; u.ativo = ativo; u.aprovado = aprovado;
+    u.paginasCustom = paginas; u.podeCustom = pode;
     if(senha.length >= 6) u.senha = senha;
     showToast('Usuário atualizado!', 'success');
   } else {
     if(users.find(u => u.usuario === login)) { showToast('Este login já está em uso.', 'error'); return; }
     const newId = Math.max(0, ...users.map(u => u.id||0)) + 1;
-    users.push({ id: newId, usuario: login, senha, nome, perfil, ativo });
+    users.push({ id: newId, usuario: login, senha, nome, email, perfil, perfilNome, ativo, aprovado,
+      paginasCustom: paginas, podeCustom: pode, dataCadastro: new Date().toISOString() });
     showToast('Usuário criado!', 'success');
   }
   saveUsers(users); closeModal('modal-usuario'); renderUsuarios();
@@ -3119,11 +3324,21 @@ function editarUsuario(id) {
   document.getElementById('usuario-edit-id').value = u.id;
   document.getElementById('modal-usuario-title').textContent = 'Editar Usuário';
   document.getElementById('usuario-nome').value = u.nome||'';
-  document.getElementById('usuario-login').value = u.usuario;
+  document.getElementById('usuario-login').value = u.usuario||'';
+  document.getElementById('usuario-email').value = u.email||'';
   document.getElementById('usuario-senha').value = '';
-  document.getElementById('usuario-perfil').value = u.perfil||'admin';
+  document.getElementById('usuario-perfil').value = u.perfil||'secretaria';
   document.getElementById('usuario-ativo').value = u.ativo !== false ? 'true' : 'false';
-  atualizarPreviewPermissoes(u.perfil||'admin');
+  document.getElementById('usuario-aprovado').value = u.aprovado ? 'true' : 'false';
+  // Nome do perfil personalizado
+  const nomePerfilEl = document.getElementById('usuario-perfil-nome');
+  if(nomePerfilEl) nomePerfilEl.value = u.perfilNome||'';
+  const blocoNome = document.getElementById('bloco-nome-perfil');
+  if(blocoNome) blocoNome.style.display = u.perfil === 'custom' ? 'block' : 'none';
+  const obs = document.getElementById('senha-label-obs');
+  if(obs) obs.style.display = '';
+  const perm = getPermissoesEfetivas(u);
+  preencherCheckboxes(perm.paginas, perm.pode);
   openModal('modal-usuario', false);
 }
 function excluirUsuario(id) {
@@ -3132,18 +3347,6 @@ function excluirUsuario(id) {
   if(!users.length) { showToast('Deve haver ao menos um usuário.', 'error'); return; }
   saveUsers(users); renderUsuarios(); showToast('Usuário excluído.');
 }
-function atualizarPreviewPermissoes(perfil) {
-  const p = PERFIS[perfil]; if(!p) return;
-  const el = document.getElementById('preview-permissoes'); if(!el) return;
-  const desc = { editarClientes:'Editar clientes', excluirClientes:'Excluir clientes', verFinanceiro:'Ver financeiro', gerenciarUsuarios:'Gerenciar usuários', verOpcoes:'Acessar opções', exportarRelatorio:'Exportar relatórios' };
-  el.innerHTML = Object.entries(desc).map(([k,v]) =>
-    `<div style="display:flex;align-items:center;gap:5px;color:${p.pode[k]?'var(--success)':'#CBD5E1'}">
-      <span>${p.pode[k]?'✅':'⛔'}</span><span>${v}</span>
-    </div>`).join('');
-}
-document.addEventListener('change', e => {
-  if(e.target.id === 'usuario-perfil') atualizarPreviewPermissoes(e.target.value);
-});
 
 function renderOpcoes() {
   const session = localStorage.getItem(LOGIN_KEY);
@@ -3493,10 +3696,14 @@ function openModal(id, reset = true) {
     if(id === 'modal-usuario') {
       document.getElementById('usuario-edit-id').value = '';
       document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
-      ['usuario-nome','usuario-login','usuario-senha'].forEach(i => document.getElementById(i).value = '');
-      document.getElementById('usuario-perfil').value = 'admin';
+      ['usuario-nome','usuario-login','usuario-email','usuario-senha'].forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
+      document.getElementById('usuario-perfil').value = 'secretaria';
       document.getElementById('usuario-ativo').value = 'true';
-      atualizarPreviewPermissoes('admin');
+      document.getElementById('usuario-aprovado').value = 'true';
+      const obs = document.getElementById('senha-label-obs');
+      if(obs) obs.style.display = 'none';
+      // Inicializar checkboxes com perfil secretaria
+      onPerfilChange('secretaria');
     }
     if(id === 'modal-evento') {
       document.getElementById('evento-edit-id').value = '';
@@ -4630,6 +4837,7 @@ function exportarCSV() {
 // ==================== LOGIN ====================
 const LOGIN_KEY = 'lexpro_auth';
 const USERS_KEY = 'lexpro_users';
+const LEMBRAR_KEY = 'lexpro_lembrar';
 
 // Permissões por perfil
 const PERFIS = {
@@ -4651,27 +4859,21 @@ const PERFIS = {
 };
 
 function getPerfilAtual() {
-  try {
-    const s = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
-    return s.perfil || 'admin';
-  } catch(e) { return 'admin'; }
+  try { return JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}').perfil || 'admin'; } catch(e) { return 'admin'; }
 }
 function getUsuarioAtual() {
-  try { return JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}').usuario||'—'; } catch(e){ return '—'; }
+  try { return JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}').email||'—'; } catch(e){ return '—'; }
 }
-function pode(acao) {
-  return PERFIS[getPerfilAtual()]?.pode[acao] ?? false;
-}
+function pode(acao) { return PERFIS[getPerfilAtual()]?.pode[acao] ?? false; }
 
 function getUsers() {
   const saved = localStorage.getItem(USERS_KEY);
   let users = saved ? JSON.parse(saved) : null;
   if(!users || !users.length) {
-    users = [{ id:1, usuario:'admin', senha:'admin123', nome:'Administrador', perfil:'admin', ativo:true }];
+    users = [{ id:1, usuario:'admin', senha:'admin123', nome:'Administrador', perfil:'admin', ativo:true, email:'admin@diegonilavienna.adv.br' }];
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
     return users;
   }
-  // Migrar usuários antigos sem perfil
   let changed = false;
   users.forEach((u,i) => {
     if(!u.perfil) { u.perfil = 'admin'; changed = true; }
@@ -4687,9 +4889,11 @@ function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users
 function mostrarPainel(id) {
   document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('login-error').style.display = 'none';
-  document.getElementById('rec-error').style.display = 'none';
-  document.getElementById('rec-success').style.display = 'none';
+  // Limpar mensagens
+  ['login-error','login-success','cad-error','cad-success','rec-error','rec-success'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
 }
 
 function toggleSenhaVisivel(inputId, btn) {
@@ -4698,17 +4902,90 @@ function toggleSenhaVisivel(inputId, btn) {
   else { inp.type = 'password'; btn.textContent = '👁'; }
 }
 
-function fazerLogin() {
-  const usuario = document.getElementById('login-usuario').value.trim();
+// Preencher campos se "lembrar" estava ativo
+function carregarLembrar() {
+  const saved = localStorage.getItem(LEMBRAR_KEY);
+  if(saved) {
+    try {
+      const d = JSON.parse(saved);
+      const emailEl = document.getElementById('login-email');
+      const senhaEl = document.getElementById('login-senha');
+      const lembrarEl = document.getElementById('login-lembrar');
+      if(emailEl) emailEl.value = d.email||'';
+      if(senhaEl) senhaEl.value = d.senha||'';
+      if(lembrarEl) lembrarEl.checked = true;
+    } catch(e) {}
+  }
+}
+
+async function fazerLogin() {
+  const email = document.getElementById('login-email').value.trim();
   const senha = document.getElementById('login-senha').value;
+  const lembrar = document.getElementById('login-lembrar').checked;
   const errEl = document.getElementById('login-error');
-  if(!usuario || !senha) { errEl.style.display = 'block'; errEl.textContent = '❌ Preencha usuário e senha.'; return; }
-  const users = getUsers();
-  const found = users.find(u => u.usuario === usuario && u.senha === senha && u.ativo !== false);
-  if(!found) { errEl.style.display = 'block'; errEl.textContent = '❌ Usuário ou senha incorretos.'; return; }
-  // Sempre salvar perfil e nome na sessão
-  const sessao = { usuario: found.usuario, nome: found.nome||found.usuario, perfil: found.perfil||'admin', ts: Date.now() };
-  localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
+  const sucEl = document.getElementById('login-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  if(!email || !senha) { errEl.textContent = '❌ Preencha e-mail e senha.'; errEl.style.display = 'block'; return; }
+
+  const btnLogin = document.querySelector('#panel-login .login-btn');
+  btnLogin.textContent = 'Entrando...'; btnLogin.disabled = true;
+
+  try {
+    const sb = await getSB();
+
+    // Tentar login via Supabase Auth
+    if(sb) {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
+      if(!error && data.user) {
+        // Login Supabase OK — buscar perfil nos users locais
+        const users = getUsers();
+        const localUser = users.find(u => u.email === email || u.usuario === email.split('@')[0]);
+        const perfil = localUser?.perfil || 'admin';
+        const nome = localUser?.nome || data.user.user_metadata?.nome || email.split('@')[0];
+
+        const sessao = { email, nome, perfil, ts: Date.now(), supabase: true };
+        localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
+
+        // Lembrar acesso
+        if(lembrar) {
+          localStorage.setItem(LEMBRAR_KEY, JSON.stringify({ email, senha }));
+        } else {
+          localStorage.removeItem(LEMBRAR_KEY);
+        }
+
+        entrarNoSistema();
+        return;
+      }
+    }
+
+    // Fallback: login local (admin padrão)
+    const users = getUsers();
+    const found = users.find(u => (u.email === email || u.usuario === email) && u.senha === senha && u.ativo !== false);
+    if(found) {
+      const sessao = { email: found.email||email, nome: found.nome||found.usuario, perfil: found.perfil||'admin', ts: Date.now() };
+      localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
+      if(lembrar) {
+        localStorage.setItem(LEMBRAR_KEY, JSON.stringify({ email, senha }));
+      } else {
+        localStorage.removeItem(LEMBRAR_KEY);
+      }
+      entrarNoSistema();
+      return;
+    }
+
+    errEl.textContent = '❌ E-mail ou senha incorretos.';
+    errEl.style.display = 'block';
+
+  } catch(e) {
+    errEl.textContent = '❌ Erro de conexão. Tente novamente.';
+    errEl.style.display = 'block';
+  }
+
+  btnLogin.textContent = 'Entrar no Sistema →'; btnLogin.disabled = false;
+}
+
+function entrarNoSistema() {
   const screen = document.getElementById('login-screen');
   screen.style.transition = 'opacity 0.4s';
   screen.style.opacity = '0';
@@ -4719,86 +4996,170 @@ function fazerLogin() {
   }, 400);
 }
 
+async function cadastrarUsuario() {
+  const nome = document.getElementById('cad-nome').value.trim();
+  const email = document.getElementById('cad-email').value.trim();
+  const senha = document.getElementById('cad-senha').value;
+  const confirmar = document.getElementById('cad-confirmar').value;
+  const errEl = document.getElementById('cad-error');
+  const sucEl = document.getElementById('cad-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  if(!nome || !email || !senha || !confirmar) { errEl.textContent = '❌ Preencha todos os campos.'; errEl.style.display = 'block'; return; }
+  if(senha !== confirmar) { errEl.textContent = '❌ As senhas não coincidem.'; errEl.style.display = 'block'; return; }
+  if(senha.length < 6) { errEl.textContent = '❌ Senha deve ter pelo menos 6 caracteres.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.querySelector('#panel-cadastro .login-btn');
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+
+  try {
+    const sb = await getSB();
+    if(sb) {
+      const { data, error } = await sb.auth.signUp({
+        email, password: senha,
+        options: { data: { nome }, emailRedirectTo: 'https://renansoares-dotcom.github.io/erp_advocaticio.html/' }
+      });
+      if(error) {
+        errEl.textContent = '❌ ' + (error.message === 'User already registered' ? 'Este e-mail já está cadastrado.' : error.message);
+        errEl.style.display = 'block';
+      } else {
+        // Salvar perfil local como secretaria por padrão (admin aprova depois)
+        const users = getUsers();
+        const newId = Math.max(0, ...users.map(u=>u.id||0)) + 1;
+        users.push({ id: newId, usuario: email.split('@')[0], senha, nome, perfil: 'secretaria', ativo: true, email, aprovado: false, dataCadastro: new Date().toISOString() });
+        saveUsers(users);
+        document.getElementById('confirmar-email-dest').textContent = email;
+        mostrarPainel('panel-confirmar');
+      }
+    } else {
+      errEl.textContent = '❌ Sem conexão com o servidor.'; errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Erro ao criar conta. Tente novamente.'; errEl.style.display = 'block';
+  }
+
+  btn.textContent = 'Solicitar Acesso'; btn.disabled = false;
+}
+
+async function recuperarSenha() {
+  const email = document.getElementById('rec-email').value.trim();
+  const errEl = document.getElementById('rec-error');
+  const sucEl = document.getElementById('rec-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+  if(!email) { errEl.textContent = '❌ Digite seu e-mail.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.querySelector('#panel-recuperar .login-btn');
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+
+  try {
+    const sb = await getSB();
+    if(sb) {
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://renansoares-dotcom.github.io/erp_advocaticio.html/'
+      });
+      if(error) { errEl.textContent = '❌ ' + error.message; errEl.style.display = 'block'; }
+      else {
+        sucEl.textContent = '✅ Link enviado! Verifique seu e-mail (inclusive o spam).';
+        sucEl.style.display = 'block';
+        setTimeout(() => mostrarPainel('panel-login'), 4000);
+      }
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Erro de conexão.'; errEl.style.display = 'block';
+  }
+
+  btn.textContent = '📧 Enviar Link de Redefinição'; btn.disabled = false;
+}
+
+async function reenviarConfirmacao() {
+  const email = document.getElementById('cad-email')?.value || document.getElementById('confirmar-email-dest')?.textContent;
+  if(!email) return;
+  const sb = await getSB();
+  if(sb) { await sb.auth.resend({ type: 'signup', email }); showToast('E-mail reenviado!', 'success'); }
+}
+
 function aplicarPermissoes() {
   const perfil = getPerfilAtual();
   const perm = PERFIS[perfil];
   if(!perm) return;
 
-  // Mostrar/ocultar itens do menu conforme perfil
+  // Buscar usuário atual para pegar permissões customizadas
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  const users = getUsers();
+  const userAtual = users.find(u => u.email === session.email || u.usuario === session.email || u.usuario === session.usuario);
+  const permEfetivas = userAtual ? getPermissoesEfetivas(userAtual) : perm;
+
+  // Mostrar/ocultar itens do menu conforme permissões efetivas
   document.querySelectorAll('.nav-item').forEach(btn => {
     const onclick = btn.getAttribute('onclick')||'';
     const match = onclick.match(/navigate\('(\w+)'/);
-    if(match) {
-      const pag = match[1];
-      btn.style.display = perm.paginas.includes(pag) ? '' : 'none';
-    }
+    if(match) btn.style.display = permEfetivas.paginas.includes(match[1]) ? '' : 'none';
   });
 
   // Atualizar badge de perfil na sidebar
   const avatar = document.querySelector('.user-avatar');
   const userName = document.querySelector('.user-name');
   const userRole = document.querySelector('.user-role');
-  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
   if(avatar) {
-    const initials = (session.nome||session.usuario||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const initials = (session.nome||session.email||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     avatar.textContent = initials;
     avatar.style.background = `linear-gradient(135deg, ${perm.cor}, ${perm.cor}cc)`;
   }
-  if(userName) userName.textContent = session.nome || session.usuario;
-  if(userRole) {
-    userRole.textContent = perm.label;
-    userRole.style.color = perm.cor;
-  }
-}
-
-function recuperarSenha() {
-  const usuario = document.getElementById('rec-usuario').value.trim();
-  const nova = document.getElementById('rec-nova-senha').value;
-  const confirmar = document.getElementById('rec-confirmar-senha').value;
-  const errEl = document.getElementById('rec-error');
-  const sucEl = document.getElementById('rec-success');
-  errEl.style.display = 'none'; sucEl.style.display = 'none';
-  if(!usuario || !nova || !confirmar) { errEl.textContent = '❌ Preencha todos os campos.'; errEl.style.display = 'block'; return; }
-  if(nova !== confirmar) { errEl.textContent = '❌ As senhas não coincidem.'; errEl.style.display = 'block'; return; }
-  if(nova.length < 6) { errEl.textContent = '❌ A senha deve ter pelo menos 6 caracteres.'; errEl.style.display = 'block'; return; }
-  const users = getUsers();
-  const user = users.find(u => u.usuario === usuario);
-  if(!user) { errEl.textContent = '❌ Usuário não encontrado.'; errEl.style.display = 'block'; return; }
-  user.senha = nova;
-  saveUsers(users);
-  sucEl.textContent = '✅ Senha redefinida com sucesso! Faça login.';
-  sucEl.style.display = 'block';
-  document.getElementById('rec-nova-senha').value = '';
-  document.getElementById('rec-confirmar-senha').value = '';
-  setTimeout(() => mostrarPainel('panel-login'), 2200);
+  if(userName) userName.textContent = session.nome || session.email;
+  if(userRole) { userRole.textContent = perm.label; userRole.style.color = perm.cor; }
 }
 
 function logout() {
+  const sb = getSB();
+  if(sb) sb.then && sb.then(s => s && s.auth.signOut());
   localStorage.removeItem(LOGIN_KEY);
   location.reload();
 }
 
 function checkLogin() {
   const raw = localStorage.getItem(LOGIN_KEY);
-  if(raw) {
-    const session = JSON.parse(raw);
-    // Migrar sessão antiga sem perfil
-    if(!session.perfil) {
-      const users = getUsers();
-      const u = users.find(u => u.usuario === session.usuario);
-      if(u) {
-        session.perfil = u.perfil||'admin';
-        session.nome = u.nome||u.usuario;
-        localStorage.setItem(LOGIN_KEY, JSON.stringify(session));
-      }
+  // Verificar se sessão Supabase está ativa
+  getSB().then(sb => {
+    if(sb) {
+      sb.auth.getSession().then(({ data }) => {
+        if(data.session) {
+          // Sessão Supabase válida
+          const users = getUsers();
+          const u = users.find(u => u.email === data.session.user.email);
+          const sessao = {
+            email: data.session.user.email,
+            nome: u?.nome || data.session.user.user_metadata?.nome || data.session.user.email.split('@')[0],
+            perfil: u?.perfil || 'admin',
+            ts: Date.now(), supabase: true
+          };
+          localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app-wrapper').style.display = 'flex';
+          aplicarPermissoes();
+          carregarLembrar();
+        } else if(raw) {
+          // Sessão local válida
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app-wrapper').style.display = 'flex';
+          aplicarPermissoes();
+          carregarLembrar();
+        } else {
+          document.getElementById('login-screen').style.display = 'flex';
+          document.getElementById('app-wrapper').style.display = 'none';
+          carregarLembrar();
+        }
+      });
+    } else if(raw) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-wrapper').style.display = 'flex';
+      aplicarPermissoes();
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app-wrapper').style.display = 'none';
+      carregarLembrar();
     }
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-wrapper').style.display = 'flex';
-    aplicarPermissoes();
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app-wrapper').style.display = 'none';
-  }
+  });
 }
 
 // ==================== INIT ====================
