@@ -3693,18 +3693,23 @@ const OBD_TIPOS_SUGERIDOS = [
 ];
 
 function iniciarOnboarding(forcar) {
+  // Segurança: nunca abre sem sessão ativa
+  if(!localStorage.getItem(LOGIN_KEY)) return;
   if(!forcar && localStorage.getItem(OBD_KEY)) return;
-  obdStep = 1;
-  document.getElementById('onboarding-screen').style.display = 'flex';
-  renderObdStep();
+  try {
+    obdStep = 1;
+    const el = document.getElementById('onboarding-screen');
+    if(el) { el.style.visibility = ''; el.style.display = 'flex'; }
+    renderObdStep();
+  } catch(e) { fecharOnboarding(); }
 }
 function fecharOnboarding() {
+  try { localStorage.setItem(OBD_KEY, '1'); } catch(e) {}
   try {
-    localStorage.setItem(OBD_KEY, '1');
+    const el = document.getElementById('onboarding-screen');
+    if(el) { el.style.display = 'none'; el.style.visibility = 'hidden'; }
   } catch(e) {}
-  const el = document.getElementById('onboarding-screen');
-  if(el) el.style.display = 'none';
-  showToast('Configuração concluída! Bem-vindo ao sistema. 🎉', 'success');
+  try { showToast('Configuração concluída! Bem-vindo ao sistema. 🎉', 'success'); } catch(e) {}
 }
 function obdProximo() {
   if(!salvarObdStep()) return;
@@ -7227,8 +7232,12 @@ function entrarNoSistema() {
     screen.style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     aplicarPermissoes();
-    // Iniciar onboarding se for a primeira vez
-    setTimeout(() => iniciarOnboarding(false), 600);
+    // Onboarding: só abre se tiver sessão ativa E nunca tiver sido concluído
+    try {
+      if(localStorage.getItem(LOGIN_KEY) && !localStorage.getItem(OBD_KEY)) {
+        setTimeout(() => iniciarOnboarding(false), 800);
+      }
+    } catch(e) {}
   }, 400);
 }
 
@@ -7347,20 +7356,47 @@ function aplicarPermissoes() {
 }
 
 function logout() {
+  // Fechar onboarding PRIMEIRO — antes de qualquer outra coisa
+  try {
+    const obd = document.getElementById('onboarding-screen');
+    if(obd) { obd.style.display = 'none'; obd.style.visibility = 'hidden'; }
+  } catch(e) {}
   registrarAuditoria('logout', 'sistema', 'Logout realizado', '');
-  // Esconder onboarding se estiver aberto
-  const obd = document.getElementById('onboarding-screen');
-  if(obd) obd.style.display = 'none';
-  const sb = getSB();
-  if(sb) sb.then && sb.then(s => s && s.auth.signOut());
   localStorage.removeItem(LOGIN_KEY);
-  location.reload();
+  localStorage.removeItem(LEMBRAR_KEY);
+  // Fazer signOut no Supabase e recarregar
+  try {
+    getSB().then(sb => {
+      if(sb && sb.auth) {
+        sb.auth.signOut().finally(() => location.reload());
+      } else {
+        location.reload();
+      }
+    }).catch(() => location.reload());
+  } catch(e) {
+    location.reload();
+  }
 }
 
 function checkLogin() {
   const raw = localStorage.getItem(LOGIN_KEY);
+  // Se não há sessão local, mostrar login imediatamente
+  if(!raw) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-wrapper').style.display = 'none';
+    carregarLembrar();
+    // Fazer signOut no Supabase silenciosamente para limpar sessão residual
+    getSB().then(sb => { if(sb && sb.auth) sb.auth.signOut(); }).catch(()=>{});
+    return;
+  }
+  // Há sessão local — entrar no sistema
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'flex';
+  aplicarPermissoes();
+  carregarLembrar();
+  // Verificar validade da sessão Supabase em segundo plano
   getSB().then(sb => {
-    if(sb) {
+    if(sb && sb.auth) {
       sb.auth.getSession().then(({ data }) => {
         if(data.session) {
           const users = getUsers();
@@ -7372,39 +7408,11 @@ function checkLogin() {
             ts: Date.now(), supabase: true
           };
           localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('app-wrapper').style.display = 'flex';
           aplicarPermissoes();
-          carregarLembrar();
-          setTimeout(() => iniciarOnboarding(false), 600);
-        } else if(raw) {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('app-wrapper').style.display = 'flex';
-          aplicarPermissoes();
-          carregarLembrar();
-          setTimeout(() => iniciarOnboarding(false), 600);
-        } else {
-          document.getElementById('login-screen').style.display = 'flex';
-          document.getElementById('app-wrapper').style.display = 'none';
-          // Garantir que onboarding não aparece na tela de login
-          const obd = document.getElementById('onboarding-screen');
-          if(obd) obd.style.display = 'none';
-          carregarLembrar();
         }
       });
-    } else if(raw) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app-wrapper').style.display = 'flex';
-      aplicarPermissoes();
-      setTimeout(() => iniciarOnboarding(false), 600);
-    } else {
-      document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('app-wrapper').style.display = 'none';
-      const obd = document.getElementById('onboarding-screen');
-      if(obd) obd.style.display = 'none';
-      carregarLembrar();
     }
-  });
+  }).catch(()=>{});
 }
 
 // ==================== INIT ====================
