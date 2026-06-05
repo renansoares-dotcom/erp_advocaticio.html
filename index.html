@@ -710,6 +710,33 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <body>
 
 <!-- ========== TELA DE LOGIN ========== -->
+<!-- ========== ONBOARDING ========== -->
+<div id="onboarding-screen" style="display:none;position:fixed;inset:0;background:rgba(26,46,69,0.92);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+
+    <!-- Barra de progresso -->
+    <div style="padding:20px 28px 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px" id="obd-step-label">Etapa 1 de 5</span>
+        <button onclick="fecharOnboarding()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px">Pular configuração ›</button>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div id="obd-progress" style="height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:4px;transition:width 0.4s;width:20%"></div>
+      </div>
+    </div>
+
+    <!-- Conteúdo das etapas -->
+    <div id="obd-content" style="padding:28px"></div>
+
+    <!-- Botões de navegação -->
+    <div style="padding:0 28px 24px;display:flex;justify-content:space-between;align-items:center">
+      <button id="obd-btn-back" class="btn btn-outline" onclick="obdAnterior()" style="display:none">← Anterior</button>
+      <div></div>
+      <button id="obd-btn-next" class="btn btn-primary" onclick="obdProximo()">Próximo →</button>
+    </div>
+  </div>
+</div>
+
 <div id="login-screen">
   <div class="login-orb" style="width:400px;height:400px;top:-120px;right:-80px"></div>
   <div class="login-orb" style="width:280px;height:280px;bottom:-60px;left:-60px"></div>
@@ -1324,6 +1351,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="page" id="page-relatorios">
       <div class="tabs-bar">
         <button class="tab-btn active" onclick="switchTab('rel','fluxo',this)">📊 Fluxo de Caixa</button>
+        <button class="tab-btn" onclick="switchTab('rel','conversao',this)">🎯 Conversão</button>
         <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">👤 Clientes</button>
       </div>
 
@@ -1435,6 +1463,133 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
 
       <!-- CLIENTES -->
+      <!-- MÉTRICAS DE CONVERSÃO -->
+      <div class="tab-content" id="rel-conversao">
+
+        <!-- Período -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">Período:</span>
+          <input type="date" class="form-control" id="conv-de" onchange="renderConversao()" style="width:160px;font-size:13px">
+          <span style="font-size:13px;color:var(--text-muted)">até</span>
+          <input type="date" class="form-control" id="conv-ate" onchange="renderConversao()" style="width:160px;font-size:13px">
+          <button class="btn btn-outline btn-sm" onclick="convPeriodoMesAtual()">Mês atual</button>
+          <button class="btn btn-outline btn-sm" onclick="convPeriodoAno()">Ano atual</button>
+          <button class="btn btn-outline btn-sm" onclick="convPeriodoTudo()">Tudo</button>
+        </div>
+
+        <!-- Cards principais -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--blue-600)">
+            <div class="stat-label">📋 Total de Propostas</div>
+            <div class="stat-value" id="conv-total">0</div>
+            <div class="stat-sub" id="conv-periodo-label">no período</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--success)">
+            <div class="stat-label">✅ Taxa de Conversão</div>
+            <div class="stat-value" style="color:var(--success)" id="conv-taxa">0%</div>
+            <div class="stat-sub" id="conv-aprovados-label">0 aprovados</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--gold)">
+            <div class="stat-label">💰 Ticket Médio</div>
+            <div class="stat-value" style="font-size:18px;color:var(--gold)" id="conv-ticket">R$ 0</div>
+            <div class="stat-sub">dos aprovados</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--navy)">
+            <div class="stat-label">⏱ Tempo Médio</div>
+            <div class="stat-value" style="font-size:18px" id="conv-tempo">— dias</div>
+            <div class="stat-sub">para decisão</div>
+          </div>
+        </div>
+
+        <!-- Funil + Gráfico mensal -->
+        <div class="grid-2" style="margin-bottom:20px">
+
+          <!-- Funil de conversão -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">🔽 Funil de Conversão</span></div>
+            <div class="card-body" id="conv-funil">
+              <div style="text-align:center;color:var(--text-muted);padding:20px">Sem dados no período.</div>
+            </div>
+          </div>
+
+          <!-- Gráfico mensal -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📈 Propostas por Mês</span>
+              <div style="display:flex;gap:10px;font-size:11.5px">
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue-600);display:inline-block"></span>Criadas</span>
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--success);display:inline-block"></span>Aprovadas</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="conv-grafico" style="height:160px;display:flex;align-items:flex-end;gap:4px">
+                <div style="color:var(--text-muted);font-size:13px;text-align:center;width:100%;padding:40px 0">Sem dados.</div>
+              </div>
+              <div id="conv-grafico-labels" style="display:flex;gap:4px;margin-top:4px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Por tipo de serviço + Por advogado -->
+        <div class="grid-2" style="margin-bottom:20px">
+
+          <!-- Por tipo de serviço -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚖️ Conversão por Tipo de Serviço</span></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Serviço</th><th>Propostas</th><th>Aprovadas</th><th>Taxa</th><th>Ticket Médio</th>
+                </tr></thead>
+                <tbody id="tbody-conv-tipo">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Sem dados.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Por advogado -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">👤 Conversão por Advogado</span></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Advogado</th><th>Propostas</th><th>Aprovadas</th><th>Taxa</th><th>Valor Total</th>
+                </tr></thead>
+                <tbody id="tbody-conv-adv">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Sem dados.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista detalhada -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 Detalhamento de Propostas</span>
+            <select class="form-control" id="conv-filtro-status" onchange="renderConversao()" style="width:160px;font-size:13px">
+              <option value="">Todos os status</option>
+              <option value="aprovado">✅ Aprovado</option>
+              <option value="recusado">❌ Recusado</option>
+              <option value="aguardando">⏳ Aguardando</option>
+              <option value="expirado">⏰ Expirado</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>#</th><th>Cliente</th><th>Serviço</th><th>Advogado</th><th>Data</th><th>Validade</th><th>Valor</th><th>Status</th>
+              </tr></thead>
+              <tbody id="tbody-conv-lista">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px">Sem dados no período.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
       <div class="tab-content" id="rel-clientes-rel">
         <div class="card">
           <div class="card-header"><span class="card-title">Relatório de Clientes</span></div>
@@ -1659,6 +1814,20 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
             </div><!-- /card-body backup -->
           </div><!-- /card backup -->
+          <!-- ONBOARDING -->
+          <div class="card" style="margin-top:20px">
+            <div class="card-header"><span class="card-title">🎯 Configuração Inicial</span></div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div>
+                  <div style="font-size:14px;font-weight:600;margin-bottom:4px">Assistente de Configuração</div>
+                  <div style="font-size:12.5px;color:var(--text-secondary)">Reabra o guia de configuração inicial para revisar ou atualizar as configurações do escritório.</div>
+                </div>
+                <button class="btn btn-outline" onclick="iniciarOnboarding(true)" style="white-space:nowrap;flex-shrink:0">🎯 Reabrir</button>
+              </div>
+            </div>
+          </div>
+
         </div><!-- /max-width sistema -->
       </div><!-- /opt-sistema -->
 
@@ -2379,6 +2548,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <input type="checkbox" id="perm-processos" style="accent-color:var(--navy)"> ⚖️ Processos
           </label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-orcamentos" style="accent-color:var(--navy)"> 📋 Orçamentos
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
             <input type="checkbox" id="perm-agenda" style="accent-color:var(--navy)"> 📅 Agenda
           </label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
@@ -2999,9 +3171,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <script>
 // ==================== DATA STORE ====================
 let store = {
-  tipos: [], clientes: [], processos: [], parcelas: [],
+  tipos: [], clientes: [], processos: [], parcelas: [], orcamentos: [],
   andamentos: {}, modelos: [], eventos: [], documentos: {}, despesas: [],
-  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1 }
+  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1, orcamento:1 }
 };
 
 // ==================== SUPABASE CONFIG ====================
@@ -3176,11 +3348,12 @@ function refreshPage(page) {
   if(page === 'dashboard') updateDashboard();
   else if(page === 'tipos') renderTipos();
   else if(page === 'clientes') renderClientes();
+  else if(page === 'orcamentos') renderOrcamentos();
   else if(page === 'processos') renderProcessos();
   else if(page === 'agenda') renderAgenda();
   else if(page === 'financeiro') { renderFinVisao(); renderParcelas(); updateParcelasSelect(); }
   else if(page === 'despesas') renderDespesas();
-  else if(page === 'relatorios') { gerarRelatorio(); renderRelClientes(); renderRelProcessos(); }
+  else if(page === 'relatorios') { gerarRelatorio(); renderConversao(); renderRelClientes(); }
   else if(page === 'opcoes') renderOpcoes();
 }
 
@@ -3501,7 +3674,169 @@ function gerarPDFOrcamento(id) {
   win.document.close();
   setTimeout(() => win.print(), 500);
 }
-const WPP_KEY = 'lexpro_wpp_config';
+
+// ==================== ONBOARDING ====================
+const OBD_KEY = 'lexpro_onboarding_done';
+const OBD_DADOS_KEY = 'lexpro_escritorio';
+const WPP_KEY = 'lexpro_wpp_config'; // declarado aqui para uso no onboarding
+let obdStep = 1;
+const OBD_TOTAL = 5;
+const OBD_TIPOS_SUGERIDOS = [
+  { nome:'Trabalhista', area:'Trabalhista' },
+  { nome:'Previdenciário / INSS', area:'Previdenciário' },
+  { nome:'Cível', area:'Cível' },
+  { nome:'Criminal', area:'Criminal' },
+  { nome:'Família e Sucessões', area:'Família' },
+  { nome:'Consumidor', area:'Consumidor' },
+  { nome:'Tributário', area:'Tributário' },
+  { nome:'Administrativo', area:'Administrativo' }
+];
+
+function iniciarOnboarding(forcar) {
+  if(!forcar && localStorage.getItem(OBD_KEY)) return;
+  obdStep = 1;
+  document.getElementById('onboarding-screen').style.display = 'flex';
+  renderObdStep();
+}
+function fecharOnboarding() {
+  try {
+    localStorage.setItem(OBD_KEY, '1');
+  } catch(e) {}
+  const el = document.getElementById('onboarding-screen');
+  if(el) el.style.display = 'none';
+  showToast('Configuração concluída! Bem-vindo ao sistema. 🎉', 'success');
+}
+function obdProximo() {
+  if(!salvarObdStep()) return;
+  if(obdStep >= OBD_TOTAL) { fecharOnboarding(); return; }
+  obdStep++; renderObdStep();
+}
+function obdAnterior() {
+  if(obdStep <= 1) return;
+  obdStep--; renderObdStep();
+}
+function obdToggleTipo(i, label) {
+  const cb = document.getElementById('obd-tipo-'+i);
+  cb.checked = !cb.checked;
+  label.style.borderColor = cb.checked ? 'var(--navy)' : 'var(--border)';
+  label.style.background = cb.checked ? '#EEF2FF' : 'white';
+}
+function salvarObdStep() {
+  if(obdStep === 2) {
+    const nome = document.getElementById('obd-nome')?.value.trim();
+    if(!nome) { showToast('Informe o nome do escritório.','error'); return false; }
+    localStorage.setItem(OBD_DADOS_KEY, JSON.stringify({
+      nome, oab: document.getElementById('obd-oab')?.value.trim(),
+      tel: document.getElementById('obd-tel')?.value.trim(),
+      endereco: document.getElementById('obd-endereco')?.value.trim(),
+      email: document.getElementById('obd-email')?.value.trim()
+    }));
+  }
+  if(obdStep === 3) {
+    OBD_TIPOS_SUGERIDOS.forEach((t,i) => {
+      const cb = document.getElementById('obd-tipo-'+i);
+      if(cb && cb.checked && !store.tipos.some(st=>st.nome===t.nome)) {
+        store.tipos.push({ id: store.nextId.tipo++, nome: t.nome, area: t.area, desc: '' });
+      }
+    });
+    saveData();
+  }
+  if(obdStep === 4) {
+    const cfg = (() => { try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}'); } catch(e){ return {}; } })();
+    cfg.numero = document.getElementById('obd-wpp')?.value.trim()||cfg.numero;
+    cfg.pix = document.getElementById('obd-pix')?.value.trim()||cfg.pix;
+    cfg.pixTipo = document.getElementById('obd-pix-tipo')?.value||cfg.pixTipo;
+    cfg.pixTitular = document.getElementById('obd-pix-titular')?.value.trim()||cfg.pixTitular;
+    localStorage.setItem(WPP_KEY, JSON.stringify(cfg));
+  }
+  return true;
+}
+function renderObdStep() {
+  try {
+  const progress = document.getElementById('obd-progress');
+  const btnBack = document.getElementById('obd-btn-back');
+  const btnNext = document.getElementById('obd-btn-next');
+  const content = document.getElementById('obd-content');
+  if(!content) return;
+  label.textContent = 'Etapa '+obdStep+' de '+OBD_TOTAL;
+  progress.style.width = Math.round((obdStep/OBD_TOTAL)*100)+'%';
+  btnBack.style.display = obdStep > 1 ? '' : 'none';
+  btnNext.textContent = obdStep === OBD_TOTAL ? '✅ Concluir' : 'Próximo →';
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const cfg = (() => { try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}'); } catch(e){ return {}; } })();
+  const tiposHtml = OBD_TIPOS_SUGERIDOS.map((t,i) => {
+    const icons = {Trabalhista:'⚒️',Previdenciário:'🏥',Cível:'⚖️',Criminal:'🔒',Família:'👨‍👩‍👧',Consumidor:'🛒',Tributário:'📋',Administrativo:'🏛'};
+    return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:13.5px;background:white" id="obd-tipo-label-${i}" onclick="obdToggleTipo(${i},this)">
+      <input type="checkbox" id="obd-tipo-${i}" style="accent-color:var(--navy);width:16px;height:16px" checked>
+      <span>${icons[t.area]||'⚖️'} ${t.nome}</span>
+    </label>`;
+  }).join('');
+  const steps = {
+    1: `<div style="text-align:center;padding:10px 0 20px">
+      <div style="width:72px;height:72px;background:var(--navy);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:700;color:var(--gold)">DV</div>
+      <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin:0 0 10px">Bem-vindo ao seu ERP!</h2>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 24px">Vamos configurar o sistema em poucos passos. Isso levará menos de 3 minutos.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[['📋','Orçamentos e Propostas'],['⚖️','Gestão de Processos'],['💰','Controle Financeiro'],['📱','Cobranças via WhatsApp'],['📊','Relatórios e Métricas'],['🔔','Alertas de Prazos']].map(([ic,tx])=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;font-size:13px">
+        <span style="font-size:20px">${ic}</span><span style="color:var(--text-secondary)">${tx}</span>
+      </div>`).join('')}
+    </div>`,
+    2: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">🏛 Dados do Escritório</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Aparecem nos PDFs, propostas e contratos gerados pelo sistema.</p>
+      <div class="form-group"><label class="form-label">Nome do Escritório *</label>
+        <input type="text" class="form-control" id="obd-nome" value="${dados.nome||'Diego Vila Nova Advocacia e Consultoria Jurídica'}"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">OAB</label>
+          <input type="text" class="form-control" id="obd-oab" value="${dados.oab||'OAB/PE 51.493'}"></div>
+        <div class="form-group"><label class="form-label">Telefone</label>
+          <input type="text" class="form-control" id="obd-tel" value="${dados.tel||''}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Endereço</label>
+        <input type="text" class="form-control" id="obd-endereco" value="${dados.endereco||''}"></div>
+      <div class="form-group" style="margin-bottom:0"><label class="form-label">E-mail</label>
+        <input type="email" class="form-control" id="obd-email" value="${dados.email||''}"></div>`,
+    3: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">📋 Tipos de Processo</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Marque as áreas em que o escritório atua. Serão cadastradas automaticamente.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${tiposHtml}</div>`,
+    4: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">📱 WhatsApp e PIX</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Configure para enviar cobranças com a chave PIX já na mensagem.</p>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">WhatsApp (com DDD)</label>
+          <input type="text" class="form-control" id="obd-wpp" value="${cfg.numero||''}" placeholder="81999999999"></div>
+        <div class="form-group"><label class="form-label">Chave PIX</label>
+          <input type="text" class="form-control" id="obd-pix" value="${cfg.pix||''}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Tipo de Chave</label>
+          <select class="form-control" id="obd-pix-tipo">
+            <option value="cpf" ${cfg.pixTipo==='cpf'?'selected':''}>CPF/CNPJ</option>
+            <option value="email" ${cfg.pixTipo==='email'?'selected':''}>E-mail</option>
+            <option value="telefone" ${cfg.pixTipo==='telefone'?'selected':''}>Telefone</option>
+            <option value="aleatoria" ${cfg.pixTipo==='aleatoria'?'selected':''}>Aleatória</option>
+          </select></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Titular do PIX</label>
+          <input type="text" class="form-control" id="obd-pix-titular" value="${cfg.pixTitular||''}"></div>
+      </div>
+      <div style="background:var(--surface);border-radius:10px;padding:12px;margin-top:14px;font-size:12.5px;color:var(--text-secondary)">
+        💡 A mensagem personalizada pode ser editada em <strong>Opções → WhatsApp</strong>.</div>`,
+    5: `<div style="text-align:center;padding:10px 0 24px">
+      <div style="font-size:56px;margin-bottom:12px">🎉</div>
+      <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin:0 0 10px">Tudo pronto!</h2>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:380px;margin:0 auto 20px">Seu sistema está configurado. Você pode ajustar qualquer configuração em <strong>Opções</strong>.</p>
+    </div>
+    <div style="background:var(--surface);border-radius:12px;padding:16px 18px;font-size:13px;display:grid;gap:12px">
+      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">🏛</span><div><div style="font-size:11px;color:var(--text-muted)">Escritório</div><strong>${dados.nome||'—'}</strong></div></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">📋</span><div><div style="font-size:11px;color:var(--text-muted)">Tipos de processo</div><strong>${store.tipos.length} cadastrado(s)</strong></div></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">📱</span><div><div style="font-size:11px;color:var(--text-muted)">Chave PIX</div><strong>${cfg.pix||'Não configurado'}</strong></div></div>
+    </div>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-muted)">Para reabrir: <strong>Opções → Sistema → Assistente de Configuração</strong></div>`
+  };
+  content.innerHTML = steps[obdStep]||'';
+  } catch(e) { console.error('Onboarding erro:', e); fecharOnboarding(); }
+}
+
 const WPP_MSG_PADRAO = `Olá, *{{NOME}}*! 👋
 
 Esperamos que esteja bem. Passamos para lembrá-lo(a) sobre a parcela do seu processo em nosso escritório.
@@ -4789,7 +5124,7 @@ function aprovarUsuario(id) {
 }
 
 // Páginas e ações disponíveis
-const TODAS_PAGINAS = ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios','opcoes'];
+const TODAS_PAGINAS = ['dashboard','tipos','clientes','processos','orcamentos','agenda','financeiro','despesas','relatorios','opcoes'];
 const TODAS_ACOES = ['editarClientes','excluirClientes','verFinanceiro','exportarRelatorio','gerenciarUsuarios','verOpcoes'];
 
 function onPerfilChange(val) {
@@ -5218,6 +5553,7 @@ function switchTab(group, tab, btn) {
   if(group === 'fin' && tab === 'parcelas') renderParcelas();
   if(group === 'fin' && tab === 'lancar') updateParcelasSelect();
   if(group === 'rel' && tab === 'fluxo') gerarRelatorio();
+  if(group === 'rel' && tab === 'conversao') renderConversao();
   if(group === 'rel' && tab === 'clientes-rel') renderRelClientes();
   if(group === 'rel' && tab === 'processos-rel') renderRelProcessos();
   if(group === 'rel' && tab === 'entradas') renderRelEntradas();
@@ -5245,6 +5581,19 @@ function openModal(id, reset = true) {
       if(obs) obs.style.display = 'none';
       // Inicializar checkboxes com perfil secretaria
       onPerfilChange('secretaria');
+    }
+    if(id === 'modal-orcamento') {
+      document.getElementById('orcamento-edit-id').value = '';
+      document.getElementById('modal-orcamento-title').textContent = 'Novo Orçamento';
+      ['orc-adv','orc-descricao','orc-obs','orc-valor','orc-valor-parcela'].forEach(i => {
+        const el = document.getElementById(i); if(el) el.value = '';
+      });
+      document.getElementById('orc-parcelas').value = '1';
+      document.getElementById('orc-status').value = 'aguardando';
+      document.getElementById('orc-data').value = today();
+      const v = new Date(); v.setDate(v.getDate()+30);
+      document.getElementById('orc-validade').value = v.toISOString().split('T')[0];
+      populateOrcSelects();
     }
     if(id === 'modal-evento') {
       document.getElementById('evento-edit-id').value = '';
@@ -6402,6 +6751,151 @@ function relPeriodoTudo() {
   gerarRelatorio();
 }
 
+// ==================== MÉTRICAS DE CONVERSÃO ====================
+function convPeriodoMesAtual() {
+  const h=new Date(); const y=h.getFullYear(); const m=String(h.getMonth()+1).padStart(2,'0');
+  document.getElementById('conv-de').value = y+'-'+m+'-01';
+  document.getElementById('conv-ate').value = y+'-'+m+'-'+String(new Date(y,h.getMonth()+1,0).getDate()).padStart(2,'0');
+  renderConversao();
+}
+function convPeriodoAno() {
+  const y=new Date().getFullYear();
+  document.getElementById('conv-de').value = y+'-01-01';
+  document.getElementById('conv-ate').value = y+'-12-31';
+  renderConversao();
+}
+function convPeriodoTudo() {
+  document.getElementById('conv-de').value='';
+  document.getElementById('conv-ate').value='';
+  renderConversao();
+}
+
+function renderConversao() {
+  const de = document.getElementById('conv-de')?.value||'';
+  const ate = document.getElementById('conv-ate')?.value||'';
+  const filtroStatus = document.getElementById('conv-filtro-status')?.value||'';
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  let orcs = getOrcamentos().slice();
+  if(de)  orcs = orcs.filter(o=>(o.data||'')>=de);
+  if(ate) orcs = orcs.filter(o=>(o.data||'')<=ate);
+
+  const total      = orcs.length;
+  const aprovados  = orcs.filter(o=>o.status==='aprovado');
+  const recusados  = orcs.filter(o=>o.status==='recusado');
+  const aguardando = orcs.filter(o=>o.status==='aguardando');
+  const expirados  = orcs.filter(o=>o.status==='expirado');
+  const taxa = total > 0 ? Math.round((aprovados.length/total)*100) : 0;
+  const ticketMedio = aprovados.length > 0 ? aprovados.reduce((s,o)=>s+o.valor,0)/aprovados.length : 0;
+  const tempos = aprovados.filter(o=>o.data&&o.validade).map(o=>
+    (new Date(o.validade)-new Date(o.data))/(1000*60*60*24));
+  const tempoMedio = tempos.length > 0 ? Math.round(tempos.reduce((s,t)=>s+t,0)/tempos.length) : 0;
+
+  set('conv-total', total);
+  set('conv-taxa', taxa+'%');
+  set('conv-aprovados-label', aprovados.length+' aprovado(s)');
+  set('conv-ticket', fmtMoney(ticketMedio));
+  set('conv-tempo', tempoMedio > 0 ? tempoMedio+' dias' : '—');
+
+  // Funil
+  const funilEl = document.getElementById('conv-funil');
+  if(funilEl) {
+    if(!total) { funilEl.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:20px">Sem dados no período.</div>'; }
+    else {
+      const pct = n => total>0?Math.round((n/total)*100):0;
+      const barra = (label,n,cor) => `<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span>${label}</span><span style="font-weight:600;color:${cor}">${n} <span style="font-weight:400;color:var(--text-muted)">(${pct(n)}%)</span></span>
+        </div>
+        <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${pct(n)}%;background:${cor};border-radius:6px"></div>
+        </div></div>`;
+      funilEl.innerHTML =
+        barra('📋 Propostas criadas', total, 'var(--blue-600)') +
+        barra('✅ Aprovadas', aprovados.length, 'var(--success)') +
+        barra('⏳ Aguardando', aguardando.length, '#92400E') +
+        barra('❌ Recusadas', recusados.length, 'var(--danger)') +
+        barra('⏰ Expiradas', expirados.length, '#475569');
+    }
+  }
+
+  // Gráfico mensal
+  const mesesNomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hoje=new Date();
+  const meses=[];
+  for(let i=5;i>=0;i--){const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1);meses.push({ano:d.getFullYear(),mes:d.getMonth(),label:mesesNomes[d.getMonth()]+'/'+String(d.getFullYear()).slice(2)});}
+  const dadosGraf=meses.map(m=>{
+    const prefix=m.ano+'-'+String(m.mes+1).padStart(2,'0');
+    const criadas=getOrcamentos().filter(o=>(o.data||'').startsWith(prefix)).length;
+    const aprov=getOrcamentos().filter(o=>(o.data||'').startsWith(prefix)&&o.status==='aprovado').length;
+    return {...m,criadas,aprov};
+  });
+  const maxVal=Math.max(...dadosGraf.map(d=>d.criadas),1);
+  const grafEl=document.getElementById('conv-grafico');
+  if(grafEl){
+    grafEl.innerHTML=dadosGraf.map(d=>{
+      const hC=Math.max(Math.round((d.criadas/maxVal)*140),d.criadas>0?4:0);
+      const hA=Math.max(Math.round((d.aprov/maxVal)*140),d.aprov>0?4:0);
+      const isMes=d.ano===hoje.getFullYear()&&d.mes===hoje.getMonth();
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;height:150px">
+          <div title="Criadas:${d.criadas}" style="width:42%;background:${isMes?'#60A5FA':'var(--blue-600)'};border-radius:4px 4px 0 0;height:${hC}px;opacity:0.85"></div>
+          <div title="Aprovadas:${d.aprov}" style="width:42%;background:${isMes?'#4ADE80':'var(--success)'};border-radius:4px 4px 0 0;height:${hA}px;opacity:0.85"></div>
+        </div>
+        <div style="font-size:10px;color:${isMes?'var(--blue-600)':'var(--text-muted)'};font-weight:${isMes?700:400}">${d.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Por tipo de serviço
+  const tbTipo=document.getElementById('tbody-conv-tipo');
+  if(tbTipo){
+    const grupos={};
+    orcs.forEach(o=>{const t=store.tipos.find(t=>t.id===o.tipoId)||{nome:'—'};if(!grupos[t.nome])grupos[t.nome]={total:0,aprov:0,valor:0};grupos[t.nome].total++;if(o.status==='aprovado'){grupos[t.nome].aprov++;grupos[t.nome].valor+=o.valor;}});
+    const linhas=Object.entries(grupos).sort((a,b)=>b[1].aprov-a[1].aprov);
+    tbTipo.innerHTML=linhas.length?linhas.map(([nome,d])=>{
+      const taxa=d.total>0?Math.round((d.aprov/d.total)*100):0;
+      const cor=taxa>=70?'var(--success)':taxa>=40?'#92400E':'var(--danger)';
+      return `<tr><td><strong>${nome}</strong></td><td style="text-align:center">${d.total}</td><td style="text-align:center;color:var(--success);font-weight:600">${d.aprov}</td><td><span style="font-weight:700;color:${cor}">${taxa}%</span></td><td>${d.aprov>0?fmtMoney(d.valor/d.aprov):'—'}</td></tr>`;
+    }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Sem dados.</td></tr>';
+  }
+
+  // Por advogado
+  const tbAdv=document.getElementById('tbody-conv-adv');
+  if(tbAdv){
+    const grupos={};
+    orcs.forEach(o=>{const adv=o.adv||'Não informado';if(!grupos[adv])grupos[adv]={total:0,aprov:0,valor:0};grupos[adv].total++;if(o.status==='aprovado'){grupos[adv].aprov++;grupos[adv].valor+=o.valor;}});
+    const linhas=Object.entries(grupos).sort((a,b)=>b[1].aprov-a[1].aprov);
+    tbAdv.innerHTML=linhas.length?linhas.map(([adv,d])=>{
+      const taxa=d.total>0?Math.round((d.aprov/d.total)*100):0;
+      const cor=taxa>=70?'var(--success)':taxa>=40?'#92400E':'var(--danger)';
+      return `<tr><td><strong>${adv}</strong></td><td style="text-align:center">${d.total}</td><td style="text-align:center;color:var(--success);font-weight:600">${d.aprov}</td><td><span style="font-weight:700;color:${cor}">${taxa}%</span></td><td style="color:var(--success);font-weight:600">${fmtMoney(d.valor)}</td></tr>`;
+    }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">Sem dados.</td></tr>';
+  }
+
+  // Lista detalhada
+  const tbLista=document.getElementById('tbody-conv-lista');
+  if(tbLista){
+    let lista=orcs.slice();
+    if(filtroStatus) lista=lista.filter(o=>o.status===filtroStatus);
+    lista.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+    tbLista.innerHTML=lista.length?lista.map(o=>{
+      const c=store.clientes.find(c=>c.id===o.clienteId)||{nome:'—'};
+      const t=store.tipos.find(t=>t.id===o.tipoId)||{nome:'—'};
+      const st=ORC_STATUS[o.status]||ORC_STATUS.aguardando;
+      return `<tr>
+        <td style="color:var(--blue-600);font-weight:600">#${o.id}</td>
+        <td>${c.nome}</td><td style="font-size:12.5px">${t.nome}</td>
+        <td style="font-size:12.5px">${o.adv||'—'}</td>
+        <td style="font-size:12.5px">${fmtDate(o.data)}</td>
+        <td style="font-size:12.5px">${fmtDate(o.validade)}</td>
+        <td><strong>${fmtMoney(o.valor)}</strong></td>
+        <td><span class="badge ${st.cls}">${st.icon} ${st.label}</span></td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px">Sem dados no período.</td></tr>';
+  }
+}
+
 function gerarRelatorio() {
   const de  = document.getElementById('rel-de')?.value || '';
   const ate = document.getElementById('rel-ate')?.value || '';
@@ -6581,12 +7075,12 @@ const LEMBRAR_KEY = 'lexpro_lembrar';
 const PERFIS = {
   admin: {
     label: 'Administrador', cor: '#185FA5', bg: '#E6F1FB',
-    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios','opcoes'],
+    paginas: ['dashboard','tipos','clientes','processos','orcamentos','agenda','financeiro','despesas','relatorios','opcoes'],
     pode: { editarClientes:true, excluirClientes:true, verFinanceiro:true, gerenciarUsuarios:true, verOpcoes:true, exportarRelatorio:true }
   },
   advogado: {
     label: 'Advogado', cor: '#0B7B45', bg: '#E2F5EC',
-    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios'],
+    paginas: ['dashboard','tipos','clientes','processos','orcamentos','agenda','financeiro','despesas','relatorios'],
     pode: { editarClientes:true, excluirClientes:false, verFinanceiro:true, gerenciarUsuarios:false, verOpcoes:false, exportarRelatorio:true }
   },
   secretaria: {
@@ -6733,6 +7227,8 @@ function entrarNoSistema() {
     screen.style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     aplicarPermissoes();
+    // Iniciar onboarding se for a primeira vez
+    setTimeout(() => iniciarOnboarding(false), 600);
   }, 400);
 }
 
@@ -6852,6 +7348,9 @@ function aplicarPermissoes() {
 
 function logout() {
   registrarAuditoria('logout', 'sistema', 'Logout realizado', '');
+  // Esconder onboarding se estiver aberto
+  const obd = document.getElementById('onboarding-screen');
+  if(obd) obd.style.display = 'none';
   const sb = getSB();
   if(sb) sb.then && sb.then(s => s && s.auth.signOut());
   localStorage.removeItem(LOGIN_KEY);
@@ -6860,12 +7359,10 @@ function logout() {
 
 function checkLogin() {
   const raw = localStorage.getItem(LOGIN_KEY);
-  // Verificar se sessão Supabase está ativa
   getSB().then(sb => {
     if(sb) {
       sb.auth.getSession().then(({ data }) => {
         if(data.session) {
-          // Sessão Supabase válida
           const users = getUsers();
           const u = users.find(u => u.email === data.session.user.email);
           const sessao = {
@@ -6879,15 +7376,19 @@ function checkLogin() {
           document.getElementById('app-wrapper').style.display = 'flex';
           aplicarPermissoes();
           carregarLembrar();
+          setTimeout(() => iniciarOnboarding(false), 600);
         } else if(raw) {
-          // Sessão local válida
           document.getElementById('login-screen').style.display = 'none';
           document.getElementById('app-wrapper').style.display = 'flex';
           aplicarPermissoes();
           carregarLembrar();
+          setTimeout(() => iniciarOnboarding(false), 600);
         } else {
           document.getElementById('login-screen').style.display = 'flex';
           document.getElementById('app-wrapper').style.display = 'none';
+          // Garantir que onboarding não aparece na tela de login
+          const obd = document.getElementById('onboarding-screen');
+          if(obd) obd.style.display = 'none';
           carregarLembrar();
         }
       });
@@ -6895,9 +7396,12 @@ function checkLogin() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-wrapper').style.display = 'flex';
       aplicarPermissoes();
+      setTimeout(() => iniciarOnboarding(false), 600);
     } else {
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('app-wrapper').style.display = 'none';
+      const obd = document.getElementById('onboarding-screen');
+      if(obd) obd.style.display = 'none';
       carregarLembrar();
     }
   });
