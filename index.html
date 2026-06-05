@@ -1194,13 +1194,13 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <!-- ========== FINANCEIRO ========== -->
     <div class="page" id="page-financeiro">
       <div class="tabs-bar">
-        <button class="tab-btn active" onclick="switchTab('fin','visao',this)">Visão Geral</button>
-        <button class="tab-btn" onclick="switchTab('fin','parcelas',this)">Parcelas</button>
-        <button class="tab-btn" onclick="switchTab('fin','lancar',this)">Lançar Pagamento</button>
+        <button class="tab-btn" onclick="switchTab('fin','visao',this)">📊 Visão Geral</button>
+        <button class="tab-btn active" onclick="switchTab('fin','parcelas',this)">📋 Parcelas</button>
+        <button class="tab-btn" onclick="switchTab('fin','lancar',this)">✅ Lançar Pagamento</button>
       </div>
 
       <!-- VISÃO GERAL -->
-      <div class="tab-content active" id="fin-visao">
+      <div class="tab-content" id="fin-visao">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
           <div class="fin-card fin-green">
             <div class="fin-label">Total Recebido</div>
@@ -1241,7 +1241,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
 
       <!-- PARCELAS -->
-      <div class="tab-content" id="fin-parcelas">
+      <div class="tab-content active" id="fin-parcelas">
         <div class="search-row">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
@@ -1381,6 +1381,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       <div class="tabs-bar">
         <button class="tab-btn active" onclick="switchTab('rel','fluxo',this)">📊 Fluxo de Caixa</button>
         <button class="tab-btn" onclick="switchTab('rel','conversao',this)">🎯 Conversão</button>
+        <button class="tab-btn" onclick="switchTab('rel','inadimplencia',this)">⚠️ Inadimplência</button>
+        <button class="tab-btn" onclick="switchTab('rel','exito',this)">🏆 Êxito</button>
         <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">👤 Clientes</button>
       </div>
 
@@ -1617,6 +1619,100 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           </div>
         </div>
 
+      </div>
+
+      <!-- INADIMPLÊNCIA -->
+      <div class="tab-content" id="rel-inadimplencia">
+
+        <!-- Cards resumo -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--danger)">
+            <div class="stat-label">👥 Clientes Inadimplentes</div>
+            <div class="stat-value" style="color:var(--danger)" id="inad-qtd-clientes">0</div>
+            <div class="stat-sub" id="inad-pct-clientes">0% da base</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--danger)">
+            <div class="stat-label">💸 Total em Atraso</div>
+            <div class="stat-value" style="font-size:18px;color:var(--danger)" id="inad-total">R$ 0,00</div>
+            <div class="stat-sub" id="inad-qtd-parcelas">0 parcela(s)</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--warning)">
+            <div class="stat-label">📅 Média de Atraso</div>
+            <div class="stat-value" style="font-size:18px;color:#92400E" id="inad-media-dias">0 dias</div>
+            <div class="stat-sub">por parcela vencida</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--navy)">
+            <div class="stat-label">🔴 Atraso Maior 30d</div>
+            <div class="stat-value" style="font-size:18px;color:var(--navy)" id="inad-grave">0</div>
+            <div class="stat-sub">parcelas críticas</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Clientes com Parcelas em Atraso</span>
+            <div style="display:flex;gap:8px">
+              <select class="form-control" id="inad-filtro-dias" onchange="renderInadimplencia()" style="width:160px;font-size:13px">
+                <option value="">Todos os atrasos</option>
+                <option value="1">1–15 dias</option>
+                <option value="15">15–30 dias</option>
+                <option value="30">Mais de 30 dias</option>
+                <option value="60">Mais de 60 dias</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="exportarInadimplencia()">⬇️ Exportar CSV</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Cliente</th><th>Processo</th><th>Parcela</th>
+                <th>Vencimento</th><th>Dias em Atraso</th><th>Valor</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="tbody-inadimplencia">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px">Sem parcelas em atraso. 🎉</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- HONORÁRIOS POR ÊXITO -->
+      <div class="tab-content" id="rel-exito">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--gold)">
+            <div class="stat-label">🏆 Total de Êxitos</div>
+            <div class="stat-value" id="exito-total">0</div>
+            <div class="stat-sub">processos com êxito cadastrado</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--success)">
+            <div class="stat-label">💰 Total a Receber (Êxito)</div>
+            <div class="stat-value" style="font-size:18px;color:var(--success)" id="exito-valor-total">R$ 0,00</div>
+            <div class="stat-sub">soma dos honorários de êxito</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--success)">
+            <div class="stat-label">✅ Recebido (Êxito)</div>
+            <div class="stat-value" style="font-size:18px;color:var(--success)" id="exito-recebido">R$ 0,00</div>
+            <div class="stat-sub">honorários de êxito pagos</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <span class="card-title">🏆 Honorários por Êxito — Processos</span>
+            <button class="btn btn-primary" onclick="openModal('modal-exito')">+ Registrar Êxito</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Processo</th><th>Cliente</th><th>Resultado</th>
+                <th>Valor da Causa</th><th>% Êxito</th><th>Honorário</th><th>Status</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="tbody-exito">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum honorário por êxito cadastrado.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <div class="tab-content" id="rel-clientes-rel">
@@ -2379,6 +2475,67 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-converter-orc')">Cancelar</button>
       <button class="btn btn-primary" onclick="converterEmProcesso()">⚖️ Criar Processo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ÊXITO -->
+<div class="modal-overlay" id="modal-exito">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-exito-title">Registrar Honorário por Êxito</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-exito')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="exito-edit-id">
+      <div class="form-group">
+        <label class="form-label">Processo *</label>
+        <select class="form-control" id="exito-processo" onchange="exitoCalcHonorario()">
+          <option value="">— Selecionar Processo —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resultado / Descrição *</label>
+        <input type="text" class="form-control" id="exito-resultado" placeholder="Ex: Ganho de causa, Acordo extrajudicial, Indenização...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor da Causa / Condenação (R$)</label>
+          <input type="number" class="form-control" id="exito-valor-causa" placeholder="0,00" min="0" step="0.01" oninput="exitoCalcHonorario()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Percentual de Êxito (%)</label>
+          <input type="number" class="form-control" id="exito-percentual" placeholder="Ex: 20" min="0" max="100" step="0.1" value="20" oninput="exitoCalcHonorario()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Honorário Calculado (R$)</label>
+          <input type="text" class="form-control" id="exito-honorario-calc" readonly style="background:var(--surface);color:var(--success);font-weight:700;font-size:15px">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Honorário Acordado (R$)</label>
+          <input type="number" class="form-control" id="exito-honorario" placeholder="Pode ajustar o valor" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Data do Êxito</label>
+          <input type="date" class="form-control" id="exito-data">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Status do Pagamento</label>
+          <select class="form-control" id="exito-status">
+            <option value="pendente">⏳ Pendente</option>
+            <option value="pago">✅ Pago</option>
+            <option value="parcial">🔄 Parcialmente Pago</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-exito')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarExito()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -3200,9 +3357,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <script>
 // ==================== DATA STORE ====================
 let store = {
-  tipos: [], clientes: [], processos: [], parcelas: [], orcamentos: [],
+  tipos: [], clientes: [], processos: [], parcelas: [], orcamentos: [], exitos: [],
   andamentos: {}, modelos: [], eventos: [], documentos: {}, despesas: [],
-  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1, orcamento:1 }
+  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1, orcamento:1, exito:1 }
 };
 
 // ==================== SUPABASE CONFIG ====================
@@ -3252,13 +3409,7 @@ async function sbLoad() {
       if(error) { console.warn('Supabase load error:', error.message); }
       else if(data && data.data) {
         store = JSON.parse(data.data);
-        if(!store.modelos)    store.modelos    = [];
-        if(!store.eventos)    store.eventos    = [];
-        if(!store.documentos) store.documentos = {};
-        if(!store.andamentos) store.andamentos = {};
-        if(!store.nextId.modelo) store.nextId.modelo = 1;
-        if(!store.nextId.evento) store.nextId.evento = 1;
-        if(!store.nextId.doc)    store.nextId.doc    = 1;
+        normalizarStore();
         localStorage.setItem('lexpro_erp', JSON.stringify(store));
         console.log('✅ Dados carregados do Supabase!');
         return true;
@@ -3270,8 +3421,36 @@ async function sbLoad() {
   // Fallback: localStorage
   console.log('📦 Carregando do localStorage...');
   const saved = localStorage.getItem('lexpro_erp');
-  if(saved) { try { store = JSON.parse(saved); } catch(e) {} }
+  if(saved) { try { store = JSON.parse(saved); normalizarStore(); } catch(e) {} }
   return false;
+}
+
+function normalizarStore() {
+  // Arrays
+  if(!store.tipos)      store.tipos      = [];
+  if(!store.clientes)   store.clientes   = [];
+  if(!store.processos)  store.processos  = [];
+  if(!store.parcelas)   store.parcelas   = [];
+  if(!store.orcamentos) store.orcamentos = [];
+  if(!store.exitos)     store.exitos     = [];
+  if(!store.despesas)   store.despesas   = [];
+  if(!store.modelos)    store.modelos    = [];
+  if(!store.eventos)    store.eventos    = [];
+  // Objetos
+  if(!store.documentos) store.documentos = {};
+  if(!store.andamentos) store.andamentos = {};
+  // NextId — garantir todos os campos
+  if(!store.nextId) store.nextId = {};
+  const ids = ['tipo','cliente','processo','parcela','modelo','evento','doc','despesa','orcamento','exito'];
+  ids.forEach(k => { if(!store.nextId[k]) store.nextId[k] = 1; });
+  // Recalcular nextIds a partir dos dados reais para evitar colisões
+  store.nextId.tipo      = Math.max(store.nextId.tipo,      ...(store.tipos.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.cliente   = Math.max(store.nextId.cliente,   ...(store.clientes.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.processo  = Math.max(store.nextId.processo,  ...(store.processos.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.parcela   = Math.max(store.nextId.parcela,   ...(store.parcelas.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.orcamento = Math.max(store.nextId.orcamento, ...(store.orcamentos.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.despesa   = Math.max(store.nextId.despesa,   ...(store.despesas.map(x=>x.id)||[0]), 0) + 1;
+  store.nextId.exito     = Math.max(store.nextId.exito,     ...(store.exitos.map(x=>x.id)||[0]), 0) + 1;
 }
 
 // Compatibilidade: saveData e loadData agora usam Supabase
@@ -3380,9 +3559,9 @@ function refreshPage(page) {
   else if(page === 'orcamentos') renderOrcamentos();
   else if(page === 'processos') renderProcessos();
   else if(page === 'agenda') renderAgenda();
-  else if(page === 'financeiro') { renderFinVisao(); renderParcelas(); updateParcelasSelect(); }
+  else if(page === 'financeiro') { renderParcelas(); renderFinVisao(); updateParcelasSelect(); }
   else if(page === 'despesas') renderDespesas();
-  else if(page === 'relatorios') { gerarRelatorio(); renderConversao(); renderRelClientes(); }
+  else if(page === 'relatorios') { gerarRelatorio(); renderConversao(); renderInadimplencia(); renderExito(); renderRelClientes(); }
   else if(page === 'opcoes') renderOpcoes();
 }
 
@@ -3704,7 +3883,198 @@ function gerarPDFOrcamento(id) {
   setTimeout(() => win.print(), 500);
 }
 
-// ==================== BUSCA GLOBAL ====================
+// ==================== INADIMPLÊNCIA ====================
+function renderInadimplencia() {
+  const filtroDias = parseInt(document.getElementById('inad-filtro-dias')?.value)||0;
+  const hoje = today();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  // Todas as parcelas vencidas não pagas
+  let vencidas = store.parcelas.filter(p => p.status !== 'pago' && p.vencimento < hoje);
+
+  // Cards
+  const totalInad = vencidas.reduce((s,p)=>s+p.valor,0);
+  const diasAtraso = vencidas.map(p=>diffDays(p.vencimento,hoje));
+  const mediaDias = diasAtraso.length ? Math.round(diasAtraso.reduce((s,d)=>s+d,0)/diasAtraso.length) : 0;
+  const graves = vencidas.filter(p=>diffDays(p.vencimento,hoje)>30).length;
+  const clientesInad = [...new Set(vencidas.map(p=>p.clienteId))];
+
+  set('inad-qtd-clientes', clientesInad.length);
+  set('inad-pct-clientes', store.clientes.length ? Math.round(clientesInad.length/store.clientes.length*100)+'% da base' : '');
+  set('inad-total', fmtMoney(totalInad));
+  set('inad-qtd-parcelas', vencidas.length+' parcela(s)');
+  set('inad-media-dias', mediaDias+' dias');
+  set('inad-grave', graves);
+
+  // Filtro por faixa de dias
+  if(filtroDias === 1)  vencidas = vencidas.filter(p=>{ const d=diffDays(p.vencimento,hoje); return d>=1&&d<=15; });
+  if(filtroDias === 15) vencidas = vencidas.filter(p=>{ const d=diffDays(p.vencimento,hoje); return d>15&&d<=30; });
+  if(filtroDias === 30) vencidas = vencidas.filter(p=>diffDays(p.vencimento,hoje)>30);
+  if(filtroDias === 60) vencidas = vencidas.filter(p=>diffDays(p.vencimento,hoje)>60);
+
+  vencidas.sort((a,b)=>a.vencimento.localeCompare(b.vencimento));
+
+  const tb = document.getElementById('tbody-inadimplencia');
+  if(!tb) return;
+  if(!vencidas.length) {
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px">Sem parcelas em atraso nesse filtro. 🎉</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = vencidas.map(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+    const dias = diffDays(p.vencimento, hoje);
+    const corDias = dias > 60 ? 'var(--danger)' : dias > 30 ? '#92400E' : 'var(--warning)';
+    return `<tr style="background:${dias>30?'#FFF5F5':''}">
+      <td><strong>${c.nome}</strong></td>
+      <td style="color:var(--blue-600)">${pr.numero}</td>
+      <td style="text-align:center">${p.num}/${p.total}</td>
+      <td>${fmtDate(p.vencimento)}</td>
+      <td><span style="font-weight:700;color:${corDias}">${dias} dias</span></td>
+      <td><strong style="color:var(--danger)">${fmtMoney(p.valor)}</strong></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-primary btn-sm" onclick="abrirModalWpp(${c.id},${p.id})" title="Cobrar via WhatsApp" style="background:#25D366;border-color:#25D366">📱</button>
+        <button class="btn btn-outline btn-sm" onclick="marcarPago(${p.id})" title="Confirmar pagamento">✅</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function exportarInadimplencia() {
+  const hoje = today();
+  const vencidas = store.parcelas.filter(p=>p.status!=='pago'&&p.vencimento<hoje);
+  if(!vencidas.length) { showToast('Sem parcelas em atraso.','error'); return; }
+  const rows = vencidas.map(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+    const dias = diffDays(p.vencimento,hoje);
+    return [c.nome, pr.numero, p.num+'/'+p.total, fmtDate(p.vencimento), dias+'d', p.valor.toFixed(2)].join(';');
+  });
+  const csv = 'Cliente;Processo;Parcela;Vencimento;Dias Atraso;Valor\n'+rows.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'inadimplencia_'+today()+'.csv'; a.click();
+  showToast('Exportado!','success');
+}
+
+// ==================== HONORÁRIOS POR ÊXITO ====================
+function getExitos() {
+  if(!store.exitos) store.exitos = [];
+  return store.exitos;
+}
+
+function exitoCalcHonorario() {
+  const causa = parseFloat(document.getElementById('exito-valor-causa')?.value)||0;
+  const pct = parseFloat(document.getElementById('exito-percentual')?.value)||0;
+  const calc = causa * pct / 100;
+  const el = document.getElementById('exito-honorario-calc');
+  if(el) el.value = calc > 0 ? fmtMoney(calc) : '';
+  // Preencher honorário acordado se vazio
+  const hon = document.getElementById('exito-honorario');
+  if(hon && !hon.value && calc > 0) hon.value = calc.toFixed(2);
+}
+
+function renderExito() {
+  const exitos = getExitos();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const total = exitos.reduce((s,e)=>s+e.honorario,0);
+  const recebido = exitos.filter(e=>e.status==='pago').reduce((s,e)=>s+e.honorario,0);
+  set('exito-total', exitos.length);
+  set('exito-valor-total', fmtMoney(total));
+  set('exito-recebido', fmtMoney(recebido));
+
+  const tb = document.getElementById('tbody-exito');
+  if(!tb) return;
+  if(!exitos.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum honorário por êxito cadastrado.</td></tr>';
+    return;
+  }
+  const STATUS_EXITO = {
+    pendente: { icon:'⏳', label:'Pendente', cls:'badge-amber' },
+    pago:     { icon:'✅', label:'Pago',     cls:'badge-green' },
+    parcial:  { icon:'🔄', label:'Parcial',  cls:'badge-blue'  }
+  };
+  tb.innerHTML = exitos.map(e => {
+    const pr = store.processos.find(p=>p.id===e.processoId)||{numero:'—'};
+    const c  = store.clientes.find(c=>c.id===pr.clienteId)||{nome:'—'};
+    const st = STATUS_EXITO[e.status]||STATUS_EXITO.pendente;
+    return `<tr>
+      <td style="color:var(--blue-600);font-weight:600">${pr.numero}</td>
+      <td>${c.nome}</td>
+      <td style="font-size:12.5px">${e.resultado}</td>
+      <td>${e.valorCausa>0?fmtMoney(e.valorCausa):'—'}</td>
+      <td style="text-align:center">${e.percentual>0?e.percentual+'%':'—'}</td>
+      <td><strong style="color:var(--success)">${fmtMoney(e.honorario)}</strong></td>
+      <td><span class="badge ${st.cls}">${st.icon} ${st.label}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" onclick="editarExito(${e.id})" title="Editar">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirExito(${e.id})" title="Excluir">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function salvarExito() {
+  const processoId = parseInt(document.getElementById('exito-processo').value);
+  const resultado = document.getElementById('exito-resultado').value.trim();
+  const honorario = parseFloat(document.getElementById('exito-honorario').value)||0;
+  if(!processoId||!resultado||!honorario) { showToast('Preencha os campos obrigatórios.','error'); return; }
+  if(!store.exitos) store.exitos = [];
+  if(!store.nextId.exito) store.nextId.exito = 1;
+  const editId = document.getElementById('exito-edit-id').value;
+  const data = {
+    processoId, resultado, honorario,
+    valorCausa: parseFloat(document.getElementById('exito-valor-causa').value)||0,
+    percentual: parseFloat(document.getElementById('exito-percentual').value)||0,
+    data: document.getElementById('exito-data').value||today(),
+    status: document.getElementById('exito-status').value
+  };
+  if(editId) {
+    const e = store.exitos.find(e=>e.id==editId);
+    if(e) Object.assign(e, data);
+    showToast('Êxito atualizado!','success');
+  } else {
+    store.exitos.push({ id:store.nextId.exito++, ...data });
+    registrarAuditoria('criou','processo','Êxito registrado: '+store.processos.find(p=>p.id===processoId)?.numero,'Honorário: '+fmtMoney(honorario));
+    showToast('Êxito registrado!','success');
+  }
+  saveData(); closeModal('modal-exito'); renderExito();
+}
+
+function editarExito(id) {
+  const e = store.exitos.find(e=>e.id===id); if(!e) return;
+  populateProcessosExito();
+  document.getElementById('exito-edit-id').value = e.id;
+  document.getElementById('modal-exito-title').textContent = 'Editar Honorário por Êxito';
+  document.getElementById('exito-processo').value = e.processoId;
+  document.getElementById('exito-resultado').value = e.resultado;
+  document.getElementById('exito-valor-causa').value = e.valorCausa||'';
+  document.getElementById('exito-percentual').value = e.percentual||20;
+  document.getElementById('exito-honorario').value = e.honorario;
+  document.getElementById('exito-data').value = e.data||today();
+  document.getElementById('exito-status').value = e.status||'pendente';
+  exitoCalcHonorario();
+  openModal('modal-exito', false);
+}
+
+function excluirExito(id) {
+  if(!confirm('Excluir este registro de êxito?')) return;
+  store.exitos = store.exitos.filter(e=>e.id!==id);
+  saveData(); renderExito(); showToast('Excluído.');
+}
+
+function populateProcessosExito() {
+  const sel = document.getElementById('exito-processo');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecionar Processo —</option>';
+  store.processos.forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    sel.innerHTML += `<option value="${p.id}">${p.numero} — ${c.nome}</option>`;
+  });
+  sel.value = cur;
+}
 let buscaIdx = -1;
 
 function buscaGlobal(q) {
@@ -5740,6 +6110,8 @@ function switchTab(group, tab, btn) {
   if(group === 'fin' && tab === 'lancar') updateParcelasSelect();
   if(group === 'rel' && tab === 'fluxo') gerarRelatorio();
   if(group === 'rel' && tab === 'conversao') renderConversao();
+  if(group === 'rel' && tab === 'inadimplencia') renderInadimplencia();
+  if(group === 'rel' && tab === 'exito') { renderExito(); populateProcessosExito(); }
   if(group === 'rel' && tab === 'clientes-rel') renderRelClientes();
   if(group === 'rel' && tab === 'processos-rel') renderRelProcessos();
   if(group === 'rel' && tab === 'entradas') renderRelEntradas();
@@ -5767,6 +6139,15 @@ function openModal(id, reset = true) {
       if(obs) obs.style.display = 'none';
       // Inicializar checkboxes com perfil secretaria
       onPerfilChange('secretaria');
+    }
+    if(id === 'modal-exito') {
+      document.getElementById('exito-edit-id').value = '';
+      document.getElementById('modal-exito-title').textContent = 'Registrar Honorário por Êxito';
+      ['exito-resultado','exito-valor-causa','exito-honorario','exito-honorario-calc'].forEach(i => { const el=document.getElementById(i); if(el) el.value=''; });
+      document.getElementById('exito-percentual').value = '20';
+      document.getElementById('exito-data').value = today();
+      document.getElementById('exito-status').value = 'pendente';
+      populateProcessosExito();
     }
     if(id === 'modal-orcamento') {
       document.getElementById('orcamento-edit-id').value = '';
@@ -5927,10 +6308,18 @@ function clienteGerarDatas() {
   const container = document.getElementById('cliente-datas-container');
   const grid = document.getElementById('cliente-datas-grid');
   if(!container || !grid) return;
-  if(n <= 1 || !data1) { container.style.display = 'none'; return; }
-  container.style.display = 'block';
+
+  // Calcular valor por parcela
   const valor = parseFloat(document.getElementById('cliente-valor').value)||0;
   const vp = n > 0 ? valor/n : 0;
+
+  // Para 1 parcela não mostra o grid (desnecessário), mas ainda salva a data1
+  if(n <= 1 || !data1) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
   grid.innerHTML = '';
   for(let i = 0; i < n; i++) {
     const d = new Date(data1 + 'T12:00:00');
@@ -5945,10 +6334,22 @@ function clienteGerarDatas() {
 
 function lerDatasCliente() {
   const n = parseInt(document.getElementById('cliente-parcelas').value)||1;
+  const data1 = document.getElementById('cliente-data1').value;
   const datas = [];
+
   for(let i = 0; i < n; i++) {
     const el = document.getElementById('cliente-data-parc-' + i);
-    datas.push(el ? el.value : '');
+    if(el && el.value) {
+      // Data editada individualmente no grid
+      datas.push(el.value);
+    } else if(data1) {
+      // Calcular automaticamente a partir da data1
+      const d = new Date(data1 + 'T12:00:00');
+      d.setMonth(d.getMonth() + i);
+      datas.push(d.toISOString().split('T')[0]);
+    } else {
+      datas.push('');
+    }
   }
   return datas;
 }
@@ -6364,8 +6765,38 @@ function salvarProcesso() {
     store.processos.push({ id: pId, ...procData, lembrete });
     if(!store.andamentos[pId]) store.andamentos[pId] = [];
     store.andamentos[pId].push({ data: today(), texto: 'Processo aberto.', status: procData.status });
-    registrarAuditoria('criou','processo','Criou processo: '+num,'');
-    showToast('Processo criado!', 'success');
+
+    // Gerar parcelas a partir das condições financeiras do cliente
+    const cli = store.clientes.find(c => c.id === cId);
+    console.log('[DEBUG] cli:', cli ? {nome:cli.nome, valor:cli.valor, nParcelas:cli.nParcelas, datasParcelas:cli.datasParcelas} : 'NÃO ENCONTRADO');
+    console.log('[DEBUG] cId:', cId, '| store.clientes.length:', store.clientes.length);
+    if(cli && cli.valor > 0) {
+      const nParcelas = cli.nParcelas || 1;
+      const valorParcela = parseFloat((cli.valor / nParcelas).toFixed(2));
+      const dt1 = (cli.datasParcelas && cli.datasParcelas[0]) || today();
+      console.log('[DEBUG] Gerando', nParcelas, 'parcelas | dt1:', dt1, '| valor:', valorParcela);
+      for(let i = 0; i < nParcelas; i++) {
+        const dtVenc = (cli.datasParcelas && cli.datasParcelas[i]) || addMonths(dt1, i);
+        store.parcelas.push({
+          id: store.nextId.parcela++,
+          processoId: pId,
+          clienteId: cId,
+          num: i + 1,
+          total: nParcelas,
+          vencimento: dtVenc,
+          valor: valorParcela,
+          status: 'pendente',
+          dtPagamento: null,
+          obs: ''
+        });
+      }
+      console.log('[DEBUG] store.parcelas após push:', store.parcelas.length);
+      registrarAuditoria('criou','processo','Criou processo: '+num+' com '+nParcelas+' parcela(s)','');
+      showToast('Processo criado com '+nParcelas+' parcela(s)!', 'success');
+    } else {
+      registrarAuditoria('criou','processo','Criou processo: '+num,'Sem condições financeiras no cliente');
+      showToast('Processo criado! Configure as condições financeiras no cadastro do cliente para gerar parcelas.', 'success');
+    }
   }
   saveData(); closeModal('modal-processo'); renderProcessos(); updateDashboard();
 }
@@ -6639,7 +7070,8 @@ function renderFinVisao() {
   const pagos = all.filter(p => p.status === 'pago');
   const vencidos = all.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
   const aReceber = all.filter(p => p.status !== 'pago' && !isVencido(p.vencimento));
-  const totalContratado = store.processos.reduce((s,p) => s + p.valor, 0);
+  // Total contratado = soma das parcelas (processo não tem mais campo valor)
+  const totalContratado = all.reduce((s,p) => s + p.valor, 0);
   document.getElementById('fin-total-recebido').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0));
   document.getElementById('fin-total-vencido').textContent = fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0));
   document.getElementById('fin-total-areceber').textContent = fmtMoney(aReceber.reduce((s,p)=>s+p.valor,0));
