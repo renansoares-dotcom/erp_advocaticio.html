@@ -326,6 +326,19 @@ nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
 .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 
+/* Busca global */
+#busca-global-box { transition: width 0.25s ease, border-color 0.2s; }
+#busca-dropdown::-webkit-scrollbar { width: 4px; }
+#busca-dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.busca-grupo-titulo { padding: 8px 14px 4px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.busca-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background 0.12s; border-bottom: 1px solid #F8FAFC; }
+.busca-item:hover, .busca-item.ativo { background: var(--blue-50); }
+.busca-item:last-child { border-bottom: none; }
+.busca-item .bi-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.busca-item .bi-main { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.busca-item .bi-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.busca-sem-resultado { padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 18px; border-radius: var(--radius);
@@ -930,6 +943,22 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   <div class="topbar">
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-right">
+
+      <!-- BUSCA GLOBAL -->
+      <div style="position:relative" id="busca-global-wrap">
+        <div style="display:flex;align-items:center;background:var(--surface);border:1.5px solid var(--border);border-radius:24px;padding:6px 14px;gap:8px;transition:all 0.2s;width:220px" id="busca-global-box" onfocusin="this.style.borderColor='var(--blue-400)';this.style.width='300px'" onfocusout="this.style.borderColor='var(--border)';this.style.width='220px'">
+          <span style="color:var(--text-muted);font-size:14px">🔍</span>
+          <input type="text" id="busca-global-input" placeholder="Buscar clientes, processos..." autocomplete="off"
+            style="border:none;background:transparent;outline:none;font-size:13px;color:var(--text-primary);width:100%;font-family:'Inter',sans-serif"
+            oninput="buscaGlobal(this.value)"
+            onkeydown="buscaGlobalKeydown(event)"
+            onfocus="if(this.value) buscaGlobal(this.value)">
+          <button id="busca-limpar" onclick="limparBusca()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:0;line-height:1">✕</button>
+        </div>
+        <!-- Dropdown de resultados -->
+        <div id="busca-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;width:360px;background:white;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:9000;max-height:420px;overflow-y:auto"></div>
+      </div>
+
       <span id="topbar-date" style="font-size:13px;color:var(--text-muted)"></span>
       <!-- SINO DE NOTIFICAÇÕES -->
       <div style="position:relative">
@@ -3675,6 +3704,158 @@ function gerarPDFOrcamento(id) {
   setTimeout(() => win.print(), 500);
 }
 
+// ==================== BUSCA GLOBAL ====================
+let buscaIdx = -1;
+
+function buscaGlobal(q) {
+  const dropdown = document.getElementById('busca-dropdown');
+  const limpar = document.getElementById('busca-limpar');
+  buscaIdx = -1;
+  if(limpar) limpar.style.display = q ? '' : 'none';
+  if(!q || q.trim().length < 2) { dropdown.style.display = 'none'; return; }
+  const termo = q.toLowerCase().trim();
+  const resultados = [];
+
+  // Clientes
+  const clientes = store.clientes.filter(c =>
+    c.nome.toLowerCase().includes(termo) || (c.cpf||'').includes(termo) ||
+    (c.tel||'').includes(termo) || (c.email||'').toLowerCase().includes(termo)
+  ).slice(0,4);
+  if(clientes.length) {
+    resultados.push({tipo:'grupo', label:'👤 Clientes'});
+    clientes.forEach(c => resultados.push({tipo:'cliente', id:c.id, icon:'👤', iconBg:'#E6F1FB', iconCor:'#185FA5',
+      main:destaqueBusca(c.nome,termo), sub:[c.cpf,c.tel,c.email].filter(Boolean).join(' · ')}));
+  }
+
+  // Processos
+  const processos = store.processos.filter(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:''};
+    return p.numero.toLowerCase().includes(termo) || c.nome.toLowerCase().includes(termo) ||
+      (p.vara||'').toLowerCase().includes(termo) || (p.adv||'').toLowerCase().includes(termo);
+  }).slice(0,4);
+  if(processos.length) {
+    resultados.push({tipo:'grupo', label:'⚖️ Processos'});
+    processos.forEach(p => {
+      const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+      const st = statusLabels[p.status]||{label:p.status};
+      resultados.push({tipo:'processo', id:p.id, icon:'⚖️', iconBg:'#E2F5EC', iconCor:'#0B7B45',
+        main:destaqueBusca(p.numero,termo), sub:c.nome+' · '+st.label+(p.adv?' · '+p.adv:'')});
+    });
+  }
+
+  // Orçamentos
+  const orcs = (store.orcamentos||[]).filter(o => {
+    const c = store.clientes.find(c=>c.id===o.clienteId)||{nome:''};
+    return c.nome.toLowerCase().includes(termo) || (o.descricao||'').toLowerCase().includes(termo);
+  }).slice(0,3);
+  if(orcs.length) {
+    resultados.push({tipo:'grupo', label:'📋 Orçamentos'});
+    orcs.forEach(o => {
+      const c = store.clientes.find(c=>c.id===o.clienteId)||{nome:'—'};
+      const st = ORC_STATUS[o.status]||ORC_STATUS.aguardando;
+      resultados.push({tipo:'orcamento', id:o.id, icon:'📋', iconBg:'#FEF3C7', iconCor:'#92400E',
+        main:destaqueBusca(c.nome,termo), sub:'#'+o.id+' · '+st.label+' · '+fmtMoney(o.valor)});
+    });
+  }
+
+  // Despesas
+  const despesas = getDespesas().filter(d =>
+    d.descricao.toLowerCase().includes(termo)||(d.conta||'').toLowerCase().includes(termo)
+  ).slice(0,3);
+  if(despesas.length) {
+    resultados.push({tipo:'grupo', label:'📤 Despesas'});
+    despesas.forEach(d => {
+      const st = DESP_STATUS[d.status]||DESP_STATUS.pendente;
+      resultados.push({tipo:'despesa', id:d.id, icon:'📤', iconBg:'#FEE2E2', iconCor:'#B91C1C',
+        main:destaqueBusca(d.descricao,termo), sub:fmtMoney(d.valor)+' · '+fmtDate(d.vencimento)+' · '+st.label});
+    });
+  }
+
+  if(!resultados.length) {
+    dropdown.innerHTML = `<div class="busca-sem-resultado">🔍 Nenhum resultado para "<strong>${q}</strong>"</div>`;
+    dropdown.style.display = 'block'; return;
+  }
+
+  let html = ''; let itemIdx = 0;
+  resultados.forEach(r => {
+    if(r.tipo==='grupo') {
+      html += `<div class="busca-grupo-titulo">${r.label}</div>`;
+    } else {
+      html += `<div class="busca-item" data-idx="${itemIdx}" onclick="buscaNavegar('${r.tipo}',${r.id})" onmouseenter="buscaSetAtivo(${itemIdx})">
+        <div class="bi-icon" style="background:${r.iconBg};color:${r.iconCor}">${r.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="bi-main">${r.main}</div>
+          <div class="bi-sub">${r.sub}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">→</span>
+      </div>`;
+      itemIdx++;
+    }
+  });
+  dropdown.innerHTML = html;
+  dropdown.style.display = 'block';
+}
+
+function destaqueBusca(texto, termo) {
+  const idx = texto.toLowerCase().indexOf(termo.toLowerCase());
+  if(idx === -1) return texto;
+  return texto.substring(0,idx)+`<mark style="background:#FEF3B0;border-radius:2px;padding:0 1px">${texto.substring(idx,idx+termo.length)}</mark>`+texto.substring(idx+termo.length);
+}
+
+function buscaSetAtivo(idx) {
+  buscaIdx = idx;
+  document.querySelectorAll('.busca-item').forEach((el,i) => el.classList.toggle('ativo', i===idx));
+}
+
+function buscaGlobalKeydown(e) {
+  const items = document.querySelectorAll('.busca-item');
+  if(!items.length) return;
+  if(e.key==='ArrowDown') { e.preventDefault(); buscaIdx=Math.min(buscaIdx+1,items.length-1); buscaSetAtivo(buscaIdx); }
+  else if(e.key==='ArrowUp') { e.preventDefault(); buscaIdx=Math.max(buscaIdx-1,0); buscaSetAtivo(buscaIdx); }
+  else if(e.key==='Enter') { e.preventDefault(); const a=document.querySelector('.busca-item.ativo'); if(a) a.click(); }
+  else if(e.key==='Escape') limparBusca();
+}
+
+function buscaNavegar(tipo, id) {
+  limparBusca();
+  const navBtn = s => document.querySelector('.nav-item[onclick*="'+s+'"]');
+  if(tipo==='cliente') {
+    navigate('clientes', navBtn('clientes'));
+    setTimeout(() => {
+      const c = store.clientes.find(c=>c.id===id);
+      const inp = document.getElementById('search-clientes');
+      if(inp && c) { inp.value=c.nome; renderClientes(c.nome); }
+    }, 200);
+  } else if(tipo==='processo') {
+    navigate('processos', navBtn('processos'));
+    setTimeout(() => verDetalhe(id), 300);
+  } else if(tipo==='orcamento') {
+    navigate('orcamentos', navBtn('orcamentos'));
+    setTimeout(() => editarOrcamento(id), 300);
+  } else if(tipo==='despesa') {
+    navigate('despesas', navBtn('despesas'));
+    setTimeout(() => editarDespesa(id), 300);
+  }
+}
+
+function limparBusca() {
+  const inp = document.getElementById('busca-global-input');
+  const dd = document.getElementById('busca-dropdown');
+  const lp = document.getElementById('busca-limpar');
+  if(inp) inp.value='';
+  if(dd) dd.style.display='none';
+  if(lp) lp.style.display='none';
+  buscaIdx=-1;
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('busca-global-wrap');
+  if(wrap && !wrap.contains(e.target)) {
+    const dd = document.getElementById('busca-dropdown');
+    if(dd) dd.style.display='none';
+  }
+});
+
 // ==================== ONBOARDING ====================
 const OBD_KEY = 'lexpro_onboarding_done';
 const OBD_DADOS_KEY = 'lexpro_escritorio';
@@ -6251,54 +6432,198 @@ function salvarAndamento() {
   const p = store.processos.find(p => p.id === id);
   if(p) p.status = status;
   if(!store.andamentos[id]) store.andamentos[id] = [];
-  store.andamentos[id].push({ data: today(), texto, status });
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  const now = new Date();
+  store.andamentos[id].push({
+    data: today(),
+    hora: now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    autor: session.nome||session.email||'—',
+    texto, status
+  });
+  registrarAuditoria('editou','processo','Andamento registrado: '+p?.numero,'');
   saveData(); closeModal('modal-andamento'); renderProcessos(); updateDashboard();
   showToast('Andamento registrado!', 'success');
 }
+
+function gerarReciboPagamento(parcelaId) {
+  const pa = store.parcelas.find(p=>p.id===parcelaId);
+  if(!pa || pa.status !== 'pago') return;
+  const proc = store.processos.find(p=>p.id===pa.processoId)||{numero:'—',adv:'—'};
+  const c = store.clientes.find(c=>c.id===pa.clienteId)||{nome:'—',cpf:'—'};
+  const t = store.tipos.find(t=>t.id===proc.tipoId)||{nome:'—'};
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const reciboNum = String(pa.processoId).padStart(4,'0')+'-'+String(pa.num).padStart(2,'0');
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Recibo de Pagamento</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;color:#1A2E45;padding:40px;max-width:680px;margin:0 auto}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1A2E45;padding-bottom:18px;margin-bottom:24px}
+    .logo{width:52px;height:52px;background:#1A2E45;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#C4A96B;font-size:20px;font-weight:700}
+    h1{font-size:18px;color:#1A2E45;margin:0}
+    .esc p{font-size:11.5px;color:#666;margin:2px 0}
+    .badge-recibo{background:#1A2E45;color:#C4A96B;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px}
+    .titulo{text-align:center;padding:16px;background:#1A2E45;border-radius:10px;color:white;margin-bottom:24px}
+    .titulo h2{font-size:16px;letter-spacing:1.5px;text-transform:uppercase}
+    .titulo p{font-size:12px;opacity:0.7;margin-top:4px}
+    .valor-box{text-align:center;padding:20px;background:linear-gradient(135deg,#1A2E45,#1D3A5C);border-radius:12px;margin:20px 0;color:white}
+    .valor-box .v{font-size:32px;font-weight:700;color:#C4A96B;letter-spacing:1px}
+    .valor-box .ext{font-size:12px;opacity:0.75;margin-top:4px}
+    .secao{border:1px solid #DDE4EC;border-radius:8px;padding:14px 16px;margin-bottom:14px}
+    .secao h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#C4A96B;margin-bottom:10px;border-bottom:1px solid #EEF2F7;padding-bottom:6px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .item label{font-size:10.5px;color:#888;display:block;margin-bottom:2px}
+    .item strong{font-size:13px;color:#1A2E45}
+    .rodape{margin-top:30px;padding-top:20px;border-top:1px solid #DDE4EC;display:flex;justify-content:space-between;align-items:flex-end}
+    .assinatura{text-align:center}
+    .assinatura .linha{width:180px;border-top:1px solid #1A2E45;margin:0 auto 6px}
+    .assinatura p{font-size:11.5px;color:#666}
+    .autenticidade{font-size:10.5px;color:#999;text-align:right}
+    @media print{body{padding:20px}}
+  </style></head><body>
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="logo">DV</div>
+      <div class="esc">
+        <h1>${dados.nome||'Diego Vila Nova — Advocacia e Consultoria Jurídica'}</h1>
+        <p>${dados.oab||'OAB/PE 51.493'}</p>
+        ${dados.tel?`<p>${dados.tel}</p>`:''}
+      </div>
+    </div>
+    <span class="badge-recibo">RECIBO Nº ${reciboNum}</span>
+  </div>
+
+  <div class="titulo">
+    <h2>Recibo de Pagamento de Honorários</h2>
+    <p>Emitido em ${hoje}</p>
+  </div>
+
+  <div class="valor-box">
+    <div style="font-size:12px;opacity:0.8;margin-bottom:6px;letter-spacing:1px">VALOR RECEBIDO</div>
+    <div class="v">${fmtMoney(pa.valor)}</div>
+    <div class="ext">Parcela ${pa.num} de ${pa.total} · ${t.nome}</div>
+  </div>
+
+  <div class="secao">
+    <h3>Dados do Pagador</h3>
+    <div class="grid">
+      <div class="item"><label>Nome</label><strong>${c.nome}</strong></div>
+      <div class="item"><label>CPF/CNPJ</label><strong>${c.cpf||'—'}</strong></div>
+      ${c.tel?`<div class="item"><label>Telefone</label><strong>${c.tel}</strong></div>`:''}
+      ${c.email?`<div class="item"><label>E-mail</label><strong>${c.email}</strong></div>`:''}
+    </div>
+  </div>
+
+  <div class="secao">
+    <h3>Referência</h3>
+    <div class="grid">
+      <div class="item"><label>Processo</label><strong>${proc.numero}</strong></div>
+      <div class="item"><label>Tipo de Serviço</label><strong>${t.nome}</strong></div>
+      <div class="item"><label>Parcela</label><strong>${pa.num}ª de ${pa.total}</strong></div>
+      <div class="item"><label>Vencimento</label><strong>${fmtDate(pa.vencimento)}</strong></div>
+      <div class="item"><label>Data do Pagamento</label><strong>${fmtDate(pa.dtPagamento)||hoje}</strong></div>
+      <div class="item"><label>Forma de Pagamento</label><strong>${pa.forma||'—'}</strong></div>
+    </div>
+    ${pa.obs?`<div class="item" style="margin-top:8px"><label>Observação</label><strong>${pa.obs}</strong></div>`:''}
+  </div>
+
+  <div class="rodape">
+    <div class="assinatura">
+      <div class="linha"></div>
+      <p><strong>${proc.adv||dados.nome||'Diego Vila Nova'}</strong></p>
+      <p>Advogado · ${dados.oab||'OAB/PE 51.493'}</p>
+    </div>
+    <div class="autenticidade">
+      <p>Recibo gerado em ${hoje}</p>
+      <p>Ref.: Proc. ${proc.numero} · Parc. ${pa.num}/${pa.total}</p>
+    </div>
+  </div>
+  </body></html>`;
+
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+  registrarAuditoria('exportou','financeiro','Recibo gerado: '+proc.numero+' parc.'+pa.num,'Valor: '+fmtMoney(pa.valor));
+}
 function verDetalhe(id) {
   const p = store.processos.find(p => p.id === id);
+  if(!p) return;
   const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
   const t = store.tipos.find(t => t.id === p.tipoId)||{nome:'—'};
   const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
   const parcelas = store.parcelas.filter(pa => pa.processoId === id);
   const andamentos = (store.andamentos[id]||[]).slice().reverse();
+  const pago = parcelas.filter(pa=>pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
+  const total = parcelas.reduce((s,pa)=>s+pa.valor,0);
+  const pct = total > 0 ? Math.min(100,Math.round(pago/total*100)) : 0;
+
   document.getElementById('detalhe-title').textContent = `Processo ${p.numero}`;
   document.getElementById('detalhe-body').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+    <!-- Dados gerais -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
       <div><div class="form-label">Cliente</div><strong>${c.nome}</strong></div>
       <div><div class="form-label">Tipo</div><span class="badge badge-navy">${t.nome}</span></div>
       <div><div class="form-label">Advogado</div>${p.adv||'—'}</div>
       <div><div class="form-label">Vara/Tribunal</div>${p.vara||'—'}</div>
       <div><div class="form-label">Abertura</div>${fmtDate(p.abertura)}</div>
       <div><div class="form-label">Status</div><span class="badge ${st.cls}">${st.label}</span></div>
-      <div><div class="form-label">Valor Total</div><strong style="color:var(--blue-600)">${fmtMoney(p.valor)}</strong></div>
-      <div><div class="form-label">Parcelamento</div>${p.nParcelas}x de ${fmtMoney(p.valor/p.nParcelas)}</div>
     </div>
-    ${p.descricao ? `<div style="margin-bottom:20px"><div class="form-label">Descrição</div><p style="font-size:13.5px;color:var(--text-secondary)">${p.descricao}</p></div>` : ''}
-    <div style="margin-bottom:20px">
-      <div class="card-title" style="margin-bottom:12px">Parcelas</div>
-      <div class="parcel-row parcel-header"><span>#</span><span>Vencimento</span><span>Valor</span><span>Pagamento</span><span>Status</span></div>
-      ${parcelas.map(pa => `
-        <div class="parcel-row">
+    ${p.descricao?`<div style="margin-bottom:20px;padding:12px 14px;background:var(--surface);border-radius:var(--radius);font-size:13.5px;color:var(--text-secondary);border-left:3px solid var(--blue-300)">${p.descricao}</div>`:''}
+
+    <!-- Parcelas -->
+    ${parcelas.length ? `
+    <div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary)">💰 Parcelas</div>
+        <div style="font-size:12px;color:var(--text-muted)">${fmtMoney(pago)} de ${fmtMoney(total)} pago (${pct}%)</div>
+      </div>
+      <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="parcel-row parcel-header"><span>#</span><span>Vencimento</span><span>Valor</span><span>Pagamento</span><span>Status</span><span>Recibo</span></div>
+      ${parcelas.map(pa => {
+        const stPa = pa.status==='pago'?'badge-green':isVencido(pa.vencimento)&&pa.status!=='pago'?'badge-red':'badge-amber';
+        const stLabel = pa.status==='pago'?'Pago':isVencido(pa.vencimento)&&pa.status!=='pago'?'Vencido':'Pendente';
+        return `<div class="parcel-row">
           <span>${pa.num}/${pa.total}</span>
           <span>${fmtDate(pa.vencimento)}</span>
           <span>${fmtMoney(pa.valor)}</span>
           <span>${fmtDate(pa.dtPagamento)}</span>
-          <span><span class="badge ${pa.status==='pago'?'badge-green':isVencido(pa.vencimento)&&pa.status!=='pago'?'badge-red':'badge-amber'}">${pa.status==='pago'?'Pago':isVencido(pa.vencimento)&&pa.status!=='pago'?'Vencido':'Pendente'}</span></span>
-        </div>`).join('')}
-    </div>
-    ${andamentos.length ? `
-    <div>
-      <div class="card-title" style="margin-bottom:12px">Histórico de Andamentos</div>
-      <div class="timeline">
-        ${andamentos.map(a => `
-          <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-date">${fmtDate(a.data)} — ${statusLabels[a.status]?.label||a.status}</div>
-            <div class="timeline-text">${a.texto}</div>
-          </div>`).join('')}
-      </div>
+          <span><span class="badge ${stPa}">${stLabel}</span></span>
+          <span>${pa.status==='pago'?`<button class="btn btn-outline btn-sm" onclick="gerarReciboPagamento(${pa.id})" title="Gerar Recibo" style="font-size:11px;padding:2px 8px">🧾</button>`:'—'}</span>
+        </div>`;
+      }).join('')}
     </div>` : ''}
+
+    <!-- Timeline de Andamentos -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary)">📋 Histórico de Andamentos</div>
+        <button class="btn btn-primary btn-sm" onclick="closeModal('modal-detalhe');atualizarAndamento(${id})" style="font-size:12px">+ Novo Andamento</button>
+      </div>
+      ${andamentos.length ? `
+      <div style="position:relative;padding-left:20px">
+        <div style="position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border)"></div>
+        ${andamentos.map((a,i) => {
+          const stA = statusLabels[a.status]||{label:a.status,cls:'badge-gray'};
+          const isFirst = i===0;
+          return `<div style="position:relative;margin-bottom:${isFirst?'8':'16'}px;padding-bottom:${isFirst?'0':'8'}px">
+            <div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:${isFirst?'var(--blue-600)':'var(--border)'};border:2px solid white;box-shadow:0 0 0 2px ${isFirst?'var(--blue-600)':'var(--border)'}"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:11.5px;font-weight:600;color:var(--text-muted)">${fmtDate(a.data)}${a.hora?' às '+a.hora:''}</span>
+              <span class="badge ${stA.cls}" style="font-size:10px;padding:1px 8px">${stA.label}</span>
+              ${a.autor?`<span style="font-size:11px;color:var(--text-muted)">— ${a.autor}</span>`:''}
+            </div>
+            <div style="font-size:13.5px;color:var(--text-primary);line-height:1.5;background:${isFirst?'var(--blue-50)':'var(--surface)'};border:1px solid ${isFirst?'var(--blue-100)':'var(--border)'};border-radius:8px;padding:10px 12px">${a.texto}</div>
+          </div>`;
+        }).join('')}
+      </div>` : `
+      <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;background:var(--surface);border-radius:var(--radius)">
+        Nenhum andamento registrado ainda.<br>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('modal-detalhe');atualizarAndamento(${id})" style="margin-top:10px">+ Registrar primeiro andamento</button>
+      </div>`}
+    </div>
   `;
   openModal('modal-detalhe');
 }
