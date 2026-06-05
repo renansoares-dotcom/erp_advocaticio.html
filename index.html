@@ -851,6 +851,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <span class="icon">⚖️</span> Processos
         <span class="nav-badge" id="badge-processos">0</span>
       </button>
+      <button class="nav-item" onclick="navigate('orcamentos',this)">
+        <span class="icon">📋</span> Orçamentos
+        <span class="nav-badge" id="badge-orcamentos" style="display:none">0</span>
+      </button>
       <button class="nav-item" onclick="navigate('agenda',this)">
         <span class="icon">📅</span> Agenda
         <span class="nav-badge" id="badge-agenda" style="display:none">0</span>
@@ -859,7 +863,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="nav-section">
       <span class="nav-label">Financeiro</span>
       <button class="nav-item" onclick="navigate('financeiro',this)">
-        <span class="icon">💰</span> Financeiro
+        <span class="icon">💰</span> Recebimentos
+      </button>
+      <button class="nav-item" onclick="navigate('despesas',this)">
+        <span class="icon">📤</span> Despesas
       </button>
       <button class="nav-item" onclick="navigate('relatorios',this)">
         <span class="icon">📈</span> Relatórios
@@ -1230,57 +1237,201 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
-    <!-- ========== RELATÓRIOS ========== -->
-    <div class="page" id="page-relatorios">
-      <div class="tabs-bar">
-        <button class="tab-btn active" onclick="switchTab('rel','fluxo',this)">Fluxo de Caixa</button>
-        <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">Clientes</button>
-        <button class="tab-btn" onclick="switchTab('rel','processos-rel',this)">Processos</button>
+
+    <!-- ========== DESPESAS ========== -->
+    <div class="page" id="page-despesas">
+
+      <!-- Cards de resumo -->
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-label">Total do Mês</div>
+          <div class="stat-value" id="desp-total-mes" style="color:var(--danger)">R$ 0,00</div>
+          <div class="stat-sub" id="desp-qtd-mes">0 despesa(s)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Vencidas</div>
+          <div class="stat-value" id="desp-total-vencidas" style="color:var(--danger)">R$ 0,00</div>
+          <div class="stat-sub" id="desp-qtd-vencidas">0 em atraso</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">A Vencer (30 dias)</div>
+          <div class="stat-value" id="desp-total-avencer" style="color:var(--warning)">R$ 0,00</div>
+          <div class="stat-sub" id="desp-qtd-avencer">0 despesa(s)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pagas no Mês</div>
+          <div class="stat-value" id="desp-total-pagas" style="color:var(--success)">R$ 0,00</div>
+          <div class="stat-sub" id="desp-qtd-pagas">0 despesa(s)</div>
+        </div>
       </div>
 
-      <!-- FLUXO DE CAIXA -->
-      <div class="tab-content active" id="rel-fluxo">
-        <div style="display:flex;gap:12px;margin-bottom:20px;align-items:flex-end">
-          <div class="form-group" style="margin:0;flex:1">
-            <label class="form-label">Período De</label>
-            <input type="date" class="form-control" id="rel-de">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📤 Despesas do Escritório</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="form-control" id="desp-filtro-status" onchange="renderDespesas()" style="width:140px;font-size:13px">
+              <option value="">Todos os status</option>
+              <option value="pendente">⏳ Pendente</option>
+              <option value="pago">✅ Pago</option>
+              <option value="vencido">⚠️ Vencido</option>
+              <option value="cancelado">❌ Cancelado</option>
+            </select>
+            <select class="form-control" id="desp-filtro-categoria" onchange="renderDespesas()" style="width:150px;font-size:13px">
+              <option value="">Todas as categorias</option>
+              <option value="aluguel">🏠 Aluguel</option>
+              <option value="salario">👤 Salário</option>
+              <option value="honorario">⚖️ Honorário</option>
+              <option value="energia">💡 Energia</option>
+              <option value="agua">💧 Água</option>
+              <option value="internet">🌐 Internet</option>
+              <option value="telefone">📱 Telefone</option>
+              <option value="sistema">💻 Sistema/Software</option>
+              <option value="material">📦 Material</option>
+              <option value="imposto">📋 Imposto/Taxa</option>
+              <option value="contabilidade">🧾 Contabilidade</option>
+              <option value="outro">📁 Outro</option>
+            </select>
+            <input type="month" class="form-control" id="desp-filtro-mes" onchange="renderDespesas()" style="width:150px;font-size:13px">
+            <button class="btn btn-primary" onclick="openModal('modal-despesa')">+ Nova Despesa</button>
           </div>
-          <div class="form-group" style="margin:0;flex:1">
-            <label class="form-label">Até</label>
-            <input type="date" class="form-control" id="rel-ate">
-          </div>
-          <button class="btn btn-primary" onclick="gerarRelatorio()">🔍 Gerar Relatório</button>
-          <button class="btn btn-outline" onclick="exportarCSV()">⬇ Exportar CSV</button>
         </div>
-
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
-          <div class="fin-card fin-green">
-            <div class="fin-label">Entradas no Período</div>
-            <div class="fin-amount" style="color:var(--success)" id="rel-entradas">R$ 0,00</div>
-          </div>
-          <div class="fin-card fin-red">
-            <div class="fin-label">Vencidos no Período</div>
-            <div class="fin-amount" style="color:var(--danger)" id="rel-vencidos">R$ 0,00</div>
-          </div>
-          <div class="fin-card fin-blue">
-            <div class="fin-label">Saldo do Período</div>
-            <div class="fin-amount" style="color:var(--blue-600)" id="rel-saldo">R$ 0,00</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header"><span class="card-title">Detalhamento do Fluxo</span></div>
+        <div class="card-body" style="padding:0">
           <div class="table-wrap">
             <table class="data-table">
-              <thead><tr>
-                <th>Data Venc.</th><th>Data Pgto</th><th>Cliente</th><th>Processo</th><th>Parcela</th><th>Valor</th><th>Status</th>
-              </tr></thead>
-              <tbody id="tbody-rel-fluxo">
-                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Selecione um período e gere o relatório.</td></tr>
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                  <th>Recorrência</th>
+                  <th>Conta</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-despesas">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhuma despesa cadastrada.</td></tr>
               </tbody>
             </table>
           </div>
         </div>
+      </div>
+
+    </div><!-- /page-despesas -->
+
+    <!-- ========== RELATÓRIOS ========== -->
+    <div class="page" id="page-relatorios">
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('rel','fluxo',this)">📊 Fluxo de Caixa</button>
+        <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">👤 Clientes</button>
+      </div>
+
+      <!-- FLUXO DE CAIXA COMPLETO -->
+      <div class="tab-content active" id="rel-fluxo">
+
+        <!-- Filtro de período -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">Período:</span>
+          <input type="date" class="form-control" id="rel-de" onchange="gerarRelatorio()" style="width:160px;font-size:13px">
+          <span style="font-size:13px;color:var(--text-muted)">até</span>
+          <input type="date" class="form-control" id="rel-ate" onchange="gerarRelatorio()" style="width:160px;font-size:13px">
+          <button class="btn btn-outline btn-sm" onclick="relPeriodoMesAtual()">Mês atual</button>
+          <button class="btn btn-outline btn-sm" onclick="relPeriodoAno()">Ano atual</button>
+          <button class="btn btn-outline btn-sm" onclick="relPeriodoTudo()">Tudo</button>
+          <button class="btn btn-outline" onclick="exportarCSV()">⬇ Exportar CSV</button>
+        </div>
+
+        <!-- Cards resumo -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div class="fin-card fin-green">
+            <div class="fin-label">📥 Total Entradas</div>
+            <div class="fin-amount" style="color:var(--success)" id="rel-total-entradas">R$ 0,00</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="rel-qtd-entradas">0 recebimento(s)</div>
+          </div>
+          <div class="fin-card fin-red">
+            <div class="fin-label">📤 Total Saídas</div>
+            <div class="fin-amount" style="color:var(--danger)" id="rel-total-saidas">R$ 0,00</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="rel-qtd-saidas">0 despesa(s)</div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-label">💰 Saldo do Período</div>
+            <div class="fin-amount" id="rel-saldo-periodo">R$ 0,00</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Entradas − Saídas</div>
+          </div>
+          <div class="fin-card fin-amber">
+            <div class="fin-label">⏳ A Receber</div>
+            <div class="fin-amount" style="color:#92400E" id="rel-areceber">R$ 0,00</div>
+            <div style="font-size:11px;color:var(--danger);margin-top:4px" id="rel-vencido-label"></div>
+          </div>
+        </div>
+
+        <!-- Gráfico entradas x saídas -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <span class="card-title">📈 Entradas vs Saídas — Últimos 6 meses</span>
+            <div style="display:flex;gap:14px;font-size:12px">
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:var(--success);display:inline-block"></span>Entradas</span>
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:var(--danger);display:inline-block"></span>Saídas</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="rel-grafico-fluxo" style="height:160px;display:flex;align-items:flex-end;gap:4px">
+              <div style="color:var(--text-muted);font-size:13px;text-align:center;width:100%;padding:40px 0">Sem dados para exibir.</div>
+            </div>
+            <div id="rel-grafico-totais" style="display:flex;justify-content:space-around;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"></div>
+          </div>
+        </div>
+
+        <!-- Detalhamento: Entradas e Saídas lado a lado -->
+        <div class="grid-2" style="margin-bottom:20px">
+          <!-- Entradas -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📥 Entradas — Honorários Recebidos</span>
+              <select class="form-control" id="rel-ent-status" onchange="gerarRelatorio()" style="width:140px;font-size:12px">
+                <option value="">Todos</option>
+                <option value="pago">✅ Pago</option>
+                <option value="pendente">⏳ Pendente</option>
+                <option value="vencido">⚠️ Vencido</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Cliente</th><th>Processo</th><th>Parc.</th><th>Vencimento</th><th>Valor</th><th>Status</th>
+                </tr></thead>
+                <tbody id="tbody-rel-entradas">
+                  <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px">Selecione um período.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Saídas -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📤 Saídas — Despesas</span>
+              <select class="form-control" id="rel-said-status" onchange="gerarRelatorio()" style="width:140px;font-size:12px">
+                <option value="">Todos</option>
+                <option value="pago">✅ Pago</option>
+                <option value="pendente">⏳ Pendente</option>
+                <option value="vencido">⚠️ Vencido</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th>
+                </tr></thead>
+                <tbody id="tbody-rel-saidas">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Selecione um período.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- CLIENTES -->
@@ -1325,6 +1476,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <button class="tab-btn active" onclick="switchTab('opt','senha',this)">🔐 Senha</button>
         <button class="tab-btn" onclick="switchTab('opt','contratos',this)">📄 Modelos de Contrato</button>
         <button class="tab-btn" id="tab-btn-usuarios" onclick="switchTab('opt','usuarios',this)">👥 Usuários</button>
+        <button class="tab-btn" onclick="switchTab('opt','auditoria',this)">🔍 Auditoria</button>
+        <button class="tab-btn" onclick="switchTab('opt','whatsapp',this)">📱 WhatsApp</button>
         <button class="tab-btn" onclick="switchTab('opt','sistema',this)">ℹ️ Sistema</button>
       </div>
 
@@ -1556,7 +1709,206 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
+      <!-- AUDITORIA -->
+      <div class="tab-content" id="opt-auditoria">
+        <div class="search-row" style="margin-bottom:16px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1">
+            <select class="form-control" id="audit-filtro-tipo" onchange="renderAuditoria()" style="width:160px;font-size:13px">
+              <option value="">Todos os tipos</option>
+              <option value="cliente">👤 Clientes</option>
+              <option value="processo">⚖️ Processos</option>
+              <option value="financeiro">💰 Financeiro</option>
+              <option value="despesa">📤 Despesas</option>
+              <option value="usuario">👥 Usuários</option>
+              <option value="documento">📁 Documentos</option>
+              <option value="sistema">⚙️ Sistema</option>
+            </select>
+            <select class="form-control" id="audit-filtro-acao" onchange="renderAuditoria()" style="width:140px;font-size:13px">
+              <option value="">Todas as ações</option>
+              <option value="criou">✅ Criou</option>
+              <option value="editou">✏️ Editou</option>
+              <option value="excluiu">🗑 Excluiu</option>
+              <option value="pagou">💰 Pagou</option>
+              <option value="login">🔐 Login</option>
+            </select>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;color:var(--text-muted);white-space:nowrap">De</span>
+              <input type="date" class="form-control" id="audit-filtro-de" onchange="renderAuditoria()" style="width:150px;font-size:13px">
+              <span style="font-size:12px;color:var(--text-muted);white-space:nowrap">até</span>
+              <input type="date" class="form-control" id="audit-filtro-ate" onchange="renderAuditoria()" style="width:150px;font-size:13px">
+            </div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="limparAuditoria()" style="white-space:nowrap">🗑 Limpar histórico</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width:140px">Data/Hora</th>
+                    <th style="width:120px">Usuário</th>
+                    <th style="width:80px">Ação</th>
+                    <th style="width:100px">Módulo</th>
+                    <th>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-auditoria">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum registro de auditoria.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-header" style="border-top:1px solid var(--border);border-bottom:none;padding:10px 16px">
+            <span style="font-size:12px;color:var(--text-muted)" id="audit-contador">0 registro(s)</span>
+            <button class="btn btn-outline btn-sm" onclick="exportarAuditoria()">⬇️ Exportar CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div class="tab-content" id="opt-whatsapp">
+        <div style="max-width:680px">
+
+          <!-- Dados do escritório -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><span class="card-title">📱 Configurações do WhatsApp</span></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">WhatsApp do Escritório (com DDD)</label>
+                  <input type="text" class="form-control" id="wpp-numero" placeholder="Ex: 81999999999" oninput="salvarConfigWpp()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Chave PIX</label>
+                  <input type="text" class="form-control" id="wpp-pix" placeholder="CPF, e-mail, telefone ou chave aleatória" oninput="salvarConfigWpp()">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Tipo de PIX</label>
+                  <select class="form-control" id="wpp-pix-tipo" onchange="salvarConfigWpp()">
+                    <option value="cpf">CPF/CNPJ</option>
+                    <option value="email">E-mail</option>
+                    <option value="telefone">Telefone</option>
+                    <option value="aleatoria">Chave Aleatória</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nome do Titular da Conta PIX</label>
+                  <input type="text" class="form-control" id="wpp-pix-titular" placeholder="Nome completo do titular" oninput="salvarConfigWpp()">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modelo de mensagem de cobrança -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <span class="card-title">✉️ Modelo de Mensagem de Cobrança</span>
+            </div>
+            <div class="card-body">
+              <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:12px;margin-bottom:14px;font-size:12.5px;color:var(--blue-800)">
+                💡 Use as variáveis abaixo para personalizar a mensagem. Elas serão substituídas automaticamente pelos dados reais ao enviar.
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{VENCIMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VENCIMENTO}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PIX}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PIX}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{TITULAR}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{TITULAR}}</span>
+                <span onclick="inserirVariavel('wpp-msg-cobranca','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
+              </div>
+              <textarea class="form-control" id="wpp-msg-cobranca" rows="8" oninput="salvarConfigWpp()" placeholder="Digite o modelo da mensagem de cobrança..."></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+                <button class="btn btn-outline btn-sm" onclick="resetarMsgWpp()">↩️ Restaurar padrão</button>
+                <button class="btn btn-primary btn-sm" onclick="salvarConfigWpp();showToast('Configurações salvas!','success')">💾 Salvar configurações</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">👁 Preview da Mensagem</span></div>
+            <div class="card-body">
+              <div id="wpp-preview" style="background:#E7FFDB;border-radius:12px 12px 4px 12px;padding:14px 16px;font-size:13.5px;line-height:1.6;color:#111;white-space:pre-wrap;font-family:'Inter',sans-serif;max-width:420px;box-shadow:0 1px 4px rgba(0,0,0,0.1)">
+                Configure a mensagem acima para ver o preview.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div><!-- /page-opcoes -->
+
+    <!-- ========== ORÇAMENTOS ========== -->
+    <div class="page" id="page-orcamentos">
+
+      <!-- Cards resumo -->
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-label">Total de Orçamentos</div>
+          <div class="stat-value" id="orc-total">0</div>
+          <div class="stat-sub">cadastrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">⏳ Aguardando</div>
+          <div class="stat-value" id="orc-aguardando" style="color:var(--warning)">0</div>
+          <div class="stat-sub">pendentes de resposta</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">✅ Aprovados</div>
+          <div class="stat-value" id="orc-aprovados" style="color:var(--success)">0</div>
+          <div class="stat-sub">convertidos em processo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💰 Valor Total</div>
+          <div class="stat-value" id="orc-valor-total" style="font-size:18px;color:var(--blue-600)">R$ 0</div>
+          <div class="stat-sub">em orçamentos ativos</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📋 Orçamentos / Propostas</span>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" id="orc-filtro-status" onchange="renderOrcamentos()" style="width:160px;font-size:13px">
+              <option value="">Todos os status</option>
+              <option value="aguardando">⏳ Aguardando</option>
+              <option value="aprovado">✅ Aprovado</option>
+              <option value="recusado">❌ Recusado</option>
+              <option value="expirado">⏰ Expirado</option>
+            </select>
+            <button class="btn btn-primary" onclick="openModal('modal-orcamento')">+ Novo Orçamento</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Valor</th>
+                  <th>Validade</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-orcamentos">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum orçamento cadastrado.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-orcamentos -->
 
     <!-- ========== AGENDA ========== -->
     <div class="page" id="page-agenda">
@@ -1624,6 +1976,40 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 <!-- ===== MODAIS ===== -->
 
+<!-- MODAL WHATSAPP -->
+<div class="modal-overlay" id="modal-whatsapp">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title">📱 Enviar Cobrança via WhatsApp</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-whatsapp')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="wpp-send-clienteId">
+      <input type="hidden" id="wpp-send-parcelaId">
+
+      <div class="form-group">
+        <label class="form-label">Número do WhatsApp do Cliente</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" class="form-control" id="wpp-send-numero" placeholder="Ex: 81999999999 (só números)">
+          <button class="btn btn-outline btn-sm" onclick="buscarTelCliente()" style="white-space:nowrap">📋 Usar cadastro</button>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px">Digite apenas números com DDD, sem espaços ou traços.</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Mensagem <span style="font-size:11px;color:var(--text-muted);font-weight:400">(edite se necessário antes de enviar)</span></label>
+        <textarea class="form-control" id="wpp-send-msg" rows="10" style="font-size:13px;line-height:1.6"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-whatsapp')">Cancelar</button>
+      <button class="btn btn-primary" onclick="enviarWhatsApp()" style="background:linear-gradient(135deg,#25D366,#128C7E);border:none">
+        📱 Abrir WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL DOCUMENTOS -->
 <div class="modal-overlay" id="modal-documentos">
   <div class="modal" style="width:680px">
@@ -1671,6 +2057,134 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- MODAL ORÇAMENTO -->
+<div class="modal-overlay" id="modal-orcamento">
+  <div class="modal" style="width:620px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-orcamento-title">Novo Orçamento</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-orcamento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="orcamento-edit-id">
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Dados do Cliente</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cliente *</label>
+          <select class="form-control" id="orc-cliente">
+            <option value="">— Selecionar Cliente —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Advogado Responsável</label>
+          <input type="text" class="form-control" id="orc-adv" placeholder="Nome do advogado">
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Serviço</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo de Serviço *</label>
+          <select class="form-control" id="orc-tipo">
+            <option value="">— Selecionar Tipo —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Validade da Proposta *</label>
+          <input type="date" class="form-control" id="orc-validade">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição do Caso / Objeto da Proposta *</label>
+        <textarea class="form-control" id="orc-descricao" rows="3" placeholder="Descreva o caso, o escopo do serviço e as principais atividades..."></textarea>
+      </div>
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Condições Financeiras</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor dos Honorários (R$) *</label>
+          <input type="number" class="form-control" id="orc-valor" placeholder="0,00" min="0" step="0.01" oninput="orcCalcParcelas()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Parcelas</label>
+          <input type="number" class="form-control" id="orc-parcelas" value="1" min="1" max="120" oninput="orcCalcParcelas()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor por Parcela</label>
+          <input type="text" class="form-control" id="orc-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data da 1ª Parcela</label>
+          <input type="date" class="form-control" id="orc-data1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações / Condições Especiais</label>
+        <textarea class="form-control" id="orc-obs" rows="2" placeholder="Ex: Honorários de êxito, custas processuais por conta do cliente..."></textarea>
+      </div>
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Status</div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Status da Proposta</label>
+          <select class="form-control" id="orc-status">
+            <option value="aguardando">⏳ Aguardando Resposta</option>
+            <option value="aprovado">✅ Aprovado</option>
+            <option value="recusado">❌ Recusado</option>
+            <option value="expirado">⏰ Expirado</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Data da Proposta</label>
+          <input type="date" class="form-control" id="orc-data">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-orcamento')">Cancelar</button>
+      <button class="btn btn-outline" onclick="gerarPDFOrcamento()" style="color:var(--blue-600);border-color:var(--blue-300)">📄 Gerar PDF</button>
+      <button class="btn btn-primary" onclick="salvarOrcamento()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONVERTER ORÇAMENTO EM PROCESSO -->
+<div class="modal-overlay" id="modal-converter-orc">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <span class="modal-title">✅ Converter em Processo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-converter-orc')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="converter-orc-id">
+      <div class="alert alert-success" style="margin-bottom:16px">
+        🎉 Orçamento aprovado! Preencha os dados finais para criar o processo.
+      </div>
+      <div id="converter-orc-resumo" style="background:var(--surface);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:13px"></div>
+      <div class="form-group">
+        <label class="form-label">Número do Processo *</label>
+        <input type="text" class="form-control" id="converter-numero" placeholder="Ex: 0001234-56.2024.5.06.0001">
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Vara / Tribunal</label>
+          <input type="text" class="form-control" id="converter-vara" placeholder="Ex: 2ª Vara do Trabalho">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Data de Abertura</label>
+          <input type="date" class="form-control" id="converter-abertura">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-converter-orc')">Cancelar</button>
+      <button class="btn btn-primary" onclick="converterEmProcesso()">⚖️ Criar Processo</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL EVENTO AGENDA -->
 <div class="modal-overlay" id="modal-evento">
   <div class="modal" style="width:520px">
@@ -1687,9 +2201,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Tipo *</label>
-          <select class="form-control" id="evento-tipo">
+          <select class="form-control" id="evento-tipo" onchange="onEventoTipoChange(this.value)">
             <option value="audiencia">⚖️ Audiência</option>
-            <option value="prazo">⏰ Prazo</option>
+            <option value="prazo">⏰ Prazo Legal</option>
             <option value="reuniao">🤝 Reunião</option>
             <option value="pericia">🔍 Perícia</option>
             <option value="diligencia">📋 Diligência</option>
@@ -1703,6 +2217,45 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           </select>
         </div>
       </div>
+
+      <!-- BLOCO PRAZO LEGAL -->
+      <div id="bloco-prazo-legal" style="display:none;background:var(--danger-bg);border:1.5px solid #FCA5A5;border-radius:var(--radius-lg);padding:14px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--danger);margin-bottom:12px">⚖️ Prazo Legal Automático</div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Tipo de Prazo</label>
+            <select class="form-control" id="prazo-tipo" onchange="calcularPrazoLegal()">
+              <option value="">— Selecione —</option>
+              <option value="recursal">Recursal (15 dias)</option>
+              <option value="contestacao">Contestação (15 dias)</option>
+              <option value="apelacao">Apelação (15 dias)</option>
+              <option value="agravo">Agravo (15 dias)</option>
+              <option value="embargos">Embargos de Declaração (5 dias)</option>
+              <option value="embargos_infringentes">Embargos Infringentes (15 dias)</option>
+              <option value="mandado_seguranca">Mandado de Segurança (120 dias)</option>
+              <option value="impugnacao">Impugnação ao Cumprimento (15 dias)</option>
+              <option value="rescisoria">Ação Rescisória (2 anos)</option>
+              <option value="personalizado">⚙️ Personalizado</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0" id="bloco-prazo-dias-custom">
+            <label class="form-label">Nº de Dias</label>
+            <input type="number" class="form-control" id="prazo-dias-custom" min="1" placeholder="Ex: 30" oninput="calcularPrazoLegal()">
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Data de Início (intimação/publicação)</label>
+            <input type="date" class="form-control" id="prazo-inicio" oninput="calcularPrazoLegal()">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Prazo Final Calculado</label>
+            <input type="date" class="form-control" id="prazo-fim-calculado" readonly style="background:var(--surface);font-weight:600;color:var(--danger)">
+          </div>
+        </div>
+        <div id="prazo-aviso" style="display:none;margin-top:8px;font-size:12px;color:var(--danger);font-weight:500"></div>
+      </div>
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Data *</label>
@@ -1738,7 +2291,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     </div>
   </div>
 </div>
-
 <!-- MODAL USUARIO -->
 <div class="modal-overlay" id="modal-usuario">
   <div class="modal" style="width:580px">
@@ -1833,6 +2385,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <input type="checkbox" id="perm-financeiro" style="accent-color:var(--navy)"> 💰 Financeiro
           </label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
+            <input type="checkbox" id="perm-despesas" style="accent-color:var(--navy)"> 📤 Despesas
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
             <input type="checkbox" id="perm-relatorios" style="accent-color:var(--navy)"> 📈 Relatórios
           </label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:white">
@@ -1906,40 +2461,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
-      <!-- Financeiro -->
-      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Condições Financeiras Padrão</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Valor Total do Serviço (R$) *</label>
-          <input type="number" class="form-control" id="tipo-valor" placeholder="0,00" min="0" step="0.01" oninput="tipoCalcParcelas()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Número de Parcelas *</label>
-          <input type="number" class="form-control" id="tipo-parcelas" placeholder="1" min="1" max="120" value="1" oninput="tipoGerarDatas()">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Valor por Parcela</label>
-          <input type="text" class="form-control" id="tipo-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600" placeholder="—">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Data da 1ª Parcela</label>
-          <input type="date" class="form-control" id="tipo-data1" oninput="tipoGerarDatas()">
-        </div>
-      </div>
-
-      <!-- Datas das parcelas -->
-      <div id="tipo-datas-container" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding-bottom:6px;border-bottom:1px solid var(--border);flex:1">Datas Acordadas com o Cliente</div>
-        </div>
-        <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:var(--blue-800)">
-          💡 As datas abaixo são preenchidas automaticamente mas podem ser ajustadas individualmente conforme acordado com o cliente.
-        </div>
-        <div id="tipo-datas-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:220px;overflow-y:auto;padding-right:4px"></div>
-      </div>
-
       <!-- Descrição -->
       <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Observações</div>
       <div class="form-group">
@@ -1950,6 +2471,151 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-tipo')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarTipo()">💾 Salvar Tipo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DESPESA -->
+<div class="modal-overlay" id="modal-despesa">
+  <div class="modal" style="width:580px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-despesa-title">Nova Despesa</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-despesa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="despesa-edit-id">
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Identificação</div>
+      <div class="form-group">
+        <label class="form-label">Descrição *</label>
+        <input type="text" class="form-control" id="despesa-descricao" placeholder="Ex: Aluguel do escritório, Conta de luz...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Categoria *</label>
+          <select class="form-control" id="despesa-categoria">
+            <option value="">Selecione...</option>
+            <option value="aluguel">🏠 Aluguel</option>
+            <option value="salario">👤 Salário</option>
+            <option value="honorario">⚖️ Honorário</option>
+            <option value="energia">💡 Energia</option>
+            <option value="agua">💧 Água</option>
+            <option value="internet">🌐 Internet</option>
+            <option value="telefone">📱 Telefone</option>
+            <option value="sistema">💻 Sistema/Software</option>
+            <option value="material">📦 Material</option>
+            <option value="imposto">📋 Imposto/Taxa</option>
+            <option value="contabilidade">🧾 Contabilidade</option>
+            <option value="outro">📁 Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Conta/Centro de Custo</label>
+          <input type="text" class="form-control" id="despesa-conta" placeholder="Ex: Conta corrente, Caixa, Poupança...">
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Valores e Datas</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor (R$) *</label>
+          <input type="number" class="form-control" id="despesa-valor" placeholder="0,00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data de Vencimento *</label>
+          <input type="date" class="form-control" id="despesa-vencimento">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data de Pagamento</label>
+          <input type="date" class="form-control" id="despesa-pagamento">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Forma de Pagamento</label>
+          <select class="form-control" id="despesa-forma">
+            <option value="">Selecione...</option>
+            <option value="dinheiro">💵 Dinheiro</option>
+            <option value="pix">📲 PIX</option>
+            <option value="ted">🏦 TED/DOC</option>
+            <option value="boleto">📄 Boleto</option>
+            <option value="cartao_debito">💳 Cartão Débito</option>
+            <option value="cartao_credito">💳 Cartão Crédito</option>
+            <option value="cheque">📝 Cheque</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Recorrência e Status</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Recorrência</label>
+          <select class="form-control" id="despesa-recorrencia" onchange="toggleRecorrencia(this.value)">
+            <option value="unica">Única</option>
+            <option value="mensal">🔄 Mensal</option>
+            <option value="bimestral">🔄 Bimestral</option>
+            <option value="trimestral">🔄 Trimestral</option>
+            <option value="semestral">🔄 Semestral</option>
+            <option value="anual">🔄 Anual</option>
+          </select>
+        </div>
+        <div class="form-group" id="bloco-parcelas-desp" style="display:none">
+          <label class="form-label">Nº de Repetições</label>
+          <input type="number" class="form-control" id="despesa-repeticoes" placeholder="Ex: 12" min="2" max="120" value="12">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="despesa-status">
+            <option value="pendente">⏳ Pendente</option>
+            <option value="pago">✅ Pago</option>
+            <option value="vencido">⚠️ Vencido</option>
+            <option value="cancelado">❌ Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <textarea class="form-control" id="despesa-obs" placeholder="Informações adicionais..." style="min-height:60px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-despesa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDespesa()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR PAGAMENTO DESPESA -->
+<div class="modal-overlay" id="modal-pagar-despesa">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <span class="modal-title">Confirmar Pagamento</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-pagar-despesa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pagar-despesa-id">
+      <div style="margin-bottom:14px;font-size:14px;color:var(--text-secondary)" id="pagar-despesa-desc"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data do Pagamento</label>
+          <input type="date" class="form-control" id="pagar-despesa-data">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Forma de Pagamento</label>
+          <select class="form-control" id="pagar-despesa-forma">
+            <option value="pix">📲 PIX</option>
+            <option value="ted">🏦 TED/DOC</option>
+            <option value="boleto">📄 Boleto</option>
+            <option value="dinheiro">💵 Dinheiro</option>
+            <option value="cartao_debito">💳 Cartão Débito</option>
+            <option value="cartao_credito">💳 Cartão Crédito</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-pagar-despesa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarPagamentoDespesa()">✅ Confirmar Pagamento</button>
     </div>
   </div>
 </div>
@@ -2032,6 +2698,38 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
+      <!-- Condições Financeiras -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Condições Financeiras</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Total do Serviço (R$)</label>
+          <input type="number" class="form-control" id="cliente-valor" placeholder="0,00" min="0" step="0.01" oninput="clienteCalcParcelas()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Parcelas</label>
+          <input type="number" class="form-control" id="cliente-parcelas" placeholder="1" min="1" max="120" value="1" oninput="clienteGerarDatas()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor por Parcela</label>
+          <input type="text" class="form-control" id="cliente-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600" placeholder="—">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data da 1ª Parcela</label>
+          <input type="date" class="form-control" id="cliente-data1" oninput="clienteGerarDatas()">
+        </div>
+      </div>
+      <div id="cliente-datas-container" style="display:none">
+        <div style="display:flex;align-items:center;margin:14px 0 10px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding-bottom:6px;border-bottom:1px solid var(--border);flex:1">Datas Acordadas com o Cliente</div>
+        </div>
+        <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:var(--blue-800)">
+          💡 As datas são preenchidas automaticamente mas podem ser ajustadas individualmente.
+        </div>
+        <div id="cliente-datas-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:200px;overflow-y:auto;padding-right:4px"></div>
+      </div>
+
       <!-- Anotações -->
       <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Anotações</div>
       <div class="form-row">
@@ -2047,10 +2745,25 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <textarea class="form-control" id="cliente-obs" placeholder="Anotações gerais sobre o cliente..." style="min-height:38px"></textarea>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">DIP <span style="font-size:11px;color:var(--text-muted);font-weight:400">(Diário de Informações do Processo)</span></label>
-        <textarea class="form-control" id="cliente-dip" placeholder="Registre aqui o histórico detalhado do processo, documentos recebidos, pendências, andamentos, ligações, reuniões e qualquer informação relevante ao acompanhamento do caso..." style="min-height:100px"></textarea>
+
+      <!-- DIP -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span>DIP <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(Diário de Informações do Processo)</span></span>
       </div>
+
+      <!-- Campo de nova entrada -->
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <textarea class="form-control" id="cliente-dip-novo" placeholder="Digite uma nova informação e clique em Registrar..." style="min-height:60px;flex:1;resize:vertical"></textarea>
+        <button class="btn btn-primary" onclick="registrarDIP()" style="align-self:flex-end;white-space:nowrap;padding:8px 16px">
+          📌 Registrar
+        </button>
+      </div>
+
+      <!-- Histórico de entradas -->
+      <div id="cliente-dip-lista" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:16px 0">Nenhum registro ainda.</div>
+      </div>
+      <input type="hidden" id="cliente-dip-data">
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
@@ -2111,38 +2824,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <input type="text" class="form-control" id="proc-vara" placeholder="Ex: 2ª Vara do Trabalho">
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Valor Total (R$) *</label>
-          <input type="number" class="form-control" id="proc-valor" placeholder="0,00" min="0" step="0.01" oninput="calcularParcelas()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Número de Parcelas *</label>
-          <input type="number" class="form-control" id="proc-parcelas" placeholder="1" min="1" max="120" value="1" oninput="calcularParcelas()">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Data 1ª Parcela *</label>
-          <input type="date" class="form-control" id="proc-1a-parcela" oninput="calcularParcelas()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Valor por Parcela</label>
-          <input type="text" class="form-control" id="proc-valor-parcela" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600">
-        </div>
-      </div>
-
-      <!-- GRID DE DATAS INDIVIDUAIS -->
-      <div id="proc-datas-container" style="display:none;margin-bottom:4px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted)">Datas de Vencimento por Parcela</div>
-          <span style="font-size:11px;color:var(--text-muted)">Edite individualmente se necessário</span>
-        </div>
-        <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--blue-800)">
-          💡 As datas são geradas automaticamente a partir da 1ª parcela, mas podem ser ajustadas individualmente.
-        </div>
-        <div id="proc-datas-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:200px;overflow-y:auto;padding-right:2px"></div>
-      </div>
       <div class="form-group">
         <label class="form-label">Descrição / Andamento Inicial</label>
         <textarea class="form-control" id="proc-descricao" placeholder="Descreva o processo, fatos relevantes..."></textarea>
@@ -2177,7 +2858,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-processo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarProcesso()">💾 Salvar + Gerar Parcelas</button>
+      <button class="btn btn-primary" onclick="salvarProcesso()">💾 Salvar Processo</button>
     </div>
   </div>
 </div>
@@ -2319,8 +3000,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 // ==================== DATA STORE ====================
 let store = {
   tipos: [], clientes: [], processos: [], parcelas: [],
-  andamentos: {}, modelos: [], eventos: [], documentos: {},
-  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1 }
+  andamentos: {}, modelos: [], eventos: [], documentos: {}, despesas: [],
+  nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1 }
 };
 
 // ==================== SUPABASE CONFIG ====================
@@ -2454,12 +3135,12 @@ let procTabFilter = 'todos';
 
 const pageTitles = {
   dashboard: 'Dashboard', tipos: 'Tipos de Processo', clientes: 'Clientes',
-  processos: 'Processos', agenda: 'Agenda', financeiro: 'Financeiro',
-  relatorios: 'Relatórios', opcoes: 'Opções'
+  processos: 'Processos', orcamentos: 'Orçamentos', agenda: 'Agenda', financeiro: 'Recebimentos',
+  despesas: 'Despesas', relatorios: 'Relatórios', opcoes: 'Opções'
 };
 const pageActions = {
   dashboard: 'Atualizar', tipos: '', clientes: '', processos: '',
-  agenda: '', financeiro: '', relatorios: '⬇ Exportar', opcoes: ''
+  orcamentos: '', agenda: '', financeiro: '', despesas: '', relatorios: '⬇ Exportar', opcoes: ''
 };
 
 function navigate(page, btn) {
@@ -2498,8 +3179,732 @@ function refreshPage(page) {
   else if(page === 'processos') renderProcessos();
   else if(page === 'agenda') renderAgenda();
   else if(page === 'financeiro') { renderFinVisao(); renderParcelas(); updateParcelasSelect(); }
-  else if(page === 'relatorios') { renderRelClientes(); renderRelProcessos(); }
+  else if(page === 'despesas') renderDespesas();
+  else if(page === 'relatorios') { gerarRelatorio(); renderRelClientes(); renderRelProcessos(); }
   else if(page === 'opcoes') renderOpcoes();
+}
+
+// ==================== ORÇAMENTOS ====================
+const ORC_STATUS = {
+  aguardando: { icon:'⏳', label:'Aguardando', cls:'badge-amber' },
+  aprovado:   { icon:'✅', label:'Aprovado',   cls:'badge-green' },
+  recusado:   { icon:'❌', label:'Recusado',   cls:'badge-red'   },
+  expirado:   { icon:'⏰', label:'Expirado',   cls:'badge-gray'  }
+};
+
+function getOrcamentos() {
+  if(!store.orcamentos) store.orcamentos = [];
+  return store.orcamentos;
+}
+
+function orcCalcParcelas() {
+  const valor = parseFloat(document.getElementById('orc-valor')?.value)||0;
+  const n = parseInt(document.getElementById('orc-parcelas')?.value)||1;
+  const el = document.getElementById('orc-valor-parcela');
+  if(el) el.value = valor > 0 && n > 0 ? fmtMoney(valor/n) : '';
+}
+
+function renderOrcamentos() {
+  // Atualizar status expirados
+  const hoje = today();
+  getOrcamentos().forEach(o => {
+    if(o.status === 'aguardando' && o.validade && o.validade < hoje) o.status = 'expirado';
+  });
+
+  // Cards
+  const orcs = getOrcamentos();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('orc-total', orcs.length);
+  set('orc-aguardando', orcs.filter(o=>o.status==='aguardando').length);
+  set('orc-aprovados', orcs.filter(o=>o.status==='aprovado').length);
+  const valorAtivos = orcs.filter(o=>o.status==='aguardando').reduce((s,o)=>s+o.valor,0);
+  set('orc-valor-total', fmtMoney(valorAtivos));
+
+  // Badge menu
+  const badge = document.getElementById('badge-orcamentos');
+  const pendentes = orcs.filter(o=>o.status==='aguardando').length;
+  if(badge) { badge.textContent = pendentes; badge.style.display = pendentes > 0 ? '' : 'none'; }
+
+  const filtro = document.getElementById('orc-filtro-status')?.value||'';
+  let lista = orcs.slice();
+  if(filtro) lista = lista.filter(o=>o.status===filtro);
+  lista.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+
+  const tb = document.getElementById('tbody-orcamentos');
+  if(!tb) return;
+  if(!lista.length) {
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum orçamento encontrado.</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = lista.map(o => {
+    const c = store.clientes.find(c=>c.id===o.clienteId)||{nome:'—'};
+    const t = store.tipos.find(t=>t.id===o.tipoId)||{nome:'—'};
+    const st = ORC_STATUS[o.status]||ORC_STATUS.aguardando;
+    const vencido = o.status==='aguardando' && o.validade && o.validade < hoje;
+    return `<tr style="${vencido?'background:var(--warning-bg)':''}">
+      <td style="font-weight:600;color:var(--blue-600)">#${o.id}</td>
+      <td><strong>${c.nome}</strong></td>
+      <td style="font-size:12.5px">${t.nome}</td>
+      <td><strong>${fmtMoney(o.valor)}</strong>
+        ${o.parcelas>1?`<div style="font-size:11px;color:var(--text-muted)">${o.parcelas}x de ${fmtMoney(o.valor/o.parcelas)}</div>`:''}
+      </td>
+      <td style="font-size:13px">${fmtDate(o.validade)}
+        ${vencido?'<div style="font-size:10px;color:var(--warning);font-weight:600">EXPIRADO</div>':''}
+      </td>
+      <td><span class="badge ${st.cls}">${st.icon} ${st.label}</span></td>
+      <td style="white-space:nowrap">
+        ${o.status==='aguardando'?`<button class="btn btn-primary btn-sm" onclick="abrirConverterOrc(${o.id})" title="Aprovar e converter">✅</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="gerarPDFOrcamento(${o.id})" title="Gerar PDF">📄</button>
+        <button class="btn btn-outline btn-sm" onclick="editarOrcamento(${o.id})" title="Editar">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirOrcamento(${o.id})" title="Excluir">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function salvarOrcamento() {
+  const cId = parseInt(document.getElementById('orc-cliente').value);
+  const tId = parseInt(document.getElementById('orc-tipo').value);
+  const valor = parseFloat(document.getElementById('orc-valor').value)||0;
+  const descricao = document.getElementById('orc-descricao').value.trim();
+  const validade = document.getElementById('orc-validade').value;
+  if(!cId||!tId||!valor||!descricao||!validade) {
+    showToast('Preencha todos os campos obrigatórios.','error'); return;
+  }
+  if(!store.orcamentos) store.orcamentos = [];
+  if(!store.nextId.orcamento) store.nextId.orcamento = 1;
+  const editId = document.getElementById('orcamento-edit-id').value;
+  const data = {
+    clienteId: cId, tipoId: tId, valor,
+    parcelas: parseInt(document.getElementById('orc-parcelas').value)||1,
+    data1Parcela: document.getElementById('orc-data1').value,
+    descricao, validade, obs: document.getElementById('orc-obs').value.trim(),
+    adv: document.getElementById('orc-adv').value.trim(),
+    status: document.getElementById('orc-status').value,
+    data: document.getElementById('orc-data').value || today()
+  };
+  if(editId) {
+    const o = store.orcamentos.find(o=>o.id==editId);
+    if(o) Object.assign(o, data);
+    showToast('Orçamento atualizado!','success');
+  } else {
+    store.orcamentos.push({ id: store.nextId.orcamento++, ...data });
+    registrarAuditoria('criou','sistema','Criou orçamento para: '+(store.clientes.find(c=>c.id===cId)?.nome||''),'Valor: '+fmtMoney(valor));
+    showToast('Orçamento cadastrado!','success');
+  }
+  saveData(); closeModal('modal-orcamento'); renderOrcamentos();
+}
+
+function editarOrcamento(id) {
+  const o = store.orcamentos.find(o=>o.id===id); if(!o) return;
+  populateOrcSelects();
+  document.getElementById('orcamento-edit-id').value = o.id;
+  document.getElementById('modal-orcamento-title').textContent = 'Editar Orçamento #'+o.id;
+  document.getElementById('orc-cliente').value = o.clienteId||'';
+  document.getElementById('orc-tipo').value = o.tipoId||'';
+  document.getElementById('orc-adv').value = o.adv||'';
+  document.getElementById('orc-valor').value = o.valor||'';
+  document.getElementById('orc-parcelas').value = o.parcelas||1;
+  document.getElementById('orc-data1').value = o.data1Parcela||'';
+  document.getElementById('orc-descricao').value = o.descricao||'';
+  document.getElementById('orc-validade').value = o.validade||'';
+  document.getElementById('orc-obs').value = o.obs||'';
+  document.getElementById('orc-status').value = o.status||'aguardando';
+  document.getElementById('orc-data').value = o.data||'';
+  orcCalcParcelas();
+  openModal('modal-orcamento', false);
+}
+
+function excluirOrcamento(id) {
+  if(!confirm('Excluir este orçamento?')) return;
+  store.orcamentos = store.orcamentos.filter(o=>o.id!==id);
+  saveData(); renderOrcamentos(); showToast('Orçamento excluído.');
+}
+
+function abrirConverterOrc(id) {
+  const o = store.orcamentos.find(o=>o.id===id); if(!o) return;
+  const c = store.clientes.find(c=>c.id===o.clienteId)||{nome:'—'};
+  const t = store.tipos.find(t=>t.id===o.tipoId)||{nome:'—'};
+  document.getElementById('converter-orc-id').value = id;
+  document.getElementById('converter-abertura').value = today();
+  document.getElementById('converter-numero').value = '';
+  document.getElementById('converter-vara').value = '';
+  document.getElementById('converter-orc-resumo').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div style="font-size:11px;color:var(--text-muted)">Cliente</div><strong>${c.nome}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Serviço</div><strong>${t.nome}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Valor</div><strong style="color:var(--success)">${fmtMoney(o.valor)}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Parcelas</div><strong>${o.parcelas}x de ${fmtMoney(o.valor/o.parcelas)}</strong></div>
+    </div>`;
+  openModal('modal-converter-orc', false);
+}
+
+function converterEmProcesso() {
+  const id = parseInt(document.getElementById('converter-orc-id').value);
+  const numero = document.getElementById('converter-numero').value.trim();
+  const vara = document.getElementById('converter-vara').value.trim();
+  const abertura = document.getElementById('converter-abertura').value;
+  if(!numero) { showToast('Informe o número do processo.','error'); return; }
+  const o = store.orcamentos.find(o=>o.id===id); if(!o) return;
+  if(!store.nextId.processo) store.nextId.processo = 1;
+  if(!store.nextId.parcela) store.nextId.parcela = 1;
+
+  const pId = store.nextId.processo++;
+  store.processos.push({
+    id: pId, numero, clienteId: o.clienteId, tipoId: o.tipoId,
+    adv: o.adv||'', abertura: abertura||today(), status: 'andamento',
+    vara, descricao: o.descricao, orcamentoId: id
+  });
+
+  // Gerar parcelas com base nas condições do orçamento
+  const nParcelas = o.parcelas||1;
+  const dt1 = o.data1Parcela || today();
+  for(let i=0;i<nParcelas;i++) {
+    store.parcelas.push({
+      id: store.nextId.parcela++, processoId: pId, clienteId: o.clienteId,
+      num: i+1, total: nParcelas, vencimento: addMonths(dt1,i),
+      valor: parseFloat((o.valor/nParcelas).toFixed(2)),
+      status: 'pendente', dtPagamento: null, obs: ''
+    });
+  }
+  if(!store.andamentos[pId]) store.andamentos[pId] = [];
+  store.andamentos[pId].push({ data: today(), texto: 'Processo aberto a partir do orçamento #'+id+'.', status: 'andamento' });
+
+  // Marcar orçamento como aprovado
+  o.status = 'aprovado'; o.processoId = pId;
+
+  saveData(); closeModal('modal-converter-orc'); renderOrcamentos();
+  registrarAuditoria('criou','processo','Processo criado via orçamento #'+id,'Número: '+numero);
+  showToast('✅ Processo criado com sucesso!','success');
+
+  // Navegar para os processos
+  setTimeout(() => navigate('processos', document.querySelector('.nav-item[onclick*="processos"]')), 800);
+}
+
+function populateOrcSelects() {
+  const selC = document.getElementById('orc-cliente');
+  if(selC) {
+    const cur = selC.value;
+    selC.innerHTML = '<option value="">— Selecionar Cliente —</option>';
+    store.clientes.filter(c=>c.status==='ativo').forEach(c => selC.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
+    selC.value = cur;
+  }
+  const selT = document.getElementById('orc-tipo');
+  if(selT) {
+    const cur = selT.value;
+    selT.innerHTML = '<option value="">— Selecionar Tipo —</option>';
+    store.tipos.forEach(t => selT.innerHTML += `<option value="${t.id}">${t.nome} (${t.area})</option>`);
+    selT.value = cur;
+  }
+}
+
+function gerarPDFOrcamento(id) {
+  const idReal = id || parseInt(document.getElementById('orcamento-edit-id')?.value);
+  const o = idReal ? store.orcamentos.find(o=>o.id===idReal) : null;
+
+  // Coletar dados do formulário se modal aberto
+  const clienteId = o ? o.clienteId : parseInt(document.getElementById('orc-cliente')?.value);
+  const tipoId    = o ? o.tipoId    : parseInt(document.getElementById('orc-tipo')?.value);
+  const valor     = o ? o.valor     : parseFloat(document.getElementById('orc-valor')?.value)||0;
+  const parcelas  = o ? o.parcelas  : parseInt(document.getElementById('orc-parcelas')?.value)||1;
+  const descricao = o ? o.descricao : document.getElementById('orc-descricao')?.value||'';
+  const validade  = o ? o.validade  : document.getElementById('orc-validade')?.value||'';
+  const obs       = o ? o.obs       : document.getElementById('orc-obs')?.value||'';
+  const adv       = o ? o.adv       : document.getElementById('orc-adv')?.value||'';
+  const data      = o ? o.data      : today();
+
+  const c = store.clientes.find(c=>c.id===clienteId)||{nome:'—',cpf:'—',tel:'—'};
+  const t = store.tipos.find(t=>t.id===tipoId)||{nome:'—'};
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Proposta de Honorários</title>
+  <style>
+    body{font-family:'Segoe UI',sans-serif;color:#1A2E45;margin:0;padding:40px;max-width:800px;margin:0 auto}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1A2E45;padding-bottom:20px;margin-bottom:30px}
+    .logo-box{width:60px;height:60px;background:#1A2E45;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#C4A96B;font-size:22px;font-weight:700}
+    .escritorio h1{font-size:20px;font-weight:700;margin:0;color:#1A2E45}
+    .escritorio p{font-size:12px;color:#666;margin:2px 0}
+    .titulo{text-align:center;margin:24px 0;padding:16px;background:#1A2E45;border-radius:10px;color:white}
+    .titulo h2{margin:0;font-size:18px;letter-spacing:1px}
+    .titulo p{margin:4px 0 0;font-size:12px;opacity:0.7}
+    .secao{margin-bottom:20px;padding:16px;border:1px solid #DDE4EC;border-radius:8px}
+    .secao h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#C4A96B;margin:0 0 12px;border-bottom:1px solid #DDE4EC;padding-bottom:6px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .item label{font-size:10.5px;color:#888;display:block;margin-bottom:2px}
+    .item strong{font-size:13.5px;color:#1A2E45}
+    .valor-destaque{text-align:center;padding:20px;background:linear-gradient(135deg,#1A2E45,#1D3A5C);border-radius:10px;color:white;margin:20px 0}
+    .valor-destaque .valor{font-size:28px;font-weight:700;color:#C4A96B}
+    .valor-destaque .parcela{font-size:13px;opacity:0.8;margin-top:4px}
+    .validade{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400E;margin-top:16px}
+    .assinatura{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #DDE4EC}
+    .assinatura .linha{width:200px;border-top:1px solid #1A2E45;margin:0 auto 6px}
+    .assinatura p{font-size:12px;color:#666}
+    @media print{body{padding:20px}}
+  </style></head><body>
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="logo-box">DV</div>
+      <div class="escritorio">
+        <h1>Diego Vila Nova</h1>
+        <p>Advocacia e Consultoria Jurídica</p>
+        <p>OAB/PE 51.493</p>
+      </div>
+    </div>
+    <div style="text-align:right;font-size:12px;color:#666">
+      <p>Data: ${hoje}</p>
+      ${validade?`<p>Válido até: ${fmtDate(validade)}</p>`:''}
+    </div>
+  </div>
+
+  <div class="titulo">
+    <h2>PROPOSTA DE HONORÁRIOS ADVOCATÍCIOS</h2>
+    <p>Proposta nº ${idReal||'—'} · ${hoje}</p>
+  </div>
+
+  <div class="secao">
+    <h3>Dados do Cliente</h3>
+    <div class="grid">
+      <div class="item"><label>Nome Completo</label><strong>${c.nome}</strong></div>
+      <div class="item"><label>CPF/CNPJ</label><strong>${c.cpf||'—'}</strong></div>
+      <div class="item"><label>Telefone</label><strong>${c.tel||'—'}</strong></div>
+      <div class="item"><label>E-mail</label><strong>${c.email||'—'}</strong></div>
+    </div>
+  </div>
+
+  <div class="secao">
+    <h3>Objeto da Proposta</h3>
+    <div class="item" style="margin-bottom:10px"><label>Tipo de Serviço</label><strong>${t.nome}</strong></div>
+    <div class="item"><label>Descrição</label><p style="margin:4px 0;line-height:1.6;font-size:13.5px">${descricao}</p></div>
+    ${obs?`<div class="item" style="margin-top:10px"><label>Observações</label><p style="margin:4px 0;font-size:13px;color:#555">${obs}</p></div>`:''}
+  </div>
+
+  <div class="valor-destaque">
+    <div style="font-size:13px;opacity:0.8;margin-bottom:6px">HONORÁRIOS ADVOCATÍCIOS</div>
+    <div class="valor">${fmtMoney(valor)}</div>
+    ${parcelas>1?`<div class="parcela">${parcelas}x de ${fmtMoney(valor/parcelas)}</div>`:'<div class="parcela">Pagamento à vista</div>'}
+  </div>
+
+  ${validade?`<div class="validade">⚠️ Esta proposta é válida até <strong>${fmtDate(validade)}</strong>. Após esta data, os valores poderão ser revisados.</div>`:''}
+
+  <div class="assinatura">
+    <div class="linha"></div>
+    <p><strong>${adv||'Diego Vila Nova'}</strong></p>
+    <p>Advogado · OAB/PE 51.493</p>
+    <p style="margin-top:10px;font-size:11px;color:#999">Recife, ${hoje}</p>
+  </div>
+  </body></html>`;
+
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+}
+const WPP_KEY = 'lexpro_wpp_config';
+const WPP_MSG_PADRAO = `Olá, *{{NOME}}*! 👋
+
+Esperamos que esteja bem. Passamos para lembrá-lo(a) sobre a parcela do seu processo em nosso escritório.
+
+📋 *Processo:* {{PROCESSO}}
+🔢 *Parcela:* {{PARCELA}}
+💰 *Valor:* {{VALOR}}
+📅 *Vencimento:* {{VENCIMENTO}}
+
+Para efetuar o pagamento via PIX:
+🔑 *Chave PIX:* {{PIX}}
+👤 *Titular:* {{TITULAR}}
+
+Em caso de dúvidas, estamos à disposição.
+
+Atenciosamente,
+*{{ESCRITORIO}}*`;
+
+function getConfigWpp() {
+  try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}'); } catch(e) { return {}; }
+}
+function salvarConfigWpp() {
+  const cfg = {
+    numero:     document.getElementById('wpp-numero')?.value||'',
+    pix:        document.getElementById('wpp-pix')?.value||'',
+    pixTipo:    document.getElementById('wpp-pix-tipo')?.value||'cpf',
+    pixTitular: document.getElementById('wpp-pix-titular')?.value||'',
+    msg:        document.getElementById('wpp-msg-cobranca')?.value||''
+  };
+  localStorage.setItem(WPP_KEY, JSON.stringify(cfg));
+  renderPreviewWpp();
+}
+function resetarMsgWpp() {
+  const el = document.getElementById('wpp-msg-cobranca');
+  if(el) { el.value = WPP_MSG_PADRAO; salvarConfigWpp(); }
+}
+function inserirVariavel(inputId, variavel) {
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  const pos = el.selectionStart || el.value.length;
+  el.value = el.value.substring(0, pos) + variavel + el.value.substring(pos);
+  el.focus(); el.selectionStart = el.selectionEnd = pos + variavel.length;
+  salvarConfigWpp();
+}
+function renderPreviewWpp() {
+  const cfg = getConfigWpp();
+  const msg = cfg.msg || WPP_MSG_PADRAO;
+  const preview = msg
+    .replace(/{{NOME}}/g, 'João Silva')
+    .replace(/{{PROCESSO}}/g, '0001234-56.2024.5.06.0001')
+    .replace(/{{PARCELA}}/g, '2/6')
+    .replace(/{{VALOR}}/g, 'R$ 500,00')
+    .replace(/{{VENCIMENTO}}/g, '15/01/2025')
+    .replace(/{{PIX}}/g, cfg.pix||'sua-chave-pix')
+    .replace(/{{TITULAR}}/g, cfg.pixTitular||'Diego Vila Nova')
+    .replace(/{{ESCRITORIO}}/g, 'Diego Vila Nova — Advocacia e Consultoria Jurídica');
+  const el = document.getElementById('wpp-preview');
+  if(el) el.textContent = preview;
+}
+function carregarConfigWpp() {
+  const cfg = getConfigWpp();
+  const set = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
+  set('wpp-numero', cfg.numero); set('wpp-pix', cfg.pix);
+  set('wpp-pix-tipo', cfg.pixTipo); set('wpp-pix-titular', cfg.pixTitular);
+  const msgEl = document.getElementById('wpp-msg-cobranca');
+  if(msgEl) msgEl.value = cfg.msg || WPP_MSG_PADRAO;
+  renderPreviewWpp();
+}
+function montarMensagemWpp(clienteId, parcelaId) {
+  const cfg = getConfigWpp();
+  const c = store.clientes.find(c=>c.id===clienteId)||{nome:'Cliente',tel:''};
+  const p = parcelaId ? store.parcelas.find(p=>p.id===parcelaId) : null;
+  const pr = p ? store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'} : null;
+  const msg = (cfg.msg||WPP_MSG_PADRAO)
+    .replace(/{{NOME}}/g, c.nome)
+    .replace(/{{PROCESSO}}/g, pr?pr.numero:'—')
+    .replace(/{{PARCELA}}/g, p?p.num+'/'+p.total:'—')
+    .replace(/{{VALOR}}/g, p?fmtMoney(p.valor):'—')
+    .replace(/{{VENCIMENTO}}/g, p?fmtDate(p.vencimento):'—')
+    .replace(/{{PIX}}/g, cfg.pix||'(configure em Opções → WhatsApp)')
+    .replace(/{{TITULAR}}/g, cfg.pixTitular||'Diego Vila Nova')
+    .replace(/{{ESCRITORIO}}/g, 'Diego Vila Nova — Advocacia e Consultoria Jurídica');
+  return { msg, tel: c.tel||'' };
+}
+function abrirModalWpp(clienteId, parcelaId) {
+  const {msg, tel} = montarMensagemWpp(clienteId, parcelaId);
+  document.getElementById('wpp-send-clienteId').value = clienteId||'';
+  document.getElementById('wpp-send-parcelaId').value = parcelaId||'';
+  document.getElementById('wpp-send-msg').value = msg;
+  const telNum = tel.replace(/\D/g,'');
+  document.getElementById('wpp-send-numero').value = telNum.startsWith('55') ? telNum : (telNum?'55'+telNum:'');
+  openModal('modal-whatsapp', false);
+}
+function buscarTelCliente() {
+  const cId = parseInt(document.getElementById('wpp-send-clienteId').value);
+  const c = store.clientes.find(c=>c.id===cId);
+  if(c&&c.tel) {
+    const tel = c.tel.replace(/\D/g,'');
+    document.getElementById('wpp-send-numero').value = tel.startsWith('55')?tel:'55'+tel;
+    showToast('Número preenchido!','success');
+  } else { showToast('Nenhum telefone cadastrado.','error'); }
+}
+function enviarWhatsApp() {
+  const numero = document.getElementById('wpp-send-numero').value.replace(/\D/g,'');
+  const msg = document.getElementById('wpp-send-msg').value.trim();
+  if(!numero) { showToast('Digite o número do WhatsApp.','error'); return; }
+  if(!msg)    { showToast('A mensagem não pode estar vazia.','error'); return; }
+  window.open('https://wa.me/'+numero+'?text='+encodeURIComponent(msg), '_blank');
+  closeModal('modal-whatsapp');
+  registrarAuditoria('exportou','cliente','Cobrança enviada via WhatsApp','Número: '+numero);
+  showToast('✅ WhatsApp aberto!','success');
+}
+
+// ==================== AUDITORIA ====================
+const AUDIT_KEY = 'lexpro_auditoria';
+const AUDIT_MAX = 500; // máximo de registros
+
+const AUDIT_ICONES = {
+  criou: '✅', editou: '✏️', excluiu: '🗑', pagou: '💰',
+  login: '🔐', logout: '🚪', importou: '📥', exportou: '📤'
+};
+const AUDIT_CORES = {
+  criou: { cor:'#0B7B45', bg:'#E2F5EC' },
+  editou: { cor:'#185FA5', bg:'#E6F1FB' },
+  excluiu: { cor:'#B91C1C', bg:'#FEE2E2' },
+  pagou: { cor:'#0B7B45', bg:'#E2F5EC' },
+  login: { cor:'#7C3AED', bg:'#EDE9FE' },
+  logout: { cor:'#475569', bg:'#F1F5F9' },
+  importou: { cor:'#92400E', bg:'#FEF3C7' },
+  exportou: { cor:'#92400E', bg:'#FEF3C7' }
+};
+const AUDIT_MODULOS = {
+  cliente:'👤', processo:'⚖️', financeiro:'💰', despesa:'📤',
+  usuario:'👥', documento:'📁', sistema:'⚙️', contrato:'📄', agenda:'📅'
+};
+
+function getAuditoria() {
+  try { return JSON.parse(localStorage.getItem(AUDIT_KEY)||'[]'); } catch(e) { return []; }
+}
+function saveAuditoria(logs) {
+  localStorage.setItem(AUDIT_KEY, JSON.stringify(logs.slice(0, AUDIT_MAX)));
+}
+
+function registrarAuditoria(acao, modulo, descricao, detalhes) {
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  const now = new Date();
+  const logs = getAuditoria();
+  logs.unshift({
+    id: Date.now(),
+    ts: now.toISOString(),
+    data: now.toLocaleDateString('pt-BR'),
+    hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'}),
+    usuario: session.nome || session.email || 'Sistema',
+    acao,
+    modulo,
+    descricao,
+    detalhes: detalhes || ''
+  });
+  saveAuditoria(logs);
+}
+
+function renderAuditoria() {
+  const logs = getAuditoria();
+  const filtroTipo = document.getElementById('audit-filtro-tipo')?.value || '';
+  const filtroAcao = document.getElementById('audit-filtro-acao')?.value || '';
+  const filtroDe = document.getElementById('audit-filtro-de')?.value || '';
+  const filtroAte = document.getElementById('audit-filtro-ate')?.value || '';
+
+  let lista = logs;
+  if(filtroTipo) lista = lista.filter(l => l.modulo === filtroTipo);
+  if(filtroAcao) lista = lista.filter(l => l.acao === filtroAcao);
+  if(filtroDe)  lista = lista.filter(l => l.ts && l.ts.substring(0,10) >= filtroDe);
+  if(filtroAte) lista = lista.filter(l => l.ts && l.ts.substring(0,10) <= filtroAte);
+
+  const tb = document.getElementById('tbody-auditoria');
+  const contador = document.getElementById('audit-contador');
+  if(!tb) return;
+
+  if(contador) contador.textContent = lista.length + ' registro(s)';
+
+  if(!lista.length) {
+    tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum registro encontrado.</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = lista.map(l => {
+    const icone = AUDIT_ICONES[l.acao] || '📝';
+    const cor = AUDIT_CORES[l.acao] || {cor:'#475569', bg:'#F1F5F9'};
+    const modIcon = AUDIT_MODULOS[l.modulo] || '📋';
+    return `<tr>
+      <td style="font-size:12px;color:var(--text-muted);white-space:nowrap">
+        <div style="font-weight:500;color:var(--text-primary)">${l.data}</div>
+        <div>${l.hora}</div>
+      </td>
+      <td>
+        <div style="font-size:13px;font-weight:500">${l.usuario}</div>
+      </td>
+      <td>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:600;background:${cor.bg};color:${cor.cor}">
+          ${icone} ${l.acao}
+        </span>
+      </td>
+      <td style="font-size:12.5px">${modIcon} ${l.modulo}</td>
+      <td>
+        <div style="font-size:13px">${l.descricao}</div>
+        ${l.detalhes ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${l.detalhes}</div>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function limparAuditoria() {
+  if(!confirm('Limpar todo o histórico de auditoria? Esta ação não pode ser desfeita.')) return;
+  saveAuditoria([]);
+  renderAuditoria();
+  showToast('Histórico limpo.');
+}
+
+function exportarAuditoria() {
+  const logs = getAuditoria();
+  if(!logs.length) { showToast('Sem registros para exportar.', 'error'); return; }
+  const header = 'Data;Hora;Usuário;Ação;Módulo;Descrição;Detalhes';
+  const rows = logs.map(l =>
+    [l.data, l.hora, l.usuario, l.acao, l.modulo, l.descricao, l.detalhes||''].join(';')
+  );
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'auditoria_dvn_' + today() + '.csv';
+  a.click();
+  showToast('Auditoria exportada!', 'success');
+}
+
+// Adicionar badge na aba de auditoria quando tiver registros
+function atualizarBadgeAuditoria() {
+  const logs = getAuditoria();
+  const btn = document.querySelector('[onclick*="auditoria"]');
+  if(btn && logs.length > 0) {
+    btn.innerHTML = '🔍 Auditoria <span style="background:var(--blue-600);color:white;border-radius:8px;padding:0 6px;font-size:10px;margin-left:4px">' + logs.length + '</span>';
+  }
+}
+const DESP_CATEGORIAS = {
+  aluguel:       { icon:'🏠', label:'Aluguel' },
+  salario:       { icon:'👤', label:'Salário' },
+  honorario:     { icon:'⚖️', label:'Honorário' },
+  energia:       { icon:'💡', label:'Energia' },
+  agua:          { icon:'💧', label:'Água' },
+  internet:      { icon:'🌐', label:'Internet' },
+  telefone:      { icon:'📱', label:'Telefone' },
+  sistema:       { icon:'💻', label:'Sistema/Software' },
+  material:      { icon:'📦', label:'Material' },
+  imposto:       { icon:'📋', label:'Imposto/Taxa' },
+  contabilidade: { icon:'🧾', label:'Contabilidade' },
+  outro:         { icon:'📁', label:'Outro' }
+};
+const DESP_STATUS = {
+  pendente:  { icon:'⏳', label:'Pendente',  cls:'badge-amber' },
+  pago:      { icon:'✅', label:'Pago',      cls:'badge-green' },
+  vencido:   { icon:'⚠️', label:'Vencido',  cls:'badge-red'   },
+  cancelado: { icon:'❌', label:'Cancelado', cls:'badge-gray'  }
+};
+
+function getDespesas() {
+  if(!store.despesas) store.despesas = [];
+  return store.despesas;
+}
+function toggleRecorrencia(val) {
+  const b = document.getElementById('bloco-parcelas-desp');
+  if(b) b.style.display = val !== 'unica' ? 'block' : 'none';
+}
+function atualizarStatusDespesas() {
+  const hoje = today();
+  getDespesas().forEach(d => { if(d.status==='pendente' && d.vencimento < hoje) d.status = 'vencido'; });
+}
+function renderDespesasCards() {
+  const hoje = today();
+  const mesAtual = hoje.substring(0,7);
+  const d30 = new Date(); d30.setDate(d30.getDate()+30);
+  const d30s = d30.toISOString().split('T')[0];
+  const desp = getDespesas();
+  const doMes = desp.filter(d => (d.vencimento||'').startsWith(mesAtual));
+  const vencidas = desp.filter(d => d.status==='vencido');
+  const aVencer = desp.filter(d => d.status==='pendente' && d.vencimento>hoje && d.vencimento<=d30s);
+  const pagas = desp.filter(d => d.status==='pago' && (d.dataPagamento||d.vencimento||'').startsWith(mesAtual));
+  const soma = arr => arr.reduce((s,d)=>s+d.valor,0);
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('desp-total-mes', fmtMoney(soma(doMes))); set('desp-qtd-mes', doMes.length+' despesa(s)');
+  set('desp-total-vencidas', fmtMoney(soma(vencidas))); set('desp-qtd-vencidas', vencidas.length+' em atraso');
+  set('desp-total-avencer', fmtMoney(soma(aVencer))); set('desp-qtd-avencer', aVencer.length+' despesa(s)');
+  set('desp-total-pagas', fmtMoney(soma(pagas))); set('desp-qtd-pagas', pagas.length+' despesa(s)');
+}
+function renderDespesas() {
+  atualizarStatusDespesas(); renderDespesasCards();
+  const filtroStatus = document.getElementById('desp-filtro-status')?.value||'';
+  const filtroCategoria = document.getElementById('desp-filtro-categoria')?.value||'';
+  const filtroMes = document.getElementById('desp-filtro-mes')?.value||'';
+  const tb = document.getElementById('tbody-despesas'); if(!tb) return;
+  let lista = getDespesas();
+  if(filtroStatus) lista = lista.filter(d=>d.status===filtroStatus);
+  if(filtroCategoria) lista = lista.filter(d=>d.categoria===filtroCategoria);
+  if(filtroMes) lista = lista.filter(d=>(d.vencimento||'').startsWith(filtroMes));
+  lista = lista.slice().sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+  if(!lista.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhuma despesa encontrada.</td></tr>'; return; }
+  tb.innerHTML = lista.map(d => {
+    const cat = DESP_CATEGORIAS[d.categoria]||DESP_CATEGORIAS.outro;
+    const st = DESP_STATUS[d.status]||DESP_STATUS.pendente;
+    const rec = d.recorrencia && d.recorrencia!=='unica' ? '🔄 '+d.recorrencia : '—';
+    return `<tr style="${d.status==='vencido'?'background:#FFF5F5':''}">
+      <td><div style="font-weight:500">${d.descricao}</div>${d.obs?`<div style="font-size:11px;color:var(--text-muted)">${d.obs}</div>`:''}</td>
+      <td><span style="font-size:12px">${cat.icon} ${cat.label}</span></td>
+      <td><strong style="color:var(--danger)">${fmtMoney(d.valor)}</strong></td>
+      <td style="font-size:13px">${fmtDate(d.vencimento)}</td>
+      <td><span class="badge ${st.cls}">${st.icon} ${st.label}</span></td>
+      <td style="font-size:12px;color:var(--text-muted)">${rec}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${d.conta||'—'}</td>
+      <td style="white-space:nowrap">
+        ${d.status!=='pago'?`<button class="btn btn-primary btn-sm" onclick="abrirPagarDespesa(${d.id})" title="Pagar">✅</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="editarDespesa(${d.id})" title="Editar">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirDespesa(${d.id})" title="Excluir">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function salvarDespesa() {
+  const descricao = document.getElementById('despesa-descricao').value.trim();
+  const categoria = document.getElementById('despesa-categoria').value;
+  const valor = parseFloat(document.getElementById('despesa-valor').value)||0;
+  const vencimento = document.getElementById('despesa-vencimento').value;
+  if(!descricao||!categoria||!valor||!vencimento) { showToast('Preencha Descrição, Categoria, Valor e Vencimento.','error'); return; }
+  const recorrencia = document.getElementById('despesa-recorrencia').value;
+  const repeticoes = parseInt(document.getElementById('despesa-repeticoes').value)||1;
+  const editId = document.getElementById('despesa-edit-id').value;
+  if(!store.despesas) store.despesas = [];
+  if(!store.nextId.despesa) store.nextId.despesa = 1;
+  const base = {
+    descricao, categoria, valor, vencimento,
+    conta: document.getElementById('despesa-conta').value.trim(),
+    dataPagamento: document.getElementById('despesa-pagamento').value,
+    forma: document.getElementById('despesa-forma').value,
+    recorrencia, status: document.getElementById('despesa-status').value,
+    obs: document.getElementById('despesa-obs').value.trim()
+  };
+  if(editId) {
+    const d = store.despesas.find(d=>d.id==editId);
+    if(d) Object.assign(d, base);
+    registrarAuditoria('editou','despesa','Editou despesa: '+descricao,fmtMoney(valor));
+    showToast('Despesa atualizada!','success');
+  } else {
+    const qtd = recorrencia!=='unica' ? repeticoes : 1;
+    const mesesMap = {mensal:1,bimestral:2,trimestral:3,semestral:6,anual:12};
+    const intervalo = mesesMap[recorrencia]||1;
+    const grupo = recorrencia!=='unica' ? Date.now() : null;
+    for(let i=0;i<qtd;i++) {
+      const d = new Date(vencimento+'T12:00:00');
+      d.setMonth(d.getMonth()+(i*intervalo));
+      store.despesas.push({...base, id:store.nextId.despesa++, vencimento:d.toISOString().split('T')[0], status:i===0?base.status:'pendente', grupoRecorrencia:grupo});
+    }
+    registrarAuditoria('criou','despesa',qtd>1?'Criou '+qtd+' despesas recorrentes: '+descricao:'Cadastrou despesa: '+descricao,fmtMoney(valor));
+    showToast(qtd>1?qtd+' despesas criadas!':'Despesa cadastrada!','success');
+  }
+  saveData(); closeModal('modal-despesa'); renderDespesas();
+}
+function editarDespesa(id) {
+  const d = store.despesas.find(d=>d.id===id); if(!d) return;
+  document.getElementById('despesa-edit-id').value = d.id;
+  document.getElementById('modal-despesa-title').textContent = 'Editar Despesa';
+  document.getElementById('despesa-descricao').value = d.descricao||'';
+  document.getElementById('despesa-categoria').value = d.categoria||'';
+  document.getElementById('despesa-conta').value = d.conta||'';
+  document.getElementById('despesa-valor').value = d.valor||'';
+  document.getElementById('despesa-vencimento').value = d.vencimento||'';
+  document.getElementById('despesa-pagamento').value = d.dataPagamento||'';
+  document.getElementById('despesa-forma').value = d.forma||'';
+  document.getElementById('despesa-recorrencia').value = d.recorrencia||'unica';
+  document.getElementById('despesa-status').value = d.status||'pendente';
+  document.getElementById('despesa-obs').value = d.obs||'';
+  toggleRecorrencia(d.recorrencia||'unica');
+  openModal('modal-despesa', false);
+}
+function excluirDespesa(id) {
+  if(!confirm('Excluir esta despesa?')) return;
+  store.despesas = store.despesas.filter(d=>d.id!==id);
+  saveData(); renderDespesas(); showToast('Despesa excluída.');
+}
+function abrirPagarDespesa(id) {
+  const d = store.despesas.find(d=>d.id===id); if(!d) return;
+  document.getElementById('pagar-despesa-id').value = id;
+  document.getElementById('pagar-despesa-desc').innerHTML =
+    `<strong>${d.descricao}</strong><br><span style="color:var(--danger)">${fmtMoney(d.valor)}</span> · Vence em ${fmtDate(d.vencimento)}`;
+  document.getElementById('pagar-despesa-data').value = today();
+  openModal('modal-pagar-despesa', false);
+}
+function confirmarPagamentoDespesa() {
+  const id = parseInt(document.getElementById('pagar-despesa-id').value);
+  const d = store.despesas.find(d=>d.id===id); if(!d) return;
+  d.status = 'pago';
+  d.dataPagamento = document.getElementById('pagar-despesa-data').value;
+  d.forma = document.getElementById('pagar-despesa-forma').value;
+  saveData(); closeModal('modal-pagar-despesa'); renderDespesas();
+  const _dp=store.despesas.find(d=>d.id===id);
+  registrarAuditoria('pagou','despesa','Pagou despesa: '+(_dp?.descricao||''),'Valor: '+fmtMoney(_dp?.valor||0));
+  showToast('✅ Pagamento confirmado!','success');
 }
 
 // ==================== DOCUMENTOS ====================
@@ -2678,6 +4083,126 @@ const PRIO_COR = {
 function getEventos() {
   if(!store.eventos) store.eventos = [];
   return store.eventos;
+}
+
+// ==================== PRAZOS LEGAIS ====================
+const PRAZOS_LEGAIS = {
+  recursal:              { label: 'Recursal',                    dias: 15 },
+  contestacao:           { label: 'Contestação',                 dias: 15 },
+  apelacao:              { label: 'Apelação',                    dias: 15 },
+  agravo:                { label: 'Agravo',                      dias: 15 },
+  embargos:              { label: 'Embargos de Declaração',      dias: 5  },
+  embargos_infringentes: { label: 'Embargos Infringentes',       dias: 15 },
+  mandado_seguranca:     { label: 'Mandado de Segurança',        dias: 120 },
+  impugnacao:            { label: 'Impugnação ao Cumprimento',   dias: 15 },
+  rescisoria:            { label: 'Ação Rescisória',             dias: 730 },
+  personalizado:         { label: 'Personalizado',               dias: null }
+};
+
+function onEventoTipoChange(tipo) {
+  const bloco = document.getElementById('bloco-prazo-legal');
+  if(bloco) bloco.style.display = tipo === 'prazo' ? 'block' : 'none';
+  // Ao selecionar prazo, define prioridade urgente automaticamente
+  if(tipo === 'prazo') {
+    selecionarPrioridade('urgente', '#B91C1C', '#FEE2E2');
+    document.querySelector('input[name="evento-prioridade"][value="urgente"]').checked = true;
+  }
+}
+
+function calcularPrazoLegal() {
+  const tipoKey = document.getElementById('prazo-tipo')?.value;
+  const inicio = document.getElementById('prazo-inicio')?.value;
+  const customDias = parseInt(document.getElementById('prazo-dias-custom')?.value) || 0;
+  const blocoCustom = document.getElementById('bloco-prazo-dias-custom');
+  const fimEl = document.getElementById('prazo-fim-calculado');
+  const avisoEl = document.getElementById('prazo-aviso');
+  const dataEl = document.getElementById('evento-data');
+  const tituloEl = document.getElementById('evento-titulo');
+
+  // Mostrar/esconder campo de dias personalizado
+  if(blocoCustom) blocoCustom.style.display = tipoKey === 'personalizado' ? 'block' : 'none';
+
+  if(!tipoKey || !inicio) return;
+
+  const prazo = PRAZOS_LEGAIS[tipoKey];
+  if(!prazo) return;
+
+  const dias = tipoKey === 'personalizado' ? customDias : prazo.dias;
+  if(!dias) return;
+
+  // Calcular data final (dias corridos)
+  const dtInicio = new Date(inicio + 'T12:00:00');
+  const dtFim = new Date(dtInicio);
+  dtFim.setDate(dtFim.getDate() + dias);
+
+  // Se cair em fim de semana, avançar para segunda
+  while(dtFim.getDay() === 0 || dtFim.getDay() === 6) {
+    dtFim.setDate(dtFim.getDate() + 1);
+  }
+
+  const fimStr = dtFim.toISOString().split('T')[0];
+
+  // Preencher campo de data calculada e data do evento
+  if(fimEl) fimEl.value = fimStr;
+  if(dataEl) dataEl.value = fimStr;
+
+  // Aviso se prazo está próximo ou vencido
+  const hoje = new Date();
+  const diasRestantes = Math.ceil((dtFim - hoje) / (1000 * 60 * 60 * 24));
+  if(avisoEl) {
+    if(diasRestantes < 0) {
+      avisoEl.textContent = '⚠️ ATENÇÃO: Prazo já vencido há ' + Math.abs(diasRestantes) + ' dia(s)!';
+      avisoEl.style.display = 'block';
+    } else if(diasRestantes <= 5) {
+      avisoEl.textContent = '🔴 URGENTE: Apenas ' + diasRestantes + ' dia(s) restante(s)!';
+      avisoEl.style.display = 'block';
+    } else if(diasRestantes <= 10) {
+      avisoEl.textContent = '🟡 Atenção: ' + diasRestantes + ' dias restantes.';
+      avisoEl.style.display = 'block';
+    } else {
+      avisoEl.style.display = 'none';
+    }
+  }
+
+  // Preencher título automaticamente se vazio
+  if(tituloEl && !tituloEl.value) {
+    const label = tipoKey === 'personalizado' ? 'Prazo ' + dias + ' dias' : prazo.label;
+    const proc = document.getElementById('evento-processo');
+    const procNome = proc && proc.value ? (' — ' + proc.options[proc.selectedIndex]?.text?.split('—')[0]?.trim()) : '';
+    tituloEl.value = '⏰ Prazo: ' + label + procNome;
+  }
+}
+
+function gerarNotificacoesPrazo(evento) {
+  if(evento.tipo !== 'prazo') return;
+  const hoje = today();
+  const d2 = new Date(); d2.setDate(d2.getDate()+2); const d2s = d2.toISOString().split('T')[0];
+  const d5 = new Date(); d5.setDate(d5.getDate()+5); const d5s = d5.toISOString().split('T')[0];
+
+  if(evento.data === hoje) {
+    addNotif('lembrete', '🔴 PRAZO HOJE: ' + evento.titulo, 'Vence HOJE! ' + (evento.obs||''), 'agenda');
+  } else if(evento.data === d2s) {
+    addNotif('lembrete', '⏰ Prazo em 2 dias: ' + evento.titulo, fmtDate(evento.data) + (evento.obs?' · '+evento.obs:''), 'agenda');
+  } else if(evento.data <= d5s && evento.data > hoje) {
+    addNotif('lembrete', '⚠️ Prazo em breve: ' + evento.titulo, fmtDate(evento.data) + (evento.obs?' · '+evento.obs:''), 'agenda');
+  }
+}
+
+function renderPrazosNaAgenda(dia) {
+  // Retorna eventos do tipo prazo no dia — para destaque visual no calendário
+  return getEventos().filter(e => e.tipo === 'prazo' && e.data === dia);
+}
+
+function resetPrazoLegal() {
+  const bloco = document.getElementById('bloco-prazo-legal');
+  if(bloco) bloco.style.display = 'none';
+  ['prazo-tipo','prazo-inicio','prazo-fim-calculado'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const aviso = document.getElementById('prazo-aviso');
+  if(aviso) aviso.style.display = 'none';
+  const blocoCustom = document.getElementById('bloco-prazo-dias-custom');
+  if(blocoCustom) blocoCustom.style.display = 'none';
 }
 
 function renderAgenda() {
@@ -2992,6 +4517,15 @@ function gerarNotificacoesAutomaticas() {
     const ti = (typeof TIPO_EVENTO!=='undefined'&&TIPO_EVENTO[e.tipo])||{icon:'📅'};
     addNotif('lembrete',ti.icon+' Hoje: '+e.titulo,e.hora?'às '+e.hora+(e.obs?' · '+e.obs:''):(e.obs||''),'agenda');
   });
+
+  // Prazos legais próximos (até 5 dias)
+  const d5n = new Date(); d5n.setDate(d5n.getDate()+5);
+  const d5ns = d5n.toISOString().split('T')[0];
+  (store.eventos||[]).filter(e=>e.tipo==='prazo'&&e.data>hoje&&e.data<=d5ns).forEach(e=>{
+    const diasR = Math.ceil((new Date(e.data+'T12:00:00')-new Date())/(1000*60*60*24));
+    const urg = diasR<=2?'🔴':'🟡';
+    addNotif('lembrete',urg+' Prazo em '+diasR+'d: '+e.titulo,'Vence em '+fmtDate(e.data)+(e.obs?' · '+e.obs:''),'agenda');
+  });
   atualizarBadgeNotif(); renderNotifList();
 }
 function atualizarBadgeNotif() {
@@ -3255,7 +4789,7 @@ function aprovarUsuario(id) {
 }
 
 // Páginas e ações disponíveis
-const TODAS_PAGINAS = ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios','opcoes'];
+const TODAS_PAGINAS = ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios','opcoes'];
 const TODAS_ACOES = ['editarClientes','excluirClientes','verFinanceiro','exportarRelatorio','gerenciarUsuarios','verOpcoes'];
 
 function onPerfilChange(val) {
@@ -3358,6 +4892,9 @@ function renderOpcoes() {
   ['opcoes-senha-atual','opcoes-senha-nova','opcoes-senha-confirmar'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
+  atualizarBadgeAuditoria();
+  renderUsuarios();
+  carregarConfigWpp();
   const errEl = document.getElementById('opcoes-senha-error');
   const sucEl = document.getElementById('opcoes-senha-success');
   if(errEl) errEl.style.display = 'none';
@@ -3680,11 +5217,15 @@ function switchTab(group, tab, btn) {
   if(group === 'fin' && tab === 'visao') renderFinVisao();
   if(group === 'fin' && tab === 'parcelas') renderParcelas();
   if(group === 'fin' && tab === 'lancar') updateParcelasSelect();
+  if(group === 'rel' && tab === 'fluxo') gerarRelatorio();
   if(group === 'rel' && tab === 'clientes-rel') renderRelClientes();
   if(group === 'rel' && tab === 'processos-rel') renderRelProcessos();
+  if(group === 'rel' && tab === 'entradas') renderRelEntradas();
+  if(group === 'rel' && tab === 'saidas') renderRelSaidas();
   if(group === 'opt' && tab === 'usuarios') renderUsuarios();
   if(group === 'opt' && tab === 'contratos') { renderListaModelos(); populateTiposSelect('modelo-tipo'); }
   if(group === 'opt' && tab === 'sistema') atualizarInfoBackup();
+  if(group === 'opt' && tab === 'whatsapp') carregarConfigWpp();
 }
 
 // ==================== MODAL ====================
@@ -3713,6 +5254,7 @@ function openModal(id, reset = true) {
       document.getElementById('evento-data').value = calDiaSel || today();
       populateProcessosSelect();
       selecionarPrioridade('normal','#0B7B45','#E2F5EC');
+      resetPrazoLegal();
     }
   }
   document.getElementById(id).classList.add('open');
@@ -3728,62 +5270,23 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 function resetFormTipo() {
   document.getElementById('tipo-edit-id').value = '';
   document.getElementById('modal-tipo-title').textContent = 'Novo Tipo de Processo';
-  ['tipo-nome','tipo-area','tipo-valor','tipo-descricao','tipo-valor-parcela','tipo-data1'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('tipo-parcelas').value = '1';
-  document.getElementById('tipo-datas-container').style.display = 'none';
-  document.getElementById('tipo-datas-grid').innerHTML = '';
-}
-function tipoCalcParcelas() {
-  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
-  const n = parseInt(document.getElementById('tipo-parcelas').value)||1;
-  document.getElementById('tipo-valor-parcela').value = n > 0 && valor > 0 ? fmtMoney(valor/n) : '';
-  tipoGerarDatas();
-}
-function tipoGerarDatas() {
-  const n = parseInt(document.getElementById('tipo-parcelas').value)||1;
-  const dt1 = document.getElementById('tipo-data1').value;
-  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
-  const vParc = n > 0 && valor > 0 ? parseFloat((valor/n).toFixed(2)) : 0;
-  document.getElementById('tipo-valor-parcela').value = vParc > 0 ? fmtMoney(vParc) : '';
-  const container = document.getElementById('tipo-datas-container');
-  const grid = document.getElementById('tipo-datas-grid');
-  if(n < 1 || n > 60) { container.style.display = 'none'; return; }
-  container.style.display = 'block';
-  // Preservar datas já digitadas
-  const existing = {};
-  grid.querySelectorAll('input[data-idx]').forEach(inp => { existing[inp.dataset.idx] = inp.value; });
-  grid.innerHTML = '';
-  for(let i = 0; i < n; i++) {
-    const auto = dt1 ? addMonths(dt1, i) : '';
-    const val = existing[i] !== undefined ? existing[i] : auto;
-    grid.innerHTML += `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px">
-        <div style="font-size:10.5px;font-weight:600;color:var(--blue-600);margin-bottom:4px">
-          ${i+1}ª Parcela ${vParc > 0 ? '· '+fmtMoney(vParc) : ''}
-        </div>
-        <input type="date" class="form-control" style="padding:5px 8px;font-size:12px" data-idx="${i}" value="${val}" placeholder="dd/mm/aaaa">
-      </div>`;
-  }
-}
-function tipoGetDatas() {
-  const inputs = document.getElementById('tipo-datas-grid').querySelectorAll('input[data-idx]');
-  return Array.from(inputs).map(inp => inp.value);
+  ['tipo-nome','tipo-descricao'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('tipo-area').value = '';
 }
 function salvarTipo() {
   const nome = document.getElementById('tipo-nome').value.trim();
   const area = document.getElementById('tipo-area').value;
-  const valor = parseFloat(document.getElementById('tipo-valor').value)||0;
-  const parcelas = parseInt(document.getElementById('tipo-parcelas').value)||1;
   const desc = document.getElementById('tipo-descricao').value.trim();
-  const datas = tipoGetDatas();
-  if(!nome || !area || !valor) { showToast('Preencha Nome, Área e Valor.', 'error'); return; }
+  if(!nome || !area) { showToast('Preencha Nome e Área.', 'error'); return; }
   const editId = document.getElementById('tipo-edit-id').value;
   if(editId) {
     const t = store.tipos.find(t => t.id == editId);
-    if(t) { t.nome = nome; t.area = area; t.valor = valor; t.parcelas = parcelas; t.desc = desc; t.datas = datas; }
+    if(t) { t.nome = nome; t.area = area; t.desc = desc; }
+    registrarAuditoria('editou','sistema','Editou tipo de processo: '+nome,area);
     showToast('Tipo atualizado com sucesso!', 'success');
   } else {
-    store.tipos.push({ id: store.nextId.tipo++, nome, area, valor, parcelas, desc, datas });
+    store.tipos.push({ id: store.nextId.tipo++, nome, area, desc });
+    registrarAuditoria('criou','sistema','Cadastrou tipo de processo: '+nome,area);
     showToast('Tipo cadastrado com sucesso!', 'success');
   }
   saveData(); closeModal('modal-tipo'); renderTipos();
@@ -3795,18 +5298,7 @@ function editarTipo(id) {
   document.getElementById('modal-tipo-title').textContent = 'Editar Tipo de Processo';
   document.getElementById('tipo-nome').value = t.nome;
   document.getElementById('tipo-area').value = t.area;
-  document.getElementById('tipo-valor').value = t.valor;
-  document.getElementById('tipo-parcelas').value = t.parcelas;
   document.getElementById('tipo-descricao').value = t.desc||'';
-  // Preencher data1 se existir
-  if(t.datas && t.datas[0]) document.getElementById('tipo-data1').value = t.datas[0];
-  tipoGerarDatas();
-  // Restaurar datas individuais salvas
-  if(t.datas && t.datas.length) {
-    const inputs = document.getElementById('tipo-datas-grid').querySelectorAll('input[data-idx]');
-    inputs.forEach((inp, i) => { if(t.datas[i]) inp.value = t.datas[i]; });
-  }
-  tipoCalcParcelas();
   openModal('modal-tipo', false);
 }
 function excluirTipo(id) {
@@ -3839,15 +5331,110 @@ function renderTipos(q = '') {
 }
 
 // ==================== CLIENTES ====================
+// ==================== DIP ====================
+let _dipEntradas = []; // entradas temporárias no modal aberto
+
+function renderDIPLista() {
+  const el = document.getElementById('cliente-dip-lista');
+  if(!el) return;
+  if(!_dipEntradas.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:16px 0">Nenhum registro ainda.</div>';
+    return;
+  }
+  el.innerHTML = _dipEntradas.slice().reverse().map((e,i) => {
+    const idx = _dipEntradas.length - 1 - i;
+    return `<div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;position:relative">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:11px;font-weight:600;color:var(--blue-600)">📌 ${e.data} às ${e.hora}</span>
+        <span style="font-size:11px;color:var(--text-muted)">${e.autor||'—'}</span>
+        <button onclick="excluirDIP(${idx})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:13px;padding:0 4px" title="Excluir">🗑</button>
+      </div>
+      <div style="font-size:13px;color:var(--text-primary);white-space:pre-wrap">${e.texto}</div>
+    </div>`;
+  }).join('');
+}
+
+function registrarDIP() {
+  const texto = document.getElementById('cliente-dip-novo').value.trim();
+  if(!texto) { showToast('Digite uma informação antes de registrar.', 'error'); return; }
+  const now = new Date();
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  _dipEntradas.push({
+    texto,
+    data: now.toLocaleDateString('pt-BR'),
+    hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+    autor: session.nome || session.email || 'Admin',
+    ts: now.toISOString()
+  });
+  document.getElementById('cliente-dip-novo').value = '';
+  renderDIPLista();
+  showToast('✅ Registro adicionado!', 'success');
+}
+
+function excluirDIP(idx) {
+  if(!confirm('Excluir este registro?')) return;
+  _dipEntradas.splice(idx, 1);
+  renderDIPLista();
+}
+
+// ==================== FINANCEIRO DO CLIENTE ====================
+function clienteCalcParcelas() {
+  const valor = parseFloat(document.getElementById('cliente-valor').value)||0;
+  const n = parseInt(document.getElementById('cliente-parcelas').value)||1;
+  const vp = n > 0 ? valor/n : 0;
+  document.getElementById('cliente-valor-parcela').value = vp > 0 ? fmtMoney(vp) : '';
+  clienteGerarDatas();
+}
+
+function clienteGerarDatas() {
+  const n = parseInt(document.getElementById('cliente-parcelas').value)||1;
+  const data1 = document.getElementById('cliente-data1').value;
+  const container = document.getElementById('cliente-datas-container');
+  const grid = document.getElementById('cliente-datas-grid');
+  if(!container || !grid) return;
+  if(n <= 1 || !data1) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  const valor = parseFloat(document.getElementById('cliente-valor').value)||0;
+  const vp = n > 0 ? valor/n : 0;
+  grid.innerHTML = '';
+  for(let i = 0; i < n; i++) {
+    const d = new Date(data1 + 'T12:00:00');
+    d.setMonth(d.getMonth() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    const div = document.createElement('div');
+    div.innerHTML = `<label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Parcela ${i+1}${vp > 0 ? ' — ' + fmtMoney(vp) : ''}</label>
+      <input type="date" class="form-control" id="cliente-data-parc-${i}" value="${dateStr}" style="font-size:12px">`;
+    grid.appendChild(div);
+  }
+}
+
+function lerDatasCliente() {
+  const n = parseInt(document.getElementById('cliente-parcelas').value)||1;
+  const datas = [];
+  for(let i = 0; i < n; i++) {
+    const el = document.getElementById('cliente-data-parc-' + i);
+    datas.push(el ? el.value : '');
+  }
+  return datas;
+}
+
 function resetFormCliente() {
   document.getElementById('cliente-edit-id').value = '';
   document.getElementById('modal-cliente-title').textContent = 'Novo Cliente';
   ['cliente-nome','cliente-cpf','cliente-tel','cliente-email','cliente-endereco','cliente-cidade',
    'cliente-natureza','cliente-beneficio','cliente-senha-inss','cliente-indicacao',
-   'cliente-responsavel','cliente-obs','cliente-dip'].forEach(id => document.getElementById(id).value = '');
+   'cliente-responsavel','cliente-obs','cliente-valor','cliente-valor-parcela','cliente-data1','cliente-dip-novo'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('cliente-parcelas').value = '1';
   document.getElementById('cliente-status').value = 'ativo';
+  const cont = document.getElementById('cliente-datas-container');
+  if(cont) cont.style.display = 'none';
+  _dipEntradas = [];
+  renderDIPLista();
   populateTiposSelect('cliente-tipo-processo');
 }
+
 function populateTiposSelect(selectId) {
   const sel = document.getElementById(selectId);
   const cur = sel.value;
@@ -3855,6 +5442,7 @@ function populateTiposSelect(selectId) {
   store.tipos.forEach(t => sel.innerHTML += `<option value="${t.id}">${t.nome} (${t.area})</option>`);
   sel.value = cur;
 }
+
 function salvarCliente() {
   const nome = document.getElementById('cliente-nome').value.trim();
   const cpf = document.getElementById('cliente-cpf').value.trim();
@@ -3873,19 +5461,27 @@ function salvarCliente() {
     tipoProcessoId: parseInt(document.getElementById('cliente-tipo-processo').value)||null,
     status: document.getElementById('cliente-status').value,
     obs: document.getElementById('cliente-obs').value.trim(),
-    dip: document.getElementById('cliente-dip').value.trim()
+    // Financeiro
+    valor: parseFloat(document.getElementById('cliente-valor').value)||0,
+    nParcelas: parseInt(document.getElementById('cliente-parcelas').value)||1,
+    datasParcelas: lerDatasCliente(),
+    // DIP
+    dipEntradas: [..._dipEntradas]
   };
   const editId = document.getElementById('cliente-edit-id').value;
   if(editId) {
     const c = store.clientes.find(c => c.id == editId);
     if(c) Object.assign(c, data);
+    registrarAuditoria('editou','cliente','Editou cliente: '+data.nome,'CPF: '+data.cpf);
     showToast('Cliente atualizado!', 'success');
   } else {
     store.clientes.push({ id: store.nextId.cliente++, ...data });
+    registrarAuditoria('criou','cliente','Cadastrou cliente: '+data.nome,'CPF: '+data.cpf);
     showToast('Cliente cadastrado!', 'success');
   }
   saveData(); closeModal('modal-cliente'); renderClientes(); updateDashboard();
 }
+
 function editarCliente(id) {
   const c = store.clientes.find(c => c.id === id);
   if(!c) return;
@@ -3906,12 +5502,24 @@ function editarCliente(id) {
   document.getElementById('cliente-tipo-processo').value = c.tipoProcessoId||'';
   document.getElementById('cliente-status').value = c.status||'ativo';
   document.getElementById('cliente-obs').value = c.obs||'';
-  document.getElementById('cliente-dip').value = c.dip||'';
+  // Financeiro
+  document.getElementById('cliente-valor').value = c.valor||'';
+  document.getElementById('cliente-parcelas').value = c.nParcelas||1;
+  if(c.datasParcelas && c.datasParcelas.length > 0) {
+    document.getElementById('cliente-data1').value = c.datasParcelas[0]||'';
+  }
+  clienteCalcParcelas();
+  // DIP
+  _dipEntradas = Array.isArray(c.dipEntradas) ? [...c.dipEntradas] : (c.dip ? [{ texto: c.dip, data: 'Antes', hora: '—', autor: '—', ts: '' }] : []);
+  document.getElementById('cliente-dip-novo').value = '';
+  renderDIPLista();
   openModal('modal-cliente', false);
 }
 function excluirCliente(id) {
   if(!confirm('Excluir este cliente?')) return;
+  const _c = store.clientes.find(c=>c.id===id);
   store.clientes = store.clientes.filter(c => c.id !== id);
+  registrarAuditoria('excluiu','cliente','Excluiu cliente: '+(_c?.nome||id),'');
   saveData(); renderClientes(); showToast('Cliente excluído.');
 }
 function gerarFichaPDF(id) {
@@ -4117,6 +5725,7 @@ function renderClientes(q = '') {
         <button class="btn btn-outline btn-sm" onclick="editarCliente(${c.id})" title="Editar">✏️</button>
         <button class="btn btn-primary btn-sm" onclick="gerarFichaPDF(${c.id})" title="Gerar Ficha PDF">📄</button>
         <button class="btn btn-outline btn-sm" onclick="abrirGerarContrato(${c.id})" title="Gerar Contrato" style="background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200)">📝</button>
+        <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${c.id},null)" title="Enviar WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>
         <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})" title="Excluir">🗑</button>
       </td>
     </tr>`;
@@ -4127,15 +5736,12 @@ function renderClientes(q = '') {
 function resetFormProcesso() {
   document.getElementById('processo-edit-id').value = '';
   document.getElementById('modal-processo-title').textContent = 'Novo Processo';
-  ['proc-numero','proc-adv','proc-vara','proc-descricao','proc-valor-parcela',
-   'proc-lembrete-data','proc-lembrete-hora','proc-lembrete-msg'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('proc-parcelas').value = '1';
+  ['proc-numero','proc-adv','proc-vara','proc-descricao',
+   'proc-lembrete-data','proc-lembrete-hora','proc-lembrete-msg'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
   document.getElementById('proc-abertura').value = today();
-  document.getElementById('proc-1a-parcela').value = today();
   document.getElementById('proc-status').value = 'andamento';
-  document.getElementById('proc-datas-container').style.display = 'none';
-  document.getElementById('proc-datas-grid').innerHTML = '';
-  // Reset lembrete
   setLembreteAtivo(false);
   populateClientesSelect();
   populateTiposProcSelect();
@@ -4179,48 +5785,9 @@ function preencherTipoPorCliente() {
     preencherValorPorTipo();
   }
 }
-function preencherValorPorTipo() {
-  const sel = document.getElementById('proc-tipo');
-  const opt = sel.options[sel.selectedIndex];
-  if(opt && opt.dataset.valor) {
-    document.getElementById('proc-valor').value = opt.dataset.valor;
-    document.getElementById('proc-parcelas').value = opt.dataset.parcelas;
-    calcularParcelas();
-  }
-}
-function calcularParcelas() {
-  const valor = parseFloat(document.getElementById('proc-valor').value)||0;
-  const n = parseInt(document.getElementById('proc-parcelas').value)||1;
-  const dt1 = document.getElementById('proc-1a-parcela').value;
-  const vParc = n > 0 && valor > 0 ? parseFloat((valor/n).toFixed(2)) : 0;
-  document.getElementById('proc-valor-parcela').value = vParc > 0 ? fmtMoney(vParc) : '';
-
-  const container = document.getElementById('proc-datas-container');
-  const grid = document.getElementById('proc-datas-grid');
-  if(n < 1 || n > 60) { container.style.display = 'none'; return; }
-  container.style.display = 'block';
-
-  // Preservar datas já editadas manualmente
-  const existing = {};
-  grid.querySelectorAll('input[data-pidx]').forEach(inp => { existing[inp.dataset.pidx] = inp.value; });
-
-  grid.innerHTML = '';
-  for(let i = 0; i < n; i++) {
-    const auto = dt1 ? addMonths(dt1, i) : '';
-    const val = existing[i] !== undefined ? existing[i] : auto;
-    grid.innerHTML += `
-      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;transition:border 0.15s" onfocusin="this.style.borderColor='var(--blue-400)'" onfocusout="this.style.borderColor='var(--border)'">
-        <div style="font-size:10.5px;font-weight:600;color:var(--blue-600);margin-bottom:4px">
-          ${i+1}ª parcela ${vParc > 0 ? '· ' + fmtMoney(vParc) : ''}
-        </div>
-        <input type="date" class="form-control" style="padding:5px 8px;font-size:12px;border:none;background:transparent;padding-left:0" data-pidx="${i}" value="${val}">
-      </div>`;
-  }
-}
-function procGetDatas() {
-  const inputs = document.getElementById('proc-datas-grid').querySelectorAll('input[data-pidx]');
-  return Array.from(inputs).map(inp => inp.value);
-}
+function preencherValorPorTipo() { /* financeiro removido do processo */ }
+function calcularParcelas() { /* financeiro removido do processo */ }
+function procGetDatas() { return []; }
 
 const statusLabels = {
   andamento: { label: 'Em Andamento', cls: 'badge-blue' },
@@ -4233,10 +5800,7 @@ function salvarProcesso() {
   const num = document.getElementById('proc-numero').value.trim();
   const cId = parseInt(document.getElementById('proc-cliente').value);
   const tId = parseInt(document.getElementById('proc-tipo').value);
-  const valor = parseFloat(document.getElementById('proc-valor').value)||0;
-  const nParcelas = parseInt(document.getElementById('proc-parcelas').value)||1;
-  const dt1 = document.getElementById('proc-1a-parcela').value;
-  if(!num || !cId || !tId || !valor || !dt1) { showToast('Preencha todos os campos obrigatórios.', 'error'); return; }
+  if(!num || !cId || !tId) { showToast('Preencha todos os campos obrigatórios.', 'error'); return; }
   const editId = document.getElementById('processo-edit-id').value;
   const procData = {
     numero: num,
@@ -4246,14 +5810,12 @@ function salvarProcesso() {
     abertura: document.getElementById('proc-abertura').value,
     status: document.getElementById('proc-status').value,
     vara: document.getElementById('proc-vara').value.trim(),
-    valor,
-    nParcelas,
-    dt1Parcela: dt1,
     descricao: document.getElementById('proc-descricao').value.trim()
   };
   if(editId) {
     const p = store.processos.find(p => p.id == editId);
     if(p) Object.assign(p, procData);
+    registrarAuditoria('editou','processo','Editou processo: '+num,'');
     showToast('Processo atualizado!', 'success');
   } else {
     const pId = store.nextId.processo++;
@@ -4265,30 +5827,12 @@ function salvarProcesso() {
       msg: document.getElementById('proc-lembrete-msg').value.trim()
     } : { ativo: false };
     store.processos.push({ id: pId, ...procData, lembrete });
-    // Gerar parcelas com datas customizadas
-    const datasCustom = procGetDatas();
-    store.parcelas = store.parcelas.filter(p => p.processoId !== pId);
-    for(let i = 0; i < nParcelas; i++) {
-      const dtVenc = datasCustom[i] || addMonths(dt1, i);
-      store.parcelas.push({
-        id: store.nextId.parcela++,
-        processoId: pId,
-        clienteId: cId,
-        num: i+1,
-        total: nParcelas,
-        vencimento: dtVenc,
-        valor: parseFloat((valor / nParcelas).toFixed(2)),
-        status: 'pendente',
-        dtPagamento: null,
-        obs: ''
-      });
-    }
     if(!store.andamentos[pId]) store.andamentos[pId] = [];
     store.andamentos[pId].push({ data: today(), texto: 'Processo aberto.', status: procData.status });
-    showToast(`Processo criado com ${nParcelas} parcela(s)!`, 'success');
+    registrarAuditoria('criou','processo','Criou processo: '+num,'');
+    showToast('Processo criado!', 'success');
   }
   saveData(); closeModal('modal-processo'); renderProcessos(); updateDashboard();
-  document.getElementById('badge-processos').textContent = store.processos.filter(p => p.status === 'andamento').length;
 }
 function renderProcessos() {
   const q = (document.getElementById('search-processos')||{}).value || '';
@@ -4421,7 +5965,6 @@ function renderFinVisao() {
   document.getElementById('fin-total-vencido').textContent = fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0));
   document.getElementById('fin-total-areceber').textContent = fmtMoney(aReceber.reduce((s,p)=>s+p.valor,0));
   document.getElementById('fin-total-contratado').textContent = fmtMoney(totalContratado);
-  // Vencidas list
   const vl = document.getElementById('vencidas-list');
   if(!vencidos.length) { vl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem parcelas vencidas.</div>'; }
   else vl.innerHTML = vencidos.slice(0,6).map(p => {
@@ -4430,13 +5973,9 @@ function renderFinVisao() {
     const dias = diffDays(today(), p.vencimento);
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
-      <div style="text-align:right">
-        <div style="color:var(--danger);font-weight:600">${fmtMoney(p.valor)}</div>
-        <div style="font-size:11px;color:var(--danger)">${dias}d atrasado</div>
-      </div>
+      <div style="text-align:right"><div style="color:var(--danger);font-weight:600">${fmtMoney(p.valor)}</div><div style="font-size:11px;color:var(--danger)">${dias}d atrasado</div></div>
     </div>`;
   }).join('');
-  // Próximos
   const d30 = new Date(); d30.setDate(d30.getDate()+30);
   const prox = aReceber.filter(p => new Date(p.vencimento) <= d30).sort((a,b) => a.vencimento.localeCompare(b.vencimento));
   const pl = document.getElementById('proximos-list');
@@ -4447,13 +5986,108 @@ function renderFinVisao() {
     const dias = diffDays(p.vencimento, today());
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
-      <div style="text-align:right">
-        <div style="color:var(--blue-600);font-weight:600">${fmtMoney(p.valor)}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${fmtDate(p.vencimento)} (${dias}d)</div>
-      </div>
+      <div style="text-align:right"><div style="color:var(--blue-600);font-weight:600">${fmtMoney(p.valor)}</div><div style="font-size:11px;color:var(--text-muted)">${fmtDate(p.vencimento)} (${dias}d)</div></div>
     </div>`;
   }).join('');
 }
+  const de = document.getElementById('fin-periodo-de')?.value || '';
+  const ate = document.getElementById('fin-periodo-ate')?.value || '';
+
+  // Entradas (parcelas pagas no período)
+  let pagos = store.parcelas.filter(p => p.status === 'pago');
+  if(de)  pagos = pagos.filter(p => (p.dtPagamento||p.vencimento) >= de);
+  if(ate) pagos = pagos.filter(p => (p.dtPagamento||p.vencimento) <= ate);
+  const totalEntradas = pagos.reduce((s,p) => s+p.valor, 0);
+
+  // Saídas (despesas pagas no período)
+  let despPagas = getDespesas().filter(d => d.status === 'pago');
+  if(de)  despPagas = despPagas.filter(d => (d.dataPagamento||d.vencimento) >= de);
+  if(ate) despPagas = despPagas.filter(d => (d.dataPagamento||d.vencimento) <= ate);
+  const totalSaidas = despPagas.reduce((s,d) => s+d.valor, 0);
+  const saldo = totalEntradas - totalSaidas;
+
+  // A receber
+  const vencidos = store.parcelas.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
+  const aReceber = store.parcelas.filter(p => p.status !== 'pago' && !isVencido(p.vencimento));
+  const totalVencido = vencidos.reduce((s,p) => s+p.valor, 0);
+  const totalAReceber = aReceber.reduce((s,p) => s+p.valor, 0);
+
+  // Cards
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('fin-total-entradas', fmtMoney(totalEntradas));
+  set('fin-qtd-entradas', pagos.length+' recebimento(s)');
+  set('fin-total-saidas', fmtMoney(totalSaidas));
+  set('fin-qtd-saidas', despPagas.length+' despesa(s)');
+  const saldoEl = document.getElementById('fin-saldo-periodo');
+  if(saldoEl) {
+    saldoEl.textContent = fmtMoney(saldo);
+    saldoEl.style.color = saldo >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+  set('fin-total-areceber', fmtMoney(totalAReceber+totalVencido));
+  set('fin-total-vencido-label', fmtMoney(totalVencido)+' vencido');
+
+  // Gráfico barras mensais (6 meses)
+  const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hoje = new Date();
+  const meses = [];
+  for(let i=5;i>=0;i--) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth()-i, 1);
+    meses.push({ ano:d.getFullYear(), mes:d.getMonth(), label:mesesNomes[d.getMonth()]+'/'+String(d.getFullYear()).slice(2) });
+  }
+  const dadosGraf = meses.map(m => {
+    const prefix = m.ano+'-'+String(m.mes+1).padStart(2,'0');
+    const ent = store.parcelas.filter(p => p.status==='pago' && (p.dtPagamento||p.vencimento||'').startsWith(prefix)).reduce((s,p)=>s+p.valor,0);
+    const sai = getDespesas().filter(d => d.status==='pago' && (d.dataPagamento||d.vencimento||'').startsWith(prefix)).reduce((s,d)=>s+d.valor,0);
+    return {...m, ent, sai, saldo:ent-sai};
+  });
+  const maxVal = Math.max(...dadosGraf.map(d=>Math.max(d.ent,d.sai)), 1);
+  const grafEl = document.getElementById('fin-grafico-fluxo');
+  const labEl = document.getElementById('fin-grafico-labels');
+  if(grafEl) {
+    grafEl.innerHTML = dadosGraf.map(d => {
+      const hEnt = Math.max(Math.round((d.ent/maxVal)*160), d.ent>0?4:0);
+      const hSai = Math.max(Math.round((d.sai/maxVal)*160), d.sai>0?4:0);
+      const isMes = d.ano===hoje.getFullYear() && d.mes===hoje.getMonth();
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;height:170px">
+          <div title="Entradas: ${fmtMoney(d.ent)}" style="width:42%;background:${isMes?'#4ADE80':'var(--success)'};border-radius:4px 4px 0 0;height:${hEnt}px;opacity:0.85"></div>
+          <div title="Saídas: ${fmtMoney(d.sai)}" style="width:42%;background:${isMes?'#F87171':'var(--danger)'};border-radius:4px 4px 0 0;height:${hSai}px;opacity:0.85"></div>
+        </div>
+        <div style="font-size:10px;color:${isMes?'var(--blue-600)':'var(--text-muted)'};font-weight:${isMes?700:400}">${d.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Vencidas e próximos
+  const vl = document.getElementById('vencidas-list');
+  if(vl) {
+    if(!vencidos.length) { vl.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem parcelas vencidas.</div>'; }
+    else vl.innerHTML = vencidos.slice(0,6).map(p => {
+      const proc = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+      const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+      const dias = diffDays(today(),p.vencimento);
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
+        <div style="text-align:right"><div style="color:var(--danger);font-weight:600">${fmtMoney(p.valor)}</div><div style="font-size:11px;color:var(--danger)">${dias}d atrasado</div></div>
+      </div>`;
+    }).join('');
+  }
+  const d30 = new Date(); d30.setDate(d30.getDate()+30);
+  const prox = aReceber.filter(p=>new Date(p.vencimento)<=d30).sort((a,b)=>a.vencimento.localeCompare(b.vencimento));
+  const pl = document.getElementById('proximos-list');
+  if(pl) {
+    if(!prox.length) { pl.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem vencimentos próximos.</div>'; }
+    else pl.innerHTML = prox.slice(0,6).map(p => {
+      const proc = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+      const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+      const dias = diffDays(p.vencimento,today());
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div><strong>${c.nome}</strong><br><span style="color:var(--text-muted)">${proc.numero} — Parc. ${p.num}/${p.total}</span></div>
+        <div style="text-align:right"><div style="color:var(--blue-600);font-weight:600">${fmtMoney(p.valor)}</div><div style="font-size:11px;color:var(--text-muted)">${fmtDate(p.vencimento)} (${dias}d)</div></div>
+      </div>`;
+    }).join('');
+  }
+
 function renderParcelas(q = '') {
   const filterStatus = (document.getElementById('filter-status-parcela')||{}).value || '';
   let list = store.parcelas.map(p => ({...p, computedStatus: getParcelaStatus(p)}));
@@ -4481,7 +6115,9 @@ function renderParcelas(q = '') {
       <td>${fmtDate(p.vencimento)}</td>
       <td><strong>${fmtMoney(p.valor)}</strong></td>
       <td><span class="badge ${stCls}">${stLabel}</span>${p.dtPagamento?`<br><span style="font-size:10px;color:var(--text-muted)">Pago em ${fmtDate(p.dtPagamento)}</span>`:''}</td>
-      <td>${st!=='pago'?`<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>`:'<span style="color:var(--success);font-size:12px">✔ Confirmado</span>'}</td>
+      <td>${st!=='pago'?`<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>`:'<span style="color:var(--success);font-size:12px">✔ Confirmado</span>'}
+        <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${p.clienteId},${p.id})" title="Enviar cobrança WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -4514,6 +6150,7 @@ function confirmarPagamento() {
   p.status = 'pago'; p.dtPagamento = dt; p.obs = obs;
   notifPagamentoConfirmado(p.id);
   saveData(); updateParcelasSelect(); renderFinVisao();
+  registrarAuditoria('pagou','financeiro','Pagamento confirmado: parcela '+p.num+'/'+p.total,'Valor: '+fmtMoney(p.valor));
   showToast('Pagamento confirmado!', 'success');
 }
 
@@ -4746,37 +6383,138 @@ function renderInadimplencia() {
       <span style="font-weight:700;color:var(--danger)">${fmtMoney(c.total)}</span>
     </div>`).join('');
 }
-function gerarRelatorio() {
-  const de = document.getElementById('rel-de').value;
-  const ate = document.getElementById('rel-ate').value;
-  let list = store.parcelas;
-  if(de) list = list.filter(p => p.vencimento >= de);
-  if(ate) list = list.filter(p => p.vencimento <= ate);
-  const pagos = list.filter(p => p.status === 'pago');
-  const vencidos = list.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
-  document.getElementById('rel-entradas').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0));
-  document.getElementById('rel-vencidos').textContent = fmtMoney(vencidos.reduce((s,p)=>s+p.valor,0));
-  document.getElementById('rel-saldo').textContent = fmtMoney(pagos.reduce((s,p)=>s+p.valor,0) - vencidos.reduce((s,p)=>s+p.valor,0));
-  const tb = document.getElementById('tbody-rel-fluxo');
-  list.sort((a,b) => a.vencimento.localeCompare(b.vencimento));
-  if(!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhum lançamento no período.</td></tr>'; return; }
-  tb.innerHTML = list.map(p => {
-    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
-    const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
-    const st = getParcelaStatus(p);
-    const stLabel = st==='pago'?'Pago':st==='vencido'?'Vencido':'A Receber';
-    const stCls = st==='pago'?'badge-green':st==='vencido'?'badge-red':'badge-amber';
-    return `<tr>
-      <td>${fmtDate(p.vencimento)}</td>
-      <td>${fmtDate(p.dtPagamento)}</td>
-      <td>${c.nome}</td>
-      <td><strong style="color:var(--blue-600)">${pr.numero}</strong></td>
-      <td>${p.num}/${p.total}</td>
-      <td><strong>${fmtMoney(p.valor)}</strong></td>
-      <td><span class="badge ${stCls}">${stLabel}</span></td>
-    </tr>`;
-  }).join('');
+// Helpers de período relatório
+function relPeriodoMesAtual() {
+  const hoje = new Date(); const y=hoje.getFullYear(); const m=String(hoje.getMonth()+1).padStart(2,'0');
+  document.getElementById('rel-de').value = y+'-'+m+'-01';
+  document.getElementById('rel-ate').value = y+'-'+m+'-'+String(new Date(y,hoje.getMonth()+1,0).getDate()).padStart(2,'0');
+  gerarRelatorio();
 }
+function relPeriodoAno() {
+  const y=new Date().getFullYear();
+  document.getElementById('rel-de').value = y+'-01-01';
+  document.getElementById('rel-ate').value = y+'-12-31';
+  gerarRelatorio();
+}
+function relPeriodoTudo() {
+  document.getElementById('rel-de').value = '';
+  document.getElementById('rel-ate').value = '';
+  gerarRelatorio();
+}
+
+function gerarRelatorio() {
+  const de  = document.getElementById('rel-de')?.value || '';
+  const ate = document.getElementById('rel-ate')?.value || '';
+  const filtroEnt  = document.getElementById('rel-ent-status')?.value || '';
+  const filtroSaid = document.getElementById('rel-said-status')?.value || '';
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  // === ENTRADAS (parcelas) ===
+  let parcelas = store.parcelas.slice();
+  if(de)  parcelas = parcelas.filter(p => (p.dtPagamento||p.vencimento||'') >= de);
+  if(ate) parcelas = parcelas.filter(p => (p.dtPagamento||p.vencimento||'') <= ate);
+
+  const totalEntradas = parcelas.filter(p=>p.status==='pago').reduce((s,p)=>s+p.valor,0);
+  const totalVencEnt  = parcelas.filter(p=>getParcelaStatus(p)==='vencido').reduce((s,p)=>s+p.valor,0);
+  const totalAReceber = parcelas.filter(p=>getParcelaStatus(p)==='pendente').reduce((s,p)=>s+p.valor,0);
+
+  // === SAÍDAS (despesas) ===
+  let despesas = getDespesas().slice();
+  if(de)  despesas = despesas.filter(d => (d.dataPagamento||d.vencimento||'') >= de);
+  if(ate) despesas = despesas.filter(d => (d.dataPagamento||d.vencimento||'') <= ate);
+
+  const totalSaidas = despesas.filter(d=>d.status==='pago').reduce((s,d)=>s+d.valor,0);
+  const saldo = totalEntradas - totalSaidas;
+
+  // Cards
+  set('rel-total-entradas', fmtMoney(totalEntradas));
+  set('rel-qtd-entradas', parcelas.filter(p=>p.status==='pago').length+' recebimento(s)');
+  set('rel-total-saidas', fmtMoney(totalSaidas));
+  set('rel-qtd-saidas', despesas.filter(d=>d.status==='pago').length+' despesa(s)');
+  const saldoEl = document.getElementById('rel-saldo-periodo');
+  if(saldoEl) { saldoEl.textContent=fmtMoney(saldo); saldoEl.style.color=saldo>=0?'var(--success)':'var(--danger)'; }
+  set('rel-areceber', fmtMoney(totalAReceber+totalVencEnt));
+  set('rel-vencido-label', fmtMoney(totalVencEnt)+' vencido');
+
+  // === GRÁFICO 6 meses ===
+  const mesesNomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hoje = new Date();
+  const meses = [];
+  for(let i=5;i>=0;i--) { const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1); meses.push({ano:d.getFullYear(),mes:d.getMonth(),label:mesesNomes[d.getMonth()]+'/'+String(d.getFullYear()).slice(2)}); }
+  const dadosGraf = meses.map(m => {
+    const prefix = m.ano+'-'+String(m.mes+1).padStart(2,'0');
+    const ent = store.parcelas.filter(p=>p.status==='pago'&&(p.dtPagamento||p.vencimento||'').startsWith(prefix)).reduce((s,p)=>s+p.valor,0);
+    const sai = getDespesas().filter(d=>d.status==='pago'&&(d.dataPagamento||d.vencimento||'').startsWith(prefix)).reduce((s,d)=>s+d.valor,0);
+    return {...m, ent, sai};
+  });
+  const maxVal = Math.max(...dadosGraf.map(d=>Math.max(d.ent,d.sai)), 1);
+  const grafEl = document.getElementById('rel-grafico-fluxo');
+  if(grafEl && dadosGraf.some(d=>d.ent>0||d.sai>0)) {
+    grafEl.innerHTML = dadosGraf.map(d => {
+      const hEnt = Math.max(Math.round((d.ent/maxVal)*140), d.ent>0?4:0);
+      const hSai = Math.max(Math.round((d.sai/maxVal)*140), d.sai>0?4:0);
+      const isMes = d.ano===hoje.getFullYear() && d.mes===hoje.getMonth();
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;height:150px">
+          <div title="Entradas: ${fmtMoney(d.ent)}" style="width:42%;background:${isMes?'#4ADE80':'var(--success)'};border-radius:4px 4px 0 0;height:${hEnt}px;opacity:0.85"></div>
+          <div title="Saídas: ${fmtMoney(d.sai)}" style="width:42%;background:${isMes?'#F87171':'var(--danger)'};border-radius:4px 4px 0 0;height:${hSai}px;opacity:0.85"></div>
+        </div>
+        <div style="font-size:10px;color:${isMes?'var(--blue-600)':'var(--text-muted)'};font-weight:${isMes?700:400}">${d.label}</div>
+      </div>`;
+    }).join('');
+  }
+  const totaisEl = document.getElementById('rel-grafico-totais');
+  if(totaisEl) {
+    const totalE6 = dadosGraf.reduce((s,d)=>s+d.ent,0);
+    const totalS6 = dadosGraf.reduce((s,d)=>s+d.sai,0);
+    totaisEl.innerHTML = `
+      <div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Entradas (6m)</div><div style="font-size:15px;font-weight:700;color:var(--success)">${fmtMoney(totalE6)}</div></div>
+      <div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Saídas (6m)</div><div style="font-size:15px;font-weight:700;color:var(--danger)">${fmtMoney(totalS6)}</div></div>
+      <div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Saldo (6m)</div><div style="font-size:15px;font-weight:700;color:${totalE6-totalS6>=0?'var(--success)':'var(--danger)'}">${fmtMoney(totalE6-totalS6)}</div></div>`;
+  }
+
+  // === TABELA ENTRADAS ===
+  let listaEnt = parcelas.slice().sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+  if(filtroEnt) listaEnt = listaEnt.filter(p=>getParcelaStatus(p)===filtroEnt);
+  const tbEnt = document.getElementById('tbody-rel-entradas');
+  if(tbEnt) {
+    const STATUS_CLS={pago:'badge-green',pendente:'badge-amber',vencido:'badge-red'};
+    tbEnt.innerHTML = listaEnt.length ? listaEnt.map(p=>{
+      const c=store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+      const pr=store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+      const st=getParcelaStatus(p);
+      return `<tr>
+        <td>${c.nome}</td><td style="color:var(--blue-600)">${pr.numero}</td>
+        <td style="text-align:center">${p.num}/${p.total}</td>
+        <td>${fmtDate(p.vencimento)}</td>
+        <td><strong>${fmtMoney(p.valor)}</strong></td>
+        <td><span class="badge ${STATUS_CLS[st]||''}">${{pago:'✅ Pago',pendente:'⏳ Pendente',vencido:'⚠️ Vencido'}[st]||st}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px">Nenhuma entrada no período.</td></tr>';
+  }
+
+  // === TABELA SAÍDAS ===
+  let listaSaid = despesas.slice().sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+  if(filtroSaid) listaSaid = listaSaid.filter(d=>d.status===filtroSaid);
+  const tbSaid = document.getElementById('tbody-rel-saidas');
+  if(tbSaid) {
+    tbSaid.innerHTML = listaSaid.length ? listaSaid.map(d=>{
+      const cat=DESP_CATEGORIAS[d.categoria]||DESP_CATEGORIAS.outro;
+      const st=DESP_STATUS[d.status]||DESP_STATUS.pendente;
+      return `<tr>
+        <td><strong>${d.descricao}</strong></td>
+        <td>${cat.icon} ${cat.label}</td>
+        <td>${fmtDate(d.vencimento)}</td>
+        <td><strong style="color:var(--danger)">${fmtMoney(d.valor)}</strong></td>
+        <td><span class="badge ${st.cls}">${st.icon} ${st.label}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Nenhuma saída no período.</td></tr>';
+  }
+}
+
+function renderRelEntradas() { gerarRelatorio(); }
+function renderRelSaidas()   { gerarRelatorio(); }
+
 function renderRelClientes() {
   const tb = document.getElementById('tbody-rel-clientes');
   if(!store.clientes.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:28px">Sem dados.</td></tr>'; return; }
@@ -4843,12 +6581,12 @@ const LEMBRAR_KEY = 'lexpro_lembrar';
 const PERFIS = {
   admin: {
     label: 'Administrador', cor: '#185FA5', bg: '#E6F1FB',
-    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios','opcoes'],
+    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios','opcoes'],
     pode: { editarClientes:true, excluirClientes:true, verFinanceiro:true, gerenciarUsuarios:true, verOpcoes:true, exportarRelatorio:true }
   },
   advogado: {
     label: 'Advogado', cor: '#0B7B45', bg: '#E2F5EC',
-    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','relatorios'],
+    paginas: ['dashboard','tipos','clientes','processos','agenda','financeiro','despesas','relatorios'],
     pode: { editarClientes:true, excluirClientes:false, verFinanceiro:true, gerenciarUsuarios:false, verOpcoes:false, exportarRelatorio:true }
   },
   secretaria: {
@@ -4986,6 +6724,8 @@ async function fazerLogin() {
 }
 
 function entrarNoSistema() {
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  registrarAuditoria('login', 'sistema', 'Login realizado', session.email||session.nome||'');
   const screen = document.getElementById('login-screen');
   screen.style.transition = 'opacity 0.4s';
   screen.style.opacity = '0';
@@ -5111,6 +6851,7 @@ function aplicarPermissoes() {
 }
 
 function logout() {
+  registrarAuditoria('logout', 'sistema', 'Logout realizado', '');
   const sb = getSB();
   if(sb) sb.then && sb.then(s => s && s.auth.signOut());
   localStorage.removeItem(LOGIN_KEY);
