@@ -54,7 +54,75 @@
   --radius: 8px;
   --radius-lg: 12px;
   --radius-xl: 18px;
+  /* Dark mode card bg */
+  --card-bg: #FFFFFF;
+  --input-bg: #FFFFFF;
+  --topbar-bg: #FFFFFF;
+  --modal-bg: #FFFFFF;
 }
+
+/* ===== DARK MODE ===== */
+body.dark {
+  --surface: #0F1E2E;
+  --white: #1A2E45;
+  --card-bg: #1A2E45;
+  --input-bg: #162D48;
+  --topbar-bg: #112337;
+  --modal-bg: #1A2E45;
+  --text-primary: #E8F0F8;
+  --text-secondary: #9DB5D0;
+  --text-muted: #5A87B8;
+  --border: #1D3A5C;
+  --border-strong: #2A4D6E;
+  --blue-50: #112337;
+  --blue-100: #162D48;
+  --success-bg: #0A2E1C;
+  --danger-bg: #2E0A0A;
+  --warning-bg: #2E1A0A;
+  --info-bg: #112337;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* Transição suave */
+body, .card, .modal, .topbar, .form-control, .data-table, .stat-card {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode: cards e superfícies */
+body.dark .card { background: var(--card-bg); border-color: var(--border); }
+body.dark .modal { background: var(--modal-bg); }
+body.dark .topbar { background: var(--topbar-bg); border-color: var(--border); }
+body.dark .stat-card { background: var(--card-bg); border-color: var(--border); }
+body.dark .form-control { background: var(--input-bg); color: var(--text-primary); border-color: var(--border); }
+body.dark .form-control:focus { border-color: var(--blue-400); }
+body.dark .tabs-bar { background: var(--card-bg); border-color: var(--border); }
+body.dark .tab-btn { color: var(--text-muted); }
+body.dark .tab-btn.active { background: rgba(90,135,184,0.2); color: var(--blue-200); }
+body.dark .data-table th { background: var(--input-bg); color: var(--text-secondary); border-color: var(--border); }
+body.dark .data-table td { border-color: var(--border); color: var(--text-primary); }
+body.dark .data-table tr:hover td { background: rgba(255,255,255,0.03); }
+body.dark .modal-overlay { background: rgba(0,0,0,0.7); }
+body.dark .btn-outline { border-color: var(--border); color: var(--text-secondary); background: var(--input-bg); }
+body.dark .btn-outline:hover { background: var(--border); }
+body.dark .btn-ghost:hover { background: rgba(255,255,255,0.05); }
+body.dark .search-wrap { background: var(--input-bg); border-color: var(--border); }
+body.dark #busca-global-box { background: var(--input-bg); border-color: var(--border); }
+body.dark #busca-dropdown { background: var(--card-bg); border-color: var(--border); }
+body.dark .busca-item:hover { background: var(--input-bg); }
+body.dark .notif-panel { background: var(--card-bg); border-color: var(--border); }
+body.dark .modal-header { border-color: var(--border); }
+body.dark .modal-footer { border-color: var(--border); }
+body.dark .card-header { border-color: var(--border); }
+body.dark textarea { background: var(--input-bg); color: var(--text-primary); }
+body.dark select option { background: var(--input-bg); color: var(--text-primary); }
+body.dark .fin-card { background: var(--card-bg); border-color: var(--border); }
+body.dark .parcel-row { border-color: var(--border); }
+body.dark .parcel-header { background: var(--input-bg); }
+body.dark .cal-day { background: var(--card-bg); border-color: var(--border); }
+body.dark .cal-day:hover { background: var(--input-bg); }
+body.dark .cal-header { background: var(--card-bg); }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -307,7 +375,20 @@ nav { flex: 1; padding: 16px 12px; overflow-y: auto; min-height: 0; }
 .user-name { font-size: 12.5px; color: white; font-weight: 500; }
 .user-role { font-size: 10.5px; color: rgba(255,255,255,0.4); }
 
-/* MAIN */
+/* Pipeline de etapas */
+.pipeline { display:flex; align-items:center; gap:0; margin:16px 0; overflow-x:auto; padding-bottom:4px; }
+.pipeline-step { display:flex; flex-direction:column; align-items:center; flex:1; min-width:80px; cursor:pointer; position:relative; }
+.pipeline-step:not(:last-child)::after { content:''; position:absolute; top:14px; left:50%; width:100%; height:2px; background:var(--border); z-index:0; }
+.pipeline-step:not(:last-child).done::after { background:var(--success); }
+.pipeline-step:not(:last-child).active::after { background:var(--blue-400); }
+.pipeline-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--border); background:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; position:relative; z-index:1; transition:all 0.2s; }
+.pipeline-step.done .pipeline-dot { background:var(--success); border-color:var(--success); color:white; }
+.pipeline-step.active .pipeline-dot { background:var(--blue-600); border-color:var(--blue-600); color:white; box-shadow:0 0 0 3px rgba(29,58,92,0.2); }
+.pipeline-step.futura .pipeline-dot { background:var(--surface); border-color:var(--border); color:var(--text-muted); }
+.pipeline-label { font-size:9.5px; text-align:center; margin-top:5px; color:var(--text-muted); line-height:1.2; max-width:72px; }
+.pipeline-step.done .pipeline-label { color:var(--success); font-weight:600; }
+.pipeline-step.active .pipeline-label { color:var(--blue-600); font-weight:700; }
+
 .main {
   margin-left: 240px;
   flex: 1;
@@ -924,7 +1005,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   </nav>
 
   <div class="sidebar-footer">
-    <div class="user-info" onclick="openModal('modal-contato')" style="cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'" title="Ver cartão de contato">
+    <div class="user-info" onclick="openModal('modal-cartao-suporte',false)" style="cursor:pointer;transition:opacity 0.18s" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'" title="Contato da consultora">
       <div class="user-avatar" style="background:linear-gradient(135deg,var(--blue-400),var(--blue-600))">AD</div>
       <div>
         <div class="user-name">Administrador</div>
@@ -963,6 +1044,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
       </div>
 
       <span id="topbar-date" style="font-size:13px;color:var(--text-muted)"></span>
+      <!-- DARK MODE TOGGLE -->
+      <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Alternar tema" style="background:none;border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:6px;transition:all 0.2s">
+        <span id="dark-mode-icon">🌙</span>
+      </button>
       <!-- SINO DE NOTIFICAÇÕES -->
       <div style="position:relative">
         <button class="notif-btn" onclick="toggleNotifPanel()" id="notif-btn" title="Notificações">
@@ -1001,6 +1086,19 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
     <!-- ========== DASHBOARD ========== -->
     <div class="page active" id="page-dashboard">
+
+      <!-- ALERTA PRAZOS FATAIS -->
+      <div id="dash-alerta-fatal" style="display:none;background:linear-gradient(135deg,#7F1D1D,#B91C1C);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;color:white">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <span style="font-size:24px">🚨</span>
+          <div>
+            <div style="font-weight:700;font-size:15px;letter-spacing:0.3px">PRAZOS FATAIS — ATENÇÃO IMEDIATA</div>
+            <div style="font-size:12px;opacity:0.85" id="dash-fatal-sub"></div>
+          </div>
+        </div>
+        <div id="dash-fatal-lista" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon blue">⚖️</div>
@@ -1387,6 +1485,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <button class="tab-btn" onclick="switchTab('rel','conversao',this)">🎯 Conversão</button>
         <button class="tab-btn" onclick="switchTab('rel','inadimplencia',this)">⚠️ Inadimplência</button>
         <button class="tab-btn" onclick="switchTab('rel','exito',this)">🏆 Êxito</button>
+        <button class="tab-btn" onclick="switchTab('rel','taxa-exito',this)">📈 Taxa de Êxito</button>
+        <button class="tab-btn" onclick="switchTab('rel','duracao',this)">⏱️ Duração</button>
+        <button class="tab-btn" onclick="switchTab('rel','carga',this)">👨‍⚖️ Carga de Trabalho</button>
         <button class="tab-btn" onclick="switchTab('rel','clientes-rel',this)">👤 Clientes</button>
       </div>
 
@@ -1714,6 +1815,96 @@ textarea.form-control { resize: vertical; min-height: 80px; }
               <tbody id="tbody-exito">
                 <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum honorário por êxito cadastrado.</td></tr>
               </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAXA DE ÊXITO POR ÁREA -->
+      <div class="tab-content" id="rel-taxa-exito">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--success)">
+            <div class="stat-label">✅ Processos Ganhos</div>
+            <div class="stat-value" style="color:var(--success)" id="te-ganhos">0</div>
+            <div class="stat-sub" id="te-pct-ganhos">0% do total encerrado</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--danger)">
+            <div class="stat-label">❌ Processos Perdidos</div>
+            <div class="stat-value" style="color:var(--danger)" id="te-perdidos">0</div>
+            <div class="stat-sub" id="te-pct-perdidos">0% do total encerrado</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--navy)">
+            <div class="stat-label">⚖️ Em Andamento</div>
+            <div class="stat-value" id="te-andamento">0</div>
+            <div class="stat-sub">processos ativos</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📈 Taxa de Êxito por Área do Direito</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Área / Tipo</th><th>Total</th><th>Ganhos</th><th>Perdidos</th><th>Em Andamento</th><th>Taxa de Êxito</th></tr></thead>
+              <tbody id="tbody-taxa-exito"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEMPO MÉDIO DE DURAÇÃO -->
+      <div class="tab-content" id="rel-duracao">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--navy)">
+            <div class="stat-label">⏱️ Duração Média Geral</div>
+            <div class="stat-value" style="font-size:18px" id="dur-media-geral">—</div>
+            <div class="stat-sub">processos encerrados</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--success)">
+            <div class="stat-label">🚀 Mais Rápido</div>
+            <div class="stat-value" style="font-size:18px;color:var(--success)" id="dur-min">—</div>
+            <div class="stat-sub" id="dur-min-tipo">—</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--warning)">
+            <div class="stat-label">🐢 Mais Longo</div>
+            <div class="stat-value" style="font-size:18px;color:#92400E" id="dur-max">—</div>
+            <div class="stat-sub" id="dur-max-tipo">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⏱️ Tempo Médio por Área do Direito</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Área / Tipo</th><th>Processos Encerrados</th><th>Duração Média</th><th>Mais Rápido</th><th>Mais Longo</th></tr></thead>
+              <tbody id="tbody-duracao"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARGA DE TRABALHO -->
+      <div class="tab-content" id="rel-carga">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div class="stat-card" style="border-top:3px solid var(--navy)">
+            <div class="stat-label">👨‍⚖️ Advogados Ativos</div>
+            <div class="stat-value" id="carga-advs">0</div>
+            <div class="stat-sub">com processos ativos</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--blue-600)">
+            <div class="stat-label">📋 Média por Advogado</div>
+            <div class="stat-value" style="font-size:18px" id="carga-media">0</div>
+            <div class="stat-sub">processos ativos/advogado</div>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--warning)">
+            <div class="stat-label">🔥 Mais Sobrecarregado</div>
+            <div class="stat-value" style="font-size:16px" id="carga-top">—</div>
+            <div class="stat-sub" id="carga-top-qtd">0 processos</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">👨‍⚖️ Carga de Trabalho por Advogado</span></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Advogado</th><th>Ativos</th><th>Encerrados</th><th>Total</th><th>Tarefas Pendentes</th><th>Prazos Próximos</th><th>Distribuição</th></tr></thead>
+              <tbody id="tbody-carga"></tbody>
             </table>
           </div>
         </div>
@@ -2111,14 +2302,14 @@ textarea.form-control { resize: vertical; min-height: 80px; }
                 💡 Use as variáveis abaixo para personalizar a mensagem. Elas serão substituídas automaticamente pelos dados reais ao enviar.
               </div>
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{VENCIMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VENCIMENTO}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{PIX}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PIX}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{TITULAR}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{TITULAR}}</span>
-                <span onclick="inserirVariavel('wpp-msg-cobranca','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{VENCIMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VENCIMENTO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{PIX}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PIX}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{TITULAR}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{TITULAR}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-cobranca','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
               </div>
               <textarea class="form-control" id="wpp-msg-cobranca" rows="8" oninput="salvarConfigWpp()" placeholder="Digite o modelo da mensagem de cobrança..."></textarea>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
@@ -2138,12 +2329,12 @@ textarea.form-control { resize: vertical; min-height: 80px; }
                 ✅ Esta mensagem é enviada ao cliente após confirmar o pagamento de uma parcela.
               </div>
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{DATA_PAGAMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{DATA_PAGAMENTO}}</span>
-                <span onclick="inserirVariavel('wpp-msg-recibo','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{DATA_PAGAMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{DATA_PAGAMENTO}}</span>
+                <span onclick="inserirVariavelModelo('wpp-msg-recibo','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
               </div>
               <textarea class="form-control" id="wpp-msg-recibo" rows="8" oninput="salvarConfigWpp()" placeholder="Digite o modelo da mensagem de recibo..."></textarea>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
@@ -2242,6 +2433,34 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     <!-- ========== AGENDA ========== -->
     <div class="page" id="page-agenda">
 
+      <!-- Filtros avançados -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+        <div class="search-wrap" style="flex:1;min-width:180px">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" id="agenda-busca" placeholder="Buscar evento, processo..." oninput="renderAgenda()">
+        </div>
+        <select class="form-control" id="agenda-filtro-tipo" onchange="renderAgenda()" style="width:150px;font-size:13px">
+          <option value="">Todos os tipos</option>
+          <option value="audiencia">⚖️ Audiência</option>
+          <option value="prazo">⏰ Prazo Legal</option>
+          <option value="reuniao">🤝 Reunião</option>
+          <option value="pericia">🔍 Perícia</option>
+          <option value="diligencia">📋 Diligência</option>
+          <option value="outro">📌 Outro</option>
+        </select>
+        <select class="form-control" id="agenda-filtro-adv" onchange="renderAgenda()" style="width:160px;font-size:13px">
+          <option value="">Todos os advogados</option>
+        </select>
+        <select class="form-control" id="agenda-filtro-prioridade" onchange="renderAgenda()" style="width:140px;font-size:13px">
+          <option value="">Todas as prioridades</option>
+          <option value="urgente">🔴 Urgente</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="normal">🟢 Normal</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="limparFiltrosAgenda()" title="Limpar filtros">✕ Limpar</button>
+        <button class="btn btn-outline btn-sm" onclick="imprimirAgenda()" title="Imprimir agenda filtrada">🖨️ Imprimir</button>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
 
         <!-- CALENDÁRIO -->
@@ -2304,6 +2523,331 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 </div><!-- /main -->
 
 <!-- ===== MODAIS ===== -->
+
+<!-- MODAL PARTE DO PROCESSO -->
+<div class="modal-overlay" id="modal-parte">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-parte-title">👥 Adicionar Parte</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-parte')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="parte-proc-id">
+      <input type="hidden" id="parte-edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo de Parte *</label>
+          <select class="form-control" id="parte-tipo">
+            <option value="autor">🟢 Autor / Reclamante</option>
+            <option value="reu">🔴 Réu / Reclamado</option>
+            <option value="testemunha">👁 Testemunha</option>
+            <option value="adv_contrario">⚖️ Adv. Parte Contrária</option>
+            <option value="perito">🔬 Perito</option>
+            <option value="outro">📌 Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome Completo *</label>
+          <input type="text" class="form-control" id="parte-nome" placeholder="Nome da parte">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">CPF / CNPJ</label>
+          <input type="text" class="form-control" id="parte-cpf" placeholder="000.000.000-00">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">OAB (se advogado)</label>
+          <input type="text" class="form-control" id="parte-oab" placeholder="OAB/XX 00.000">
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Telefone</label>
+          <input type="text" class="form-control" id="parte-tel" placeholder="(00) 9 0000-0000">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-control" id="parte-email" placeholder="email@exemplo.com">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="voltarParaDetalhe('modal-parte')">← Voltar</button>
+      <button class="btn btn-primary" onclick="salvarParte()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTATO -->
+<div class="modal-overlay" id="modal-contato">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-contato-title">📞 Registrar Contato</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-contato')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="contato-proc-id">
+      <input type="hidden" id="contato-edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo *</label>
+          <select class="form-control" id="contato-tipo">
+            <option value="ligacao">📞 Ligação</option>
+            <option value="reuniao">🤝 Reunião</option>
+            <option value="email">📧 E-mail</option>
+            <option value="whatsapp">💬 WhatsApp</option>
+            <option value="presencial">🏢 Visita Presencial</option>
+            <option value="outro">📌 Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data *</label>
+          <input type="date" class="form-control" id="contato-data">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Com quem</label>
+          <input type="text" class="form-control" id="contato-pessoa" placeholder="Nome do cliente ou contato">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Duração</label>
+          <input type="text" class="form-control" id="contato-duracao" placeholder="Ex: 30 min">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px;margin-bottom:0">
+        <label class="form-label">Resumo / Observações *</label>
+        <textarea class="form-control" id="contato-obs" rows="3" placeholder="Descreva o assunto tratado, decisões tomadas, próximos passos..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="voltarParaDetalhe('modal-contato')">← Voltar</button>
+      <button class="btn btn-primary" onclick="salvarContato()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA TAREFA -->
+<div class="modal-overlay" id="modal-tarefa">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-tarefa-title">Nova Tarefa</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-tarefa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tarefa-proc-id">
+      <input type="hidden" id="tarefa-edit-id" value="">
+      <div class="form-group">
+        <label class="form-label">Descrição da Tarefa *</label>
+        <input type="text" class="form-control" id="tarefa-texto" placeholder="Ex: Protocolar petição, Juntar documentos...">
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Prazo</label>
+          <input type="date" class="form-control" id="tarefa-prazo">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Responsável</label>
+          <input type="text" class="form-control" id="tarefa-resp" placeholder="Nome do responsável">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="voltarParaDetalhe('modal-tarefa')">← Voltar</button>
+      <button class="btn btn-primary" onclick="salvarTarefa()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INTIMAÇÃO -->
+<div class="modal-overlay" id="modal-intimacao">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title">📨 Registrar Intimação</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-intimacao')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="intim-proc-id">
+      <div class="form-group">
+        <label class="form-label">Tipo de Intimação *</label>
+        <select class="form-control" id="intim-tipo" onchange="intimacaoCalcPrazo()">
+          <option value="">— Selecione —</option>
+          <option value="recursal">Prazo Recursal (15 dias)</option>
+          <option value="contestacao">Contestação (15 dias)</option>
+          <option value="apelacao">Apelação (15 dias)</option>
+          <option value="embargos">Embargos de Declaração (5 dias)</option>
+          <option value="impugnacao">Impugnação (15 dias)</option>
+          <option value="manifestacao">Manifestação (15 dias)</option>
+          <option value="personalizado">Personalizado</option>
+        </select>
+      </div>
+      <div class="form-group" id="intim-dias-bloco" style="display:none">
+        <label class="form-label">Número de Dias</label>
+        <input type="number" class="form-control" id="intim-dias" min="1" placeholder="Ex: 10" oninput="intimacaoCalcPrazo()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição / Objeto da Intimação</label>
+        <input type="text" class="form-control" id="intim-descricao" placeholder="Ex: Intimação para manifestação sobre laudo pericial">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data da Intimação (publicação) *</label>
+          <input type="date" class="form-control" id="intim-data" oninput="intimacaoCalcPrazo()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prazo Final Calculado</label>
+          <input type="date" class="form-control" id="intim-prazo-final" readonly style="background:var(--surface);font-weight:600;color:var(--danger)">
+        </div>
+      </div>
+      <div id="intim-aviso" style="display:none;padding:8px 12px;border-radius:var(--radius);font-size:12.5px;font-weight:500;margin-top:4px"></div>
+      <div class="form-row" style="margin-top:4px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Criar evento na Agenda?</label>
+          <select class="form-control" id="intim-criar-evento">
+            <option value="sim">✅ Sim — criar prazo na agenda</option>
+            <option value="nao">Não</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Prazo Fatal?</label>
+          <select class="form-control" id="intim-fatal">
+            <option value="nao">Não</option>
+            <option value="sim">🔴 Sim — prazo improrrogável</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="voltarParaDetalhe('modal-intimacao')">← Voltar</button>
+      <button class="btn btn-primary" onclick="salvarIntimacao()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DOCUMENTOS CLIENTE -->
+<div class="modal-overlay" id="modal-docs-cliente">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <div>
+        <span class="modal-title" id="modal-docs-cliente-title">📁 Documentos do Cliente</span>
+        <div id="docs-cliente-sub" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
+      </div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-docs-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="docs-cliente-id">
+
+      <!-- Upload área -->
+      <div style="border:2px dashed var(--blue-200);border-radius:var(--radius-lg);padding:24px;text-align:center;cursor:pointer;transition:all 0.18s;margin-bottom:18px;background:var(--blue-50)"
+        onclick="document.getElementById('doc-cliente-file').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--blue-600)';this.style.background='#dbeafe'"
+        ondragleave="this.style.borderColor='var(--blue-200)';this.style.background='var(--blue-50)'"
+        ondrop="event.preventDefault();this.style.borderColor='var(--blue-200)';this.style.background='var(--blue-50)';handleDocClienteDrop(event)">
+        <div style="font-size:28px;margin-bottom:8px">📎</div>
+        <div style="font-size:14px;font-weight:600;color:var(--blue-700);margin-bottom:4px">Clique ou arraste arquivos aqui</div>
+        <div style="font-size:12px;color:var(--text-muted)">PDF, Word, imagens — qualquer formato · Máx 5MB por arquivo</div>
+        <input type="file" id="doc-cliente-file" multiple style="display:none" onchange="handleDocClienteFiles(this.files)">
+      </div>
+
+      <!-- Filtro de categoria -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="filtrarDocsCliente('')" id="dcli-filtro-todos">Todos</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('rg')" id="dcli-filtro-rg">🪪 RG/CNH</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('cpf')" id="dcli-filtro-cpf">📋 CPF</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('procuracao')" id="dcli-filtro-proc">✍️ Procuração</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('contrato')" id="dcli-filtro-cont">📄 Contrato</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('comprovante')" id="dcli-filtro-comp">🏠 Comprovante</button>
+        <button class="btn btn-outline btn-sm" onclick="filtrarDocsCliente('outros')" id="dcli-filtro-out">📁 Outros</button>
+      </div>
+
+      <!-- Lista -->
+      <div id="docs-cliente-lista">
+        <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px 0">Nenhum documento anexado a este cliente.</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <span id="docs-cliente-contador" style="font-size:12.5px;color:var(--text-muted)">0 documento(s)</span>
+      <button class="btn btn-outline" onclick="closeModal('modal-docs-cliente')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REAGENDAR PARCELA -->
+<div class="modal-overlay" id="modal-reagendar">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <span class="modal-title">📅 Reagendar Vencimento</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-reagendar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="reagendar-id">
+      <div id="reagendar-info" style="background:var(--surface);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:13px"></div>
+      <div class="form-group">
+        <label class="form-label">Nova Data de Vencimento *</label>
+        <input type="date" class="form-control" id="reagendar-nova-data">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Motivo do Reagendamento</label>
+        <input type="text" class="form-control" id="reagendar-motivo" placeholder="Ex: Acordo com o cliente, dificuldade financeira...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-reagendar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarReagendar()">📅 Reagendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DESCONTO / ACRÉSCIMO -->
+<div class="modal-overlay" id="modal-desconto-acrescimo">
+  <div class="modal" style="width:460px">
+    <div class="modal-header">
+      <span class="modal-title">💱 Desconto / Acréscimo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-desconto-acrescimo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="da-parcela-id">
+      <div id="da-info" style="background:var(--surface);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:13px"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-control" id="da-tipo" onchange="calcularDA()">
+            <option value="desconto">🟢 Desconto</option>
+            <option value="acrescimo">🔴 Acréscimo / Multa</option>
+            <option value="juros">🔴 Juros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modalidade</label>
+          <select class="form-control" id="da-modalidade" onchange="calcularDA()">
+            <option value="percentual">Percentual (%)</option>
+            <option value="valor">Valor fixo (R$)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" id="da-valor-label">Percentual (%)</label>
+          <input type="number" class="form-control" id="da-valor-input" placeholder="Ex: 10" min="0" step="0.01" oninput="calcularDA()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Novo Valor da Parcela</label>
+          <input type="text" class="form-control" id="da-novo-valor" readonly style="background:var(--surface);font-size:15px;font-weight:700;color:var(--blue-600)">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Observação</label>
+        <input type="text" class="form-control" id="da-obs" placeholder="Ex: Desconto por antecipação, Multa por atraso...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-desconto-acrescimo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarDA()">💾 Aplicar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL GERAR PARCELAS -->
 <div class="modal-overlay" id="modal-gerar-parcelas">
@@ -3259,7 +3803,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
         <div class="form-group">
           <label class="form-label">Status</label>
-          <select class="form-control" id="proc-status">
+          <select class="form-control" id="proc-status" onchange="toggleResultadoProc()">
             <option value="andamento">Em Andamento</option>
             <option value="aguardando">Aguardando</option>
             <option value="encerrado">Encerrado</option>
@@ -3269,6 +3813,27 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <div class="form-group">
           <label class="form-label">Vara / Tribunal</label>
           <input type="text" class="form-control" id="proc-vara" placeholder="Ex: 2ª Vara do Trabalho">
+        </div>
+      </div>
+
+      <!-- Resultado (visível só quando encerrado) -->
+      <div id="bloco-resultado" style="display:none">
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Resultado do Processo</label>
+            <select class="form-control" id="proc-resultado">
+              <option value="">— Selecionar —</option>
+              <option value="ganho">✅ Ganho / Procedente</option>
+              <option value="perda">❌ Perda / Improcedente</option>
+              <option value="acordo">🤝 Acordo / Conciliação</option>
+              <option value="parcial">⚖️ Parcialmente Procedente</option>
+              <option value="extinto">📋 Extinto sem mérito</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Data de Encerramento</label>
+            <input type="date" class="form-control" id="proc-data-enc">
+          </div>
         </div>
       </div>
       <div class="form-group">
@@ -3314,13 +3879,14 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="modal-andamento">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Atualizar Andamento</span>
+      <span class="modal-title" id="modal-andamento-title">Novo Andamento</span>
       <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-andamento')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="andamento-proc-id">
+      <input type="hidden" id="andamento-edit-idx" value="">
       <div class="form-group">
-        <label class="form-label">Novo Status</label>
+        <label class="form-label">Status</label>
         <select class="form-control" id="andamento-status">
           <option value="andamento">Em Andamento</option>
           <option value="aguardando">Aguardando</option>
@@ -3328,13 +3894,13 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <option value="suspenso">Suspenso</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Histórico / Movimentação</label>
         <textarea class="form-control" id="andamento-texto" placeholder="Descreva o andamento, audiência, decisão..." style="min-height:100px"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-andamento')">Cancelar</button>
+      <button class="btn btn-outline" onclick="voltarParaDetalhe('modal-andamento')">← Voltar</button>
       <button class="btn btn-primary" onclick="salvarAndamento()">💾 Salvar</button>
     </div>
   </div>
@@ -3387,10 +3953,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 </div>
 
 <!-- MODAL CARTÃO DE CONTATO -->
-<div class="modal-overlay" id="modal-contato">
+<div class="modal-overlay" id="modal-cartao-suporte">
   <div class="modal" style="width:420px">
     <div class="modal-header" style="border-bottom:none;padding-bottom:0">
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-contato')" style="margin-left:auto">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-cartao-suporte')" style="margin-left:auto">✕</button>
     </div>
     <div class="modal-body" style="padding-top:8px;padding-bottom:28px">
 
@@ -3448,6 +4014,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 let store = {
   tipos: [], clientes: [], processos: [], parcelas: [], orcamentos: [], exitos: [],
   andamentos: {}, modelos: [], eventos: [], documentos: {}, despesas: [],
+  docsCliente: {},
   nextId: { tipo:1, cliente:1, processo:1, parcela:1, modelo:1, evento:1, doc:1, despesa:1, orcamento:1, exito:1 }
 };
 
@@ -3526,11 +4093,16 @@ function normalizarStore() {
   if(!store.modelos)    store.modelos    = [];
   if(!store.eventos)    store.eventos    = [];
   // Objetos
-  if(!store.documentos) store.documentos = {};
-  if(!store.andamentos) store.andamentos = {};
-  // NextId — garantir todos os campos
+  if(!store.documentos)  store.documentos  = {};
+  if(!store.docsCliente) store.docsCliente = {};
+  if(!store.andamentos)  store.andamentos  = {};
+  if(!store.checklist)   store.checklist   = {};
+  if(!store.intimacoes)  store.intimacoes  = {};
+  if(!store.partes)      store.partes      = {};
+  if(!store.contatos)    store.contatos    = {};
+  // NextId
   if(!store.nextId) store.nextId = {};
-  const ids = ['tipo','cliente','processo','parcela','modelo','evento','doc','despesa','orcamento','exito'];
+  const ids = ['tipo','cliente','processo','parcela','modelo','evento','doc','despesa','orcamento','exito','docCliente','tarefa','intimacao','parte','contato'];
   ids.forEach(k => { if(!store.nextId[k]) store.nextId[k] = 1; });
   // Recalcular nextIds a partir dos dados reais para evitar colisões
   store.nextId.tipo      = Math.max(store.nextId.tipo,      ...(store.tipos.map(x=>x.id)||[0]), 0) + 1;
@@ -3650,7 +4222,7 @@ function refreshPage(page) {
   else if(page === 'agenda') renderAgenda();
   else if(page === 'financeiro') { renderParcelas(); renderFinVisao(); updateParcelasSelect(); }
   else if(page === 'despesas') renderDespesas();
-  else if(page === 'relatorios') { gerarRelatorio(); renderConversao(); renderInadimplencia(); renderExito(); renderRelClientes(); }
+  else if(page === 'relatorios') { gerarRelatorio(); renderConversao(); renderInadimplencia(); renderExito(); renderTaxaExito(); renderDuracao(); renderCargaTrabalho(); renderRelClientes(); }
   else if(page === 'opcoes') renderOpcoes();
 }
 
@@ -3972,7 +4544,168 @@ function gerarPDFOrcamento(id) {
   setTimeout(() => win.print(), 500);
 }
 
-// ==================== INADIMPLÊNCIA ====================
+// ==================== TAXA DE ÊXITO POR ÁREA ====================
+function renderTaxaExito() {
+  const processos = store.processos;
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const encerrados = processos.filter(p=>p.status==='encerrado');
+  const ganhos = processos.filter(p=>p.resultado==='ganho');
+  const perdidos = processos.filter(p=>p.resultado==='perda');
+  const ativos = processos.filter(p=>p.status==='andamento'||p.status==='aguardando'||p.status==='suspenso');
+  set('te-ganhos', ganhos.length);
+  set('te-perdidos', perdidos.length);
+  set('te-andamento', ativos.length);
+  const totalEnc = encerrados.length;
+  set('te-pct-ganhos', totalEnc ? Math.round(ganhos.length/totalEnc*100)+'% do total encerrado' : '0% do total encerrado');
+  set('te-pct-perdidos', totalEnc ? Math.round(perdidos.length/totalEnc*100)+'% do total encerrado' : '0% do total encerrado');
+
+  // Agrupar por tipo
+  const porTipo = {};
+  processos.forEach(p => {
+    const t = store.tipos.find(t=>t.id===p.tipoId)||{nome:'Sem tipo'};
+    const key = t.nome;
+    if(!porTipo[key]) porTipo[key] = { total:0, ganhos:0, perdidos:0, ativos:0 };
+    porTipo[key].total++;
+    if(p.resultado==='ganho') porTipo[key].ganhos++;
+    else if(p.resultado==='perda') porTipo[key].perdidos++;
+    if(p.status==='andamento'||p.status==='aguardando') porTipo[key].ativos++;
+  });
+
+  const tb = document.getElementById('tbody-taxa-exito');
+  if(!tb) return;
+  const rows = Object.entries(porTipo).sort((a,b)=>b[1].total-a[1].total);
+  if(!rows.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px">Nenhum processo cadastrado.</td></tr>'; return; }
+  tb.innerHTML = rows.map(([tipo, d]) => {
+    const enc = d.ganhos + d.perdidos;
+    const taxa = enc > 0 ? Math.round(d.ganhos/enc*100) : null;
+    const corTaxa = taxa===null ? 'var(--text-muted)' : taxa>=70 ? 'var(--success)' : taxa>=40 ? '#92400E' : 'var(--danger)';
+    const barW = taxa !== null ? taxa : 0;
+    return `<tr>
+      <td><strong>${tipo}</strong></td>
+      <td style="text-align:center">${d.total}</td>
+      <td style="text-align:center;color:var(--success);font-weight:600">${d.ganhos}</td>
+      <td style="text-align:center;color:var(--danger);font-weight:600">${d.perdidos}</td>
+      <td style="text-align:center;color:var(--text-muted)">${d.ativos}</td>
+      <td style="min-width:140px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${barW}%;background:${corTaxa};border-radius:4px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${corTaxa};white-space:nowrap">${taxa!==null?taxa+'%':'—'}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ==================== TEMPO MÉDIO DE DURAÇÃO ====================
+function renderDuracao() {
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const encerrados = store.processos.filter(p => p.status==='encerrado' && p.abertura && p.dataEncerramento);
+
+  if(!encerrados.length) {
+    set('dur-media-geral','—'); set('dur-min','—'); set('dur-max','—');
+    set('dur-min-tipo','Sem dados'); set('dur-max-tipo','Sem dados');
+    const tb = document.getElementById('tbody-duracao');
+    if(tb) tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Nenhum processo encerrado com data de encerramento.</td></tr>';
+    return;
+  }
+
+  const calcDias = p => Math.max(0, Math.round((new Date(p.dataEncerramento)-new Date(p.abertura))/(1000*60*60*24)));
+  const duracoes = encerrados.map(p => ({ ...p, dias: calcDias(p) }));
+  const mediaGeral = Math.round(duracoes.reduce((s,p)=>s+p.dias,0)/duracoes.length);
+  const menor = duracoes.reduce((a,b)=>a.dias<b.dias?a:b);
+  const maior = duracoes.reduce((a,b)=>a.dias>b.dias?a:b);
+
+  const fmtDias = d => d >= 365 ? (d/365).toFixed(1)+' anos' : d >= 30 ? Math.round(d/30)+' meses' : d+' dias';
+  set('dur-media-geral', fmtDias(mediaGeral));
+  set('dur-min', fmtDias(menor.dias));
+  set('dur-max', fmtDias(maior.dias));
+  set('dur-min-tipo', store.tipos.find(t=>t.id===menor.tipoId)?.nome||'—');
+  set('dur-max-tipo', store.tipos.find(t=>t.id===maior.tipoId)?.nome||'—');
+
+  // Por tipo
+  const porTipo = {};
+  duracoes.forEach(p => {
+    const t = store.tipos.find(t=>t.id===p.tipoId)||{nome:'Sem tipo'};
+    if(!porTipo[t.nome]) porTipo[t.nome] = [];
+    porTipo[t.nome].push(p.dias);
+  });
+
+  const tb = document.getElementById('tbody-duracao');
+  if(!tb) return;
+  tb.innerHTML = Object.entries(porTipo).sort((a,b)=>b[1].length-a[1].length).map(([tipo, dias]) => {
+    const media = Math.round(dias.reduce((s,d)=>s+d,0)/dias.length);
+    const min = Math.min(...dias); const max = Math.max(...dias);
+    return `<tr>
+      <td><strong>${tipo}</strong></td>
+      <td style="text-align:center">${dias.length}</td>
+      <td style="text-align:center;font-weight:600;color:var(--navy)">${fmtDias(media)}</td>
+      <td style="text-align:center;color:var(--success)">${fmtDias(min)}</td>
+      <td style="text-align:center;color:#92400E">${fmtDias(max)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ==================== CARGA DE TRABALHO ====================
+function renderCargaTrabalho() {
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const hoje = today();
+  const d7 = new Date(); d7.setDate(d7.getDate()+7); const d7s = d7.toISOString().split('T')[0];
+
+  // Agrupar por advogado
+  const porAdv = {};
+  store.processos.forEach(p => {
+    const adv = p.adv||'Sem advogado';
+    if(!porAdv[adv]) porAdv[adv] = { ativos:0, encerrados:0, tarefas:0, prazos:0 };
+    const ativo = p.status==='andamento'||p.status==='aguardando'||p.status==='suspenso';
+    if(ativo) porAdv[adv].ativos++;
+    else porAdv[adv].encerrados++;
+    // Tarefas pendentes
+    const tarefas = (store.checklist?.[p.id]||[]).filter(t=>!t.feita).length;
+    porAdv[adv].tarefas += tarefas;
+    // Prazos próximos (7 dias)
+    const prazos = (store.intimacoes?.[p.id]||[]).filter(i=>!i.cumprido&&i.prazoFinal&&i.prazoFinal>=hoje&&i.prazoFinal<=d7s).length;
+    porAdv[adv].prazos += prazos;
+  });
+
+  const rows = Object.entries(porAdv).sort((a,b)=>b[1].ativos-a[1].ativos);
+  const totalAtivos = rows.reduce((s,[,d])=>s+d.ativos,0);
+  const advsAtivos = rows.filter(([,d])=>d.ativos>0).length;
+  const media = advsAtivos > 0 ? Math.round(totalAtivos/advsAtivos) : 0;
+  const top = rows[0];
+
+  set('carga-advs', advsAtivos);
+  set('carga-media', media);
+  set('carga-top', top?.[0]||'—');
+  set('carga-top-qtd', top ? top[1].ativos+' processos ativos' : '—');
+
+  const tb = document.getElementById('tbody-carga');
+  if(!tb) return;
+  if(!rows.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Nenhum processo com advogado cadastrado.</td></tr>'; return; }
+  const maxAtivos = Math.max(...rows.map(([,d])=>d.ativos), 1);
+  tb.innerHTML = rows.map(([adv, d]) => {
+    const total = d.ativos + d.encerrados;
+    const pct = Math.round(d.ativos/maxAtivos*100);
+    const corBarra = pct >= 80 ? 'var(--danger)' : pct >= 50 ? '#92400E' : 'var(--success)';
+    return `<tr>
+      <td><strong>${adv}</strong></td>
+      <td style="text-align:center;font-weight:700;color:var(--blue-600)">${d.ativos}</td>
+      <td style="text-align:center;color:var(--text-muted)">${d.encerrados}</td>
+      <td style="text-align:center">${total}</td>
+      <td style="text-align:center">${d.tarefas>0?`<span style="color:#92400E;font-weight:600">${d.tarefas}</span>`:'<span style="color:var(--success)">0</span>'}</td>
+      <td style="text-align:center">${d.prazos>0?`<span style="color:var(--danger);font-weight:600">⚠️ ${d.prazos}</span>`:'<span style="color:var(--success)">✅</span>'}</td>
+      <td style="min-width:120px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${corBarra};border-radius:4px"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text-muted)">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
 function renderInadimplencia() {
   const filtroDias = parseInt(document.getElementById('inad-filtro-dias')?.value)||0;
   const hoje = today();
@@ -5309,7 +6042,176 @@ function resetPrazoLegal() {
   if(blocoCustom) blocoCustom.style.display = 'none';
 }
 
+// ==================== DARK MODE ====================
+const DARK_KEY = 'lexpro_dark_mode';
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem(DARK_KEY, isDark ? '1' : '0');
+  atualizarIconeDark(isDark);
+}
+
+function atualizarIconeDark(isDark) {
+  const icon = document.getElementById('dark-mode-icon');
+  const btn = document.getElementById('btn-dark-mode');
+  if(icon) icon.textContent = isDark ? '☀️' : '🌙';
+  if(btn) btn.title = isDark ? 'Modo claro' : 'Modo escuro';
+}
+
+function iniciarDarkMode() {
+  const saved = localStorage.getItem(DARK_KEY);
+  const isDark = saved === '1';
+  if(isDark) document.body.classList.add('dark');
+  atualizarIconeDark(isDark);
+}
+
+function getEventosFiltrados() {
+  const busca = (document.getElementById('agenda-busca')?.value||'').toLowerCase();
+  const filtroTipo = document.getElementById('agenda-filtro-tipo')?.value||'';
+  const filtroAdv = document.getElementById('agenda-filtro-adv')?.value||'';
+  const filtroPrio = document.getElementById('agenda-filtro-prioridade')?.value||'';
+  return getEventos().filter(e => {
+    if(filtroTipo && e.tipo !== filtroTipo) return false;
+    if(filtroPrio && e.prioridade !== filtroPrio) return false;
+    if(filtroAdv) {
+      const proc = store.processos.find(p=>p.id===e.processoId);
+      if(!proc || proc.adv !== filtroAdv) return false;
+    }
+    if(busca) {
+      const titulo = (e.titulo||'').toLowerCase();
+      const obs = (e.obs||'').toLowerCase();
+      const proc = store.processos.find(p=>p.id===e.processoId);
+      const numero = (proc?.numero||'').toLowerCase();
+      if(!titulo.includes(busca) && !obs.includes(busca) && !numero.includes(busca)) return false;
+    }
+    return true;
+  });
+}
+
+function popularFiltroAdvAgenda() {
+  const sel = document.getElementById('agenda-filtro-adv');
+  if(!sel) return;
+  const cur = sel.value;
+  const advs = [...new Set(store.processos.map(p=>p.adv).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Todos os advogados</option>';
+  advs.forEach(a => sel.innerHTML += `<option value="${a}">${a}</option>`);
+  sel.value = cur;
+}
+
+function imprimirAgenda() {
+  const eventos = getEventosFiltrados().slice().sort((a,b) => (a.data||'').localeCompare(b.data||'') || (a.hora||'').localeCompare(b.hora||''));
+  if(!eventos.length) { showToast('Nenhum evento para imprimir com os filtros atuais.','error'); return; }
+
+  // Montar descrição dos filtros ativos
+  const filtros = [];
+  const busca = document.getElementById('agenda-busca')?.value;
+  const tipo = document.getElementById('agenda-filtro-tipo');
+  const adv = document.getElementById('agenda-filtro-adv')?.value;
+  const prio = document.getElementById('agenda-filtro-prioridade');
+  if(busca) filtros.push('Busca: "'+busca+'"');
+  if(tipo?.value) filtros.push('Tipo: '+tipo.options[tipo.selectedIndex].text);
+  if(adv) filtros.push('Advogado: '+adv);
+  if(prio?.value) filtros.push('Prioridade: '+prio.options[prio.selectedIndex].text);
+
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  // Agrupar por mês
+  const grupos = {};
+  eventos.forEach(e => {
+    const key = e.data ? e.data.substring(0,7) : '—';
+    if(!grupos[key]) grupos[key] = [];
+    grupos[key].push(e);
+  });
+
+  const PRIO_COR = { urgente:'#B91C1C', atencao:'#92400E', normal:'#0B7B45' };
+  const PRIO_LABEL = { urgente:'🔴 Urgente', atencao:'🟡 Atenção', normal:'🟢 Normal' };
+
+  let tabelasHtml = '';
+  Object.entries(grupos).sort().forEach(([key, evs]) => {
+    const [ano, mes] = key.split('-');
+    const mesLabel = mesesNomes[parseInt(mes)-1]+' '+ano;
+    tabelasHtml += `
+      <div class="mes-titulo">${mesLabel}</div>
+      <table>
+        <thead><tr>
+          <th style="width:90px">Data</th>
+          <th style="width:60px">Hora</th>
+          <th>Título</th>
+          <th style="width:110px">Tipo</th>
+          <th style="width:90px">Prioridade</th>
+          <th>Processo</th>
+          <th>Observação</th>
+        </tr></thead>
+        <tbody>
+          ${evs.map(e => {
+            const t = TIPO_EVENTO[e.tipo]||TIPO_EVENTO.outro;
+            const cor = PRIO_COR[e.prioridade]||'#475569';
+            const prioLabel = PRIO_LABEL[e.prioridade]||'—';
+            const proc = store.processos.find(p=>p.id===e.processoId);
+            const c = proc ? store.clientes.find(c=>c.id===proc.clienteId) : null;
+            const procInfo = proc ? proc.numero+(c?' — '+c.nome:'') : '—';
+            return `<tr>
+              <td>${fmtDate(e.data)}</td>
+              <td>${e.hora||'—'}</td>
+              <td><strong>${e.titulo||'—'}</strong></td>
+              <td>${t.icon} ${t.label}</td>
+              <td style="color:${cor};font-weight:600">${prioLabel}</td>
+              <td style="font-size:11px">${procInfo}</td>
+              <td style="font-size:11px;color:#666">${e.obs||'—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  });
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Agenda — ${dados.nome||'Diego Vila Nova'}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;color:#1A2E45;padding:32px;font-size:13px}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1A2E45;padding-bottom:16px;margin-bottom:20px}
+    .header h1{font-size:20px;font-weight:700;color:#1A2E45}
+    .header p{font-size:11.5px;color:#666;margin-top:3px}
+    .filtros{background:#EEF2F7;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#3D5068}
+    .filtros strong{color:#1A2E45}
+    .mes-titulo{font-size:14px;font-weight:700;color:#1A2E45;margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid #C4A96B;text-transform:uppercase;letter-spacing:0.5px}
+    table{width:100%;border-collapse:collapse;margin-bottom:8px}
+    th{background:#1A2E45;color:white;padding:8px 10px;text-align:left;font-size:11.5px;font-weight:600}
+    td{padding:8px 10px;border-bottom:1px solid #DDE4EC;vertical-align:top}
+    tr:hover td{background:#F7F9FC}
+    .total{margin-top:20px;padding-top:12px;border-top:1px solid #DDE4EC;font-size:12px;color:#666;text-align:right}
+    @media print{body{padding:16px}.no-print{display:none}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <h1>📅 Agenda — ${dados.nome||'Diego Vila Nova — Advocacia e Consultoria Jurídica'}</h1>
+      <p>${dados.oab||'OAB/PE 51.493'} · Impresso em ${hoje}</p>
+    </div>
+    <div style="text-align:right;font-size:12px;color:#666">
+      <strong>${eventos.length}</strong> evento(s)
+    </div>
+  </div>
+  ${filtros.length ? `<div class="filtros"><strong>🔍 Filtros aplicados:</strong> ${filtros.join(' · ')}</div>` : ''}
+  ${tabelasHtml}
+  <div class="total">Total: <strong>${eventos.length} evento(s)</strong> · Gerado em ${hoje}</div>
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`;
+
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  registrarAuditoria('exportou','agenda','Agenda impressa',''+eventos.length+' evento(s)');
+}
+function limparFiltrosAgenda() {
+  const ids = ['agenda-busca','agenda-filtro-tipo','agenda-filtro-adv','agenda-filtro-prioridade'];
+  ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderAgenda();
+}
+
 function renderAgenda() {
+  popularFiltroAdvAgenda();
   renderCalendario();
   renderProximosEventos();
   atualizarBadgeAgenda();
@@ -5327,7 +6229,7 @@ function renderCalendario() {
   const hojeStr = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
   const primeiroDia = new Date(calAno, calMes, 1).getDay();
   const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
-  const eventos = getEventos();
+  const eventos = getEventosFiltrados();
 
   grid.innerHTML = '';
 
@@ -5411,7 +6313,7 @@ function renderEventosDia(dateStr) {
   const [y,m,d] = dateStr.split('-');
   const label = `${parseInt(d)}/${parseInt(m)}/${y}`;
   document.getElementById('titulo-dia-sel').textContent = `📅 ${label}`;
-  const evs = getEventos().filter(e => e.data === dateStr).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+  const evs = getEventosFiltrados().filter(e => e.data === dateStr).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
   const el = document.getElementById('lista-eventos-dia');
   if(!evs.length) {
     el.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:16px 0">Nenhum evento neste dia.<br><button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="novoEventoDia('${dateStr}')">+ Adicionar</button></div>`;
@@ -5446,7 +6348,7 @@ function renderProximosEventos() {
   const hoje = today();
   const d7 = new Date(); d7.setDate(d7.getDate()+7);
   const d7str = d7.toISOString().split('T')[0];
-  const evs = getEventos()
+  const evs = getEventosFiltrados()
     .filter(e => e.data >= hoje && e.data <= d7str)
     .sort((a,b) => a.data.localeCompare(b.data)||(a.hora||'').localeCompare(b.hora||''));
   const el = document.getElementById('proximos-eventos');
@@ -6026,7 +6928,7 @@ function renderVarsContainer() {
     ['{{DATA_HOJE}}','Data de Hoje'],['{{ESCRITORIO}}','Nome Escritório']
   ];
   el.innerHTML = vars.map(([v,l]) =>
-    `<button onclick="inserirVariavel('${v}')" title="${l}"
+    `<button onclick="inserirVariavelModelo('${v}')" title="${l}"
       style="padding:3px 8px;border-radius:6px;border:1px solid var(--blue-200);background:white;color:var(--blue-700);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s"
       onmouseover="this.style.background='var(--blue-600)';this.style.color='white'"
       onmouseout="this.style.background='white';this.style.color='var(--blue-700)'">${v}</button>`
@@ -6045,7 +6947,7 @@ function novoModelo() {
 function fecharEditorModelo() {
   document.getElementById('card-editor-modelo').style.display = 'none';
 }
-function inserirVariavel(v) {
+function inserirVariavelModelo(v) {
   const ta = document.getElementById('modelo-texto');
   const start = ta.selectionStart;
   const end = ta.selectionEnd;
@@ -6325,12 +7227,16 @@ function switchTab(group, tab, btn) {
   if(group === 'rel' && tab === 'conversao') renderConversao();
   if(group === 'rel' && tab === 'inadimplencia') renderInadimplencia();
   if(group === 'rel' && tab === 'exito') { renderExito(); populateProcessosExito(); }
+  if(group === 'rel' && tab === 'taxa-exito') renderTaxaExito();
+  if(group === 'rel' && tab === 'duracao') renderDuracao();
+  if(group === 'rel' && tab === 'carga') renderCargaTrabalho();
   if(group === 'rel' && tab === 'clientes-rel') renderRelClientes();
   if(group === 'rel' && tab === 'processos-rel') renderRelProcessos();
   if(group === 'rel' && tab === 'entradas') renderRelEntradas();
   if(group === 'rel' && tab === 'saidas') renderRelSaidas();
   if(group === 'opt' && tab === 'usuarios') renderUsuarios();
   if(group === 'opt' && tab === 'contratos') { renderListaModelos(); populateTiposSelect('modelo-tipo'); }
+  if(group === 'opt' && tab === 'auditoria') renderAuditoria();
   if(group === 'opt' && tab === 'sistema') atualizarInfoBackup();
   if(group === 'opt' && tab === 'whatsapp') carregarConfigWpp();
 }
@@ -6883,6 +7789,7 @@ function renderClientes(q = '') {
         <button class="btn btn-outline btn-sm" onclick="editarCliente(${c.id})" title="Editar">✏️</button>
         <button class="btn btn-primary btn-sm" onclick="gerarFichaPDF(${c.id})" title="Gerar Ficha PDF">📄</button>
         <button class="btn btn-outline btn-sm" onclick="abrirGerarContrato(${c.id})" title="Gerar Contrato" style="background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200)">📝</button>
+        <button class="btn btn-outline btn-sm" onclick="abrirDocumentosCliente(${c.id})" title="Documentos do cliente" style="background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200)">📁</button>
         <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${c.id},null)" title="Enviar WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>
         <button class="btn btn-danger btn-sm" onclick="excluirCliente(${c.id})" title="Excluir">🗑</button>
       </td>
@@ -6900,6 +7807,7 @@ function resetFormProcesso() {
   });
   document.getElementById('proc-abertura').value = today();
   document.getElementById('proc-status').value = 'andamento';
+  toggleResultadoProc();
   setLembreteAtivo(false);
   populateClientesSelect();
   populateTiposProcSelect();
@@ -6943,6 +7851,11 @@ function preencherTipoPorCliente() {
     preencherValorPorTipo();
   }
 }
+function toggleResultadoProc() {
+  const status = document.getElementById('proc-status')?.value;
+  const bloco = document.getElementById('bloco-resultado');
+  if(bloco) bloco.style.display = status==='encerrado' ? 'block' : 'none';
+}
 function mostrarPreviewFinanceiroCliente() {
   const cId = parseInt(document.getElementById('proc-cliente').value);
   const el = document.getElementById('proc-preview-financeiro');
@@ -6985,15 +7898,18 @@ function salvarProcesso() {
   const tId = parseInt(document.getElementById('proc-tipo').value);
   if(!num || !cId || !tId) { showToast('Preencha todos os campos obrigatórios.', 'error'); return; }
   const editId = document.getElementById('processo-edit-id').value;
+  const statusProc = document.getElementById('proc-status').value;
   const procData = {
     numero: num,
     clienteId: cId,
     tipoId: tId,
     adv: document.getElementById('proc-adv').value.trim(),
     abertura: document.getElementById('proc-abertura').value,
-    status: document.getElementById('proc-status').value,
+    status: statusProc,
     vara: document.getElementById('proc-vara').value.trim(),
-    descricao: document.getElementById('proc-descricao').value.trim()
+    descricao: document.getElementById('proc-descricao').value.trim(),
+    resultado: statusProc==='encerrado' ? (document.getElementById('proc-resultado').value||'') : '',
+    dataEncerramento: statusProc==='encerrado' ? (document.getElementById('proc-data-enc').value||today()) : ''
   };
   if(editId) {
     const p = store.processos.find(p => p.id == editId);
@@ -7098,32 +8014,74 @@ function excluirProcesso(id) {
   saveData(); renderProcessos(); updateDashboard();
   showToast('Processo excluído.');
 }
+function voltarParaDetalhe(modalId) {
+  const ids = ['andamento-proc-id','tarefa-proc-id','intim-proc-id','parte-proc-id','contato-proc-id'];
+  let procId = 0;
+  for(const id of ids) {
+    const val = parseInt(document.getElementById(id)?.value)||0;
+    if(val) { procId = val; break; }
+  }
+  closeModal(modalId);
+  if(procId) setTimeout(()=>verDetalhe(procId), 100);
+}
 function atualizarAndamento(id) {
   document.getElementById('andamento-proc-id').value = id;
-  const p = store.processos.find(p => p.id === id);
-  document.getElementById('andamento-status').value = p ? p.status : 'andamento';
+  document.getElementById('andamento-edit-idx').value = '';
+  document.getElementById('modal-andamento-title').textContent = 'Novo Andamento';
   document.getElementById('andamento-texto').value = '';
+  document.getElementById('andamento-status').value = 'andamento';
+  closeModal('modal-detalhe');
   openModal('modal-andamento');
+}
+function editarAndamento(procId, idx) {
+  const list = store.andamentos[procId]||[];
+  const realIdx = list.length - 1 - idx; // idx é da lista invertida
+  const a = list[realIdx];
+  if(!a) return;
+  document.getElementById('andamento-proc-id').value = procId;
+  document.getElementById('andamento-edit-idx').value = realIdx;
+  document.getElementById('modal-andamento-title').textContent = 'Editar Andamento';
+  document.getElementById('andamento-texto').value = a.texto||'';
+  document.getElementById('andamento-status').value = a.status||'andamento';
+  closeModal('modal-detalhe');
+  openModal('modal-andamento', false);
+}
+function excluirAndamento(procId, idx) {
+  if(!confirm('Excluir este andamento?')) return;
+  const list = store.andamentos[procId]||[];
+  const realIdx = list.length - 1 - idx;
+  list.splice(realIdx, 1);
+  saveData();
+  showToast('Andamento excluído.','success');
+  setTimeout(()=>verDetalhe(procId), 100);
 }
 function salvarAndamento() {
   const id = parseInt(document.getElementById('andamento-proc-id').value);
   const status = document.getElementById('andamento-status').value;
   const texto = document.getElementById('andamento-texto').value.trim();
+  const editIdx = document.getElementById('andamento-edit-idx').value;
   if(!texto) { showToast('Descreva o andamento.', 'error'); return; }
-  const p = store.processos.find(p => p.id === id);
-  if(p) p.status = status;
   if(!store.andamentos[id]) store.andamentos[id] = [];
-  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
-  const now = new Date();
-  store.andamentos[id].push({
-    data: today(),
-    hora: now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
-    autor: session.nome||session.email||'—',
-    texto, status
-  });
-  registrarAuditoria('editou','processo','Andamento registrado: '+p?.numero,'');
+  if(editIdx !== '') {
+    const a = store.andamentos[id][parseInt(editIdx)];
+    if(a) { a.texto = texto; a.status = status; }
+    showToast('Andamento atualizado!','success');
+  } else {
+    const p = store.processos.find(p=>p.id===id);
+    if(p) p.status = status;
+    const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+    const now = new Date();
+    store.andamentos[id].push({
+      data: today(),
+      hora: now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+      autor: session.nome||session.email||'—',
+      texto, status
+    });
+    registrarAuditoria('editou','processo','Andamento: '+(store.processos.find(p=>p.id===id)?.numero||''),'');
+    showToast('Andamento registrado!', 'success');
+  }
   saveData(); closeModal('modal-andamento'); renderProcessos(); updateDashboard();
-  showToast('Andamento registrado!', 'success');
+  setTimeout(()=>verDetalhe(id), 100);
 }
 
 function gerarReciboPagamento(parcelaId) {
@@ -7240,11 +8198,17 @@ function verDetalhe(id) {
   const pago = parcelas.filter(pa=>pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
   const total = parcelas.reduce((s,pa)=>s+pa.valor,0);
   const pct = total > 0 ? Math.min(100,Math.round(pago/total*100)) : 0;
+  const etapaAtual = p.etapa || 0;
+  const nTarefas = (store.checklist?.[id]||[]).length;
+  const nIntims = (store.intimacoes?.[id]||[]).filter(i=>!i.cumprido).length;
+  const nPartes = (store.partes?.[id]||[]).length;
+  const nContatos = (store.contatos?.[id]||[]).length;
 
   document.getElementById('detalhe-title').textContent = `Processo ${p.numero}`;
   document.getElementById('detalhe-body').innerHTML = `
-    <!-- Dados gerais -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+
+    <!-- Cabeçalho resumido -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
       <div><div class="form-label">Cliente</div><strong>${c.nome}</strong></div>
       <div><div class="form-label">Tipo</div><span class="badge badge-navy">${t.nome}</span></div>
       <div><div class="form-label">Advogado</div>${p.adv||'—'}</div>
@@ -7252,62 +8216,134 @@ function verDetalhe(id) {
       <div><div class="form-label">Abertura</div>${fmtDate(p.abertura)}</div>
       <div><div class="form-label">Status</div><span class="badge ${st.cls}">${st.label}</span></div>
     </div>
-    ${p.descricao?`<div style="margin-bottom:20px;padding:12px 14px;background:var(--surface);border-radius:var(--radius);font-size:13.5px;color:var(--text-secondary);border-left:3px solid var(--blue-300)">${p.descricao}</div>`:''}
+    ${p.descricao?`<div style="margin-bottom:14px;padding:10px 14px;background:var(--surface);border-radius:var(--radius);font-size:13px;color:var(--text-secondary);border-left:3px solid var(--blue-300)">${p.descricao}</div>`:''}
 
-    <!-- Parcelas -->
-    ${parcelas.length ? `
-    <div style="margin-bottom:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--text-primary)">💰 Parcelas</div>
-        <div style="font-size:12px;color:var(--text-muted)">${fmtMoney(pago)} de ${fmtMoney(total)} pago (${pct}%)</div>
-      </div>
-      <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <div class="parcel-row parcel-header"><span>#</span><span>Vencimento</span><span>Valor</span><span>Pagamento</span><span>Status</span><span>Recibo</span></div>
-      ${parcelas.map(pa => {
-        const stPa = pa.status==='pago'?'badge-green':isVencido(pa.vencimento)&&pa.status!=='pago'?'badge-red':'badge-amber';
-        const stLabel = pa.status==='pago'?'Pago':isVencido(pa.vencimento)&&pa.status!=='pago'?'Vencido':'Pendente';
-        return `<div class="parcel-row">
-          <span>${pa.num}/${pa.total}</span>
-          <span>${fmtDate(pa.vencimento)}</span>
-          <span>${fmtMoney(pa.valor)}</span>
-          <span>${fmtDate(pa.dtPagamento)}</span>
-          <span><span class="badge ${stPa}">${stLabel}</span></span>
-          <span>${pa.status==='pago'?`<button class="btn btn-outline btn-sm" onclick="gerarReciboPagamento(${pa.id})" title="Gerar Recibo" style="font-size:11px;padding:2px 8px">🧾</button>`:'—'}</span>
-        </div>`;
-      }).join('')}
-    </div>` : ''}
+    <!-- Pipeline -->
+    ${renderPipelineHTML(id, etapaAtual)}
 
-    <!-- Timeline de Andamentos -->
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:600;color:var(--text-primary)">📋 Histórico de Andamentos</div>
-        <button class="btn btn-primary btn-sm" onclick="closeModal('modal-detalhe');atualizarAndamento(${id})" style="font-size:12px">+ Novo Andamento</button>
+    <!-- Abas internas -->
+    <div style="margin-top:16px">
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px;overflow-x:auto">
+        <button class="det-tab active" onclick="switchDetTab('parcelas',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--blue-600);border-bottom:2px solid var(--blue-600);margin-bottom:-2px;white-space:nowrap">💰 Parcelas ${parcelas.length?'('+parcelas.length+')':''}</button>
+        <button class="det-tab" onclick="switchDetTab('partes',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">👥 Partes ${nPartes?'('+nPartes+')':''}</button>
+        <button class="det-tab" onclick="switchDetTab('contatos',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">📞 Contatos ${nContatos?'('+nContatos+')':''}</button>
+        <button class="det-tab" onclick="switchDetTab('checklist',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">✅ Tarefas ${nTarefas?'('+nTarefas+')':''}</button>
+        <button class="det-tab" onclick="switchDetTab('intimacoes',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">📨 Prazos ${nIntims?'<span style="background:var(--danger);color:white;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:3px">'+nIntims+'</span>':''}</button>
+        <button class="det-tab" onclick="switchDetTab('peticao',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">📝 Petição</button>
+        <button class="det-tab" onclick="switchDetTab('andamentos',${id},this)" style="padding:7px 12px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap">📋 Andamentos ${andamentos.length?'('+andamentos.length+')':''}</button>
       </div>
-      ${andamentos.length ? `
-      <div style="position:relative;padding-left:20px">
-        <div style="position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border)"></div>
-        ${andamentos.map((a,i) => {
-          const stA = statusLabels[a.status]||{label:a.status,cls:'badge-gray'};
-          const isFirst = i===0;
-          return `<div style="position:relative;margin-bottom:${isFirst?'8':'16'}px;padding-bottom:${isFirst?'0':'8'}px">
-            <div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:${isFirst?'var(--blue-600)':'var(--border)'};border:2px solid white;box-shadow:0 0 0 2px ${isFirst?'var(--blue-600)':'var(--border)'}"></div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-              <span style="font-size:11.5px;font-weight:600;color:var(--text-muted)">${fmtDate(a.data)}${a.hora?' às '+a.hora:''}</span>
-              <span class="badge ${stA.cls}" style="font-size:10px;padding:1px 8px">${stA.label}</span>
-              ${a.autor?`<span style="font-size:11px;color:var(--text-muted)">— ${a.autor}</span>`:''}
-            </div>
-            <div style="font-size:13.5px;color:var(--text-primary);line-height:1.5;background:${isFirst?'var(--blue-50)':'var(--surface)'};border:1px solid ${isFirst?'var(--blue-100)':'var(--border)'};border-radius:8px;padding:10px 12px">${a.texto}</div>
+
+      <!-- Aba Parcelas -->
+      <div id="det-tab-parcelas">
+        ${parcelas.length ? `
+        <div style="margin-bottom:8px;display:flex;justify-content:flex-end">
+          <span style="font-size:12px;color:var(--text-muted)">${fmtMoney(pago)} de ${fmtMoney(total)} pago (${pct}%)</span>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="parcel-row parcel-header"><span>#</span><span>Vencimento</span><span>Valor</span><span>Pagamento</span><span>Status</span><span>Recibo</span></div>
+        ${parcelas.map(pa => {
+          const stPa = pa.status==='pago'?'badge-green':isVencido(pa.vencimento)&&pa.status!=='pago'?'badge-red':'badge-amber';
+          const stLabel = pa.status==='pago'?'Pago':isVencido(pa.vencimento)&&pa.status!=='pago'?'Vencido':'Pendente';
+          return `<div class="parcel-row">
+            <span>${pa.num}/${pa.total}</span>
+            <span>${fmtDate(pa.vencimento)}</span>
+            <span>${fmtMoney(pa.valor)}</span>
+            <span>${fmtDate(pa.dtPagamento)}</span>
+            <span><span class="badge ${stPa}">${stLabel}</span></span>
+            <span>${pa.status==='pago'?`<button class="btn btn-outline btn-sm" onclick="gerarReciboPagamento(${pa.id})" style="font-size:11px;padding:2px 8px">🧾</button>`:'—'}</span>
           </div>`;
-        }).join('')}
-      </div>` : `
-      <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;background:var(--surface);border-radius:var(--radius)">
-        Nenhum andamento registrado ainda.<br>
-        <button class="btn btn-outline btn-sm" onclick="closeModal('modal-detalhe');atualizarAndamento(${id})" style="margin-top:10px">+ Registrar primeiro andamento</button>
-      </div>`}
+        }).join('')}` : `<div style="text-align:center;color:var(--text-muted);padding:24px;font-size:13px">Nenhuma parcela cadastrada.</div>`}
+      </div>
+
+      <!-- Aba Partes -->
+      <div id="det-tab-partes" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-outline btn-sm" onclick="closeModal('modal-detalhe');abrirNovaParte(${id})">+ Adicionar Parte</button>
+        </div>
+        ${renderPartesHTML(id)}
+      </div>
+
+      <!-- Aba Contatos -->
+      <div id="det-tab-contatos" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-outline btn-sm" onclick="closeModal('modal-detalhe');abrirNovoContato(${id})">+ Registrar Contato</button>
+        </div>
+        ${renderContatosHTML(id)}
+      </div>
+
+      <!-- Aba Petição -->
+      <div id="det-tab-peticao" style="display:none">
+        ${renderPeticaoHTML(id)}
+      </div>
+
+      <!-- Aba Checklist -->
+      <div id="det-tab-checklist" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-outline btn-sm" onclick="adicionarTarefa(${id})">+ Nova Tarefa</button>
+        </div>
+        <div id="checklist-${id}">${renderChecklistHTML(id)}</div>
+      </div>
+
+      <!-- Aba Intimações/Prazos -->
+      <div id="det-tab-intimacoes" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-outline btn-sm" onclick="closeModal('modal-detalhe');abrirNovaIntimacao(${id})">+ Nova Intimação</button>
+        </div>
+        ${renderHistoricoPrazosHTML(id)}
+      </div>
+
+      <!-- Aba Andamentos -->
+      <div id="det-tab-andamentos" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-primary btn-sm" onclick="closeModal('modal-detalhe');atualizarAndamento(${id})">+ Novo Andamento</button>
+        </div>
+        ${andamentos.length ? `
+        <div style="position:relative;padding-left:20px">
+          <div style="position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border)"></div>
+          ${andamentos.map((a,i) => {
+            const stA = statusLabels[a.status]||{label:a.status,cls:'badge-gray'};
+            const isFirst = i===0;
+            return `<div style="position:relative;margin-bottom:16px">
+              <div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:${isFirst?'var(--blue-600)':'var(--border)'};border:2px solid white;box-shadow:0 0 0 2px ${isFirst?'var(--blue-600)':'var(--border)'}"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:11px;color:var(--text-muted)">${fmtDate(a.data)}${a.hora?' às '+a.hora:''}</span>
+                  <span class="badge ${stA.cls}" style="font-size:10px;padding:1px 7px">${stA.label}</span>
+                  ${a.autor?`<span style="font-size:11px;color:var(--text-muted)">— ${a.autor}</span>`:''}
+                </div>
+                <div style="display:flex;gap:4px;flex-shrink:0">
+                  <button onclick="editarAndamento(${id},${i})" style="background:white;border:1.5px solid #E2E8F0;border-radius:8px;cursor:pointer;font-size:13px;padding:4px 9px;line-height:1;transition:all 0.15s" title="Editar">✏️</button>
+                  <button onclick="excluirAndamento(${id},${i})" style="background:#DC2626;border:1.5px solid #DC2626;border-radius:8px;cursor:pointer;font-size:12px;padding:4px 9px;line-height:1;color:white;transition:all 0.15s" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                </div>
+              </div>
+              <div style="font-size:13px;background:${isFirst?'var(--blue-50)':'var(--surface)'};border:1px solid ${isFirst?'var(--blue-100)':'var(--border)'};border-radius:8px;padding:9px 12px">${a.texto}</div>
+            </div>`;
+          }).join('')}
+        </div>` : `<div style="text-align:center;color:var(--text-muted);padding:24px;font-size:13px">Nenhum andamento registrado.</div>`}
+      </div>
     </div>
   `;
   openModal('modal-detalhe');
 }
+
+function switchDetTab(tab, procId, btn) {
+  ['parcelas','partes','contatos','checklist','intimacoes','peticao','andamentos'].forEach(t => {
+    const el = document.getElementById('det-tab-'+t);
+    if(el) el.style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.det-tab').forEach(b => {
+    b.style.color = 'var(--text-muted)';
+    b.style.borderBottom = '2px solid transparent';
+    b.style.fontWeight = '400';
+  });
+  if(btn) {
+    btn.style.color = 'var(--blue-600)';
+    btn.style.borderBottom = '2px solid var(--blue-600)';
+    btn.style.fontWeight = '600';
+  }
+}
+
+
 
 // ==================== FINANCEIRO ====================
 function getParcelaStatus(pa) {
@@ -7487,6 +8523,8 @@ function renderParcelas(q = '') {
       <td><span class="badge ${stCls}">${stLabel}</span>${p.dtPagamento?`<br><span style="font-size:10px;color:var(--text-muted)">Pago em ${fmtDate(p.dtPagamento)}</span>`:''}</td>
       <td>${st!=='pago'
         ? `<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>
+           <button class="btn btn-outline btn-sm" onclick="abrirReagendar(${p.id})" title="Reagendar vencimento" style="font-size:11px">📅</button>
+           <button class="btn btn-outline btn-sm" onclick="abrirDescontoAcrescimo(${p.id})" title="Desconto / Acréscimo" style="font-size:11px">💱</button>
            <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${p.clienteId},${p.id})" title="Enviar Cobrança WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>`
         : `<span style="color:var(--success);font-size:12px">✔ Confirmado</span>
            <button class="btn btn-outline btn-sm" onclick="gerarReciboPagamento(${p.id})" title="Gerar Recibo PDF" style="font-size:11px;padding:3px 8px">🧾</button>
@@ -7528,8 +8566,936 @@ function confirmarPagamento() {
   showToast('Pagamento confirmado!', 'success');
 }
 
-// ==================== DASHBOARD ====================
+// ==================== PARTES DO PROCESSO ====================
+const PARTE_TIPOS = {
+  autor:        { icon:'🟢', label:'Autor / Reclamante' },
+  reu:          { icon:'🔴', label:'Réu / Reclamado' },
+  testemunha:   { icon:'👁',  label:'Testemunha' },
+  adv_contrario:{ icon:'⚖️', label:'Adv. Parte Contrária' },
+  perito:       { icon:'🔬', label:'Perito' },
+  outro:        { icon:'📌', label:'Outro' }
+};
+
+function getPartes(procId) {
+  if(!store.partes) store.partes = {};
+  if(!store.partes[procId]) store.partes[procId] = [];
+  return store.partes[procId];
+}
+
+function renderPartesHTML(procId) {
+  const partes = getPartes(procId);
+  if(!partes.length) return `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px;background:var(--surface);border-radius:var(--radius)">Nenhuma parte cadastrada.</div>`;
+  const grupos = {};
+  partes.forEach(p => { if(!grupos[p.tipo]) grupos[p.tipo]=[]; grupos[p.tipo].push(p); });
+  return Object.entries(grupos).map(([tipo, lista]) => {
+    const t = PARTE_TIPOS[tipo]||{icon:'📌',label:tipo};
+    return `<div style="margin-bottom:16px">
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:8px">${t.icon} ${t.label}</div>
+      ${lista.map(p => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface)">
+        <div>
+          <div style="font-weight:500;font-size:13.5px">${p.nome}</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">
+            ${p.cpf?p.cpf:''}${p.cpf&&p.oab?' · ':''}${p.oab?p.oab:''}
+            ${(p.cpf||p.oab)&&(p.tel||p.email)?' · ':''}${p.tel?p.tel:''}${p.tel&&p.email?' · ':''}${p.email?p.email:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button onclick="editarParte(${procId},${p.id})" style="background:white;border:1.5px solid #E2E8F0;border-radius:8px;cursor:pointer;font-size:13px;padding:4px 9px" title="Editar">✏️</button>
+          <button onclick="excluirParte(${procId},${p.id})" style="background:#DC2626;border:1.5px solid #DC2626;border-radius:8px;cursor:pointer;font-size:12px;padding:4px 9px;color:white" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function abrirNovaParte(procId) {
+  document.getElementById('parte-proc-id').value = procId;
+  document.getElementById('parte-edit-id').value = '';
+  document.getElementById('modal-parte-title').textContent = '👥 Adicionar Parte';
+  ['parte-nome','parte-cpf','parte-oab','parte-tel','parte-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('parte-tipo').value = 'autor';
+  openModal('modal-parte', false);
+}
+
+function editarParte(procId, parteId) {
+  const p = getPartes(procId).find(p=>p.id===parteId); if(!p) return;
+  document.getElementById('parte-proc-id').value = procId;
+  document.getElementById('parte-edit-id').value = parteId;
+  document.getElementById('modal-parte-title').textContent = '✏️ Editar Parte';
+  document.getElementById('parte-tipo').value = p.tipo||'autor';
+  document.getElementById('parte-nome').value = p.nome||'';
+  document.getElementById('parte-cpf').value = p.cpf||'';
+  document.getElementById('parte-oab').value = p.oab||'';
+  document.getElementById('parte-tel').value = p.tel||'';
+  document.getElementById('parte-email').value = p.email||'';
+  closeModal('modal-detalhe');
+  openModal('modal-parte', false);
+}
+
+function salvarParte() {
+  const procId = parseInt(document.getElementById('parte-proc-id').value);
+  const nome = document.getElementById('parte-nome').value.trim();
+  if(!nome) { showToast('Informe o nome da parte.','error'); return; }
+  const editId = document.getElementById('parte-edit-id').value;
+  const dados = {
+    tipo: document.getElementById('parte-tipo').value,
+    nome, cpf: document.getElementById('parte-cpf').value.trim(),
+    oab: document.getElementById('parte-oab').value.trim(),
+    tel: document.getElementById('parte-tel').value.trim(),
+    email: document.getElementById('parte-email').value.trim()
+  };
+  if(!store.partes) store.partes = {};
+  if(!store.partes[procId]) store.partes[procId] = [];
+  if(!store.nextId.parte) store.nextId.parte = 1;
+  if(editId) {
+    const p = store.partes[procId].find(p=>p.id==editId);
+    if(p) Object.assign(p, dados);
+    showToast('Parte atualizada!','success');
+  } else {
+    store.partes[procId].push({ id: store.nextId.parte++, ...dados });
+    showToast('Parte adicionada!','success');
+  }
+  saveData(); closeModal('modal-parte');
+  setTimeout(()=>verDetalhe(procId), 100);
+}
+
+function excluirParte(procId, parteId) {
+  if(!confirm('Excluir esta parte?')) return;
+  store.partes[procId] = store.partes[procId].filter(p=>p.id!==parteId);
+  saveData(); showToast('Parte excluída.');
+  setTimeout(()=>verDetalhe(procId), 100);
+}
+
+// ==================== HISTÓRICO DE CONTATOS ====================
+const CONTATO_TIPOS = {
+  ligacao:    { icon:'📞', label:'Ligação' },
+  reuniao:    { icon:'🤝', label:'Reunião' },
+  email:      { icon:'📧', label:'E-mail' },
+  whatsapp:   { icon:'💬', label:'WhatsApp' },
+  presencial: { icon:'🏢', label:'Visita Presencial' },
+  outro:      { icon:'📌', label:'Outro' }
+};
+
+function getContatos(procId) {
+  if(!store.contatos) store.contatos = {};
+  if(!store.contatos[procId]) store.contatos[procId] = [];
+  return store.contatos[procId];
+}
+
+function renderContatosHTML(procId) {
+  const contatos = getContatos(procId).slice().sort((a,b)=>b.data.localeCompare(a.data));
+  if(!contatos.length) return `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px;background:var(--surface);border-radius:var(--radius)">Nenhum contato registrado.</div>`;
+  return contatos.map(c => {
+    const t = CONTATO_TIPOS[c.tipo]||{icon:'📌',label:c.tipo};
+    return `<div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:var(--surface)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">${t.icon}</span>
+          <div>
+            <span style="font-weight:600;font-size:13px">${t.label}</span>
+            ${c.pessoa?`<span style="color:var(--text-muted);font-size:12px"> — ${c.pessoa}</span>`:''}
+            ${c.duracao?`<span style="color:var(--text-muted);font-size:12px"> · ${c.duracao}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11.5px;color:var(--text-muted)">${fmtDate(c.data)}</span>
+          <button onclick="editarContato(${procId},${c.id})" style="background:white;border:1.5px solid #E2E8F0;border-radius:8px;cursor:pointer;font-size:13px;padding:3px 8px" title="Editar">✏️</button>
+          <button onclick="excluirContato(${procId},${c.id})" style="background:#DC2626;border:1.5px solid #DC2626;border-radius:8px;cursor:pointer;font-size:12px;padding:3px 8px;color:white" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;padding:8px 10px;background:white;border-radius:6px;border:1px solid var(--border)">${c.obs}</div>
+    </div>`;
+  }).join('');
+}
+
+function abrirNovoContato(procId) {
+  document.getElementById('contato-proc-id').value = procId;
+  document.getElementById('contato-edit-id').value = '';
+  document.getElementById('modal-contato-title').textContent = '📞 Registrar Contato';
+  ['contato-pessoa','contato-duracao','contato-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('contato-tipo').value = 'ligacao';
+  document.getElementById('contato-data').value = today();
+  openModal('modal-contato', false);
+}
+
+function editarContato(procId, contatoId) {
+  const c = getContatos(procId).find(c=>c.id===contatoId); if(!c) return;
+  document.getElementById('contato-proc-id').value = procId;
+  document.getElementById('contato-edit-id').value = contatoId;
+  document.getElementById('modal-contato-title').textContent = '✏️ Editar Contato';
+  document.getElementById('contato-tipo').value = c.tipo||'ligacao';
+  document.getElementById('contato-data').value = c.data||today();
+  document.getElementById('contato-pessoa').value = c.pessoa||'';
+  document.getElementById('contato-duracao').value = c.duracao||'';
+  document.getElementById('contato-obs').value = c.obs||'';
+  closeModal('modal-detalhe');
+  openModal('modal-contato', false);
+}
+
+function salvarContato() {
+  const procId = parseInt(document.getElementById('contato-proc-id').value);
+  const obs = document.getElementById('contato-obs').value.trim();
+  if(!obs) { showToast('Descreva o contato.','error'); return; }
+  const editId = document.getElementById('contato-edit-id').value;
+  const dados = {
+    tipo: document.getElementById('contato-tipo').value,
+    data: document.getElementById('contato-data').value||today(),
+    pessoa: document.getElementById('contato-pessoa').value.trim(),
+    duracao: document.getElementById('contato-duracao').value.trim(),
+    obs
+  };
+  if(!store.contatos) store.contatos = {};
+  if(!store.contatos[procId]) store.contatos[procId] = [];
+  if(!store.nextId.contato) store.nextId.contato = 1;
+  if(editId) {
+    const c = store.contatos[procId].find(c=>c.id==editId);
+    if(c) Object.assign(c, dados);
+    showToast('Contato atualizado!','success');
+  } else {
+    store.contatos[procId].push({ id: store.nextId.contato++, ...dados });
+    showToast('Contato registrado!','success');
+  }
+  saveData(); closeModal('modal-contato');
+  setTimeout(()=>verDetalhe(procId), 100);
+}
+
+function excluirContato(procId, contatoId) {
+  if(!confirm('Excluir este contato?')) return;
+  store.contatos[procId] = store.contatos[procId].filter(c=>c.id!==contatoId);
+  saveData(); showToast('Contato excluído.');
+  setTimeout(()=>verDetalhe(procId), 100);
+}
+
+// ==================== MODELO DE PETIÇÃO ====================
+function renderPeticaoHTML(procId) {
+  const proc = store.processos.find(p=>p.id===procId)||{};
+  const c = store.clientes.find(c=>c.id===proc.clienteId)||{nome:'—',cpf:'—',endereco:'—'};
+  const t = store.tipos.find(t=>t.id===proc.tipoId)||{nome:'—'};
+  const partes = getPartes(procId);
+  const autor = partes.find(p=>p.tipo==='autor')||{nome:c.nome,cpf:c.cpf};
+  const reu = partes.find(p=>p.tipo==='reu')||{nome:'—'};
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  return `
+    <div style="margin-bottom:12px">
+      <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;background:var(--blue-50);padding:10px 14px;border-radius:var(--radius);border:1px solid var(--blue-100)">
+        💡 Selecione um modelo ou escreva livremente. As variáveis são substituídas automaticamente pelos dados do processo.
+      </div>
+
+      <!-- Seletor de modelo -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <select class="form-control" id="peticao-modelo-sel" style="flex:1;min-width:200px" onchange="carregarModeloPeticao(${procId})">
+          <option value="">— Começar do zero —</option>
+          ${(store.modelos||[]).map(m=>`<option value="${m.id}">${m.nome}</option>`).join('')}
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="inserirVariaveisPeticao(${procId})">🔄 Preencher Variáveis</button>
+        <button class="btn btn-primary btn-sm" onclick="imprimirPeticao(${procId})">🖨️ Imprimir</button>
+      </div>
+
+      <!-- Editor -->
+      <textarea id="peticao-texto-${procId}" class="form-control" rows="18"
+        style="font-family:'Segoe UI',sans-serif;font-size:13.5px;line-height:1.7;resize:vertical"
+        placeholder="Digite o texto da petição aqui...&#10;&#10;Variáveis disponíveis:&#10;{{CLIENTE}} {{CPF_CLIENTE}} {{ENDERECO_CLIENTE}}&#10;{{PROCESSO}} {{TIPO_PROCESSO}} {{DATA_ABERTURA}}&#10;{{AUTOR}} {{REU}} {{VARA}}&#10;{{ADVOGADO}} {{OAB}} {{ESCRITORIO}}&#10;{{DATA_ATUAL}}">${proc.rascunhoPeticao||''}</textarea>
+
+      <!-- Variáveis rápidas -->
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px">
+        ${['{{CLIENTE}}','{{CPF_CLIENTE}}','{{ENDERECO_CLIENTE}}','{{PROCESSO}}','{{TIPO_PROCESSO}}','{{AUTOR}}','{{REU}}','{{VARA}}','{{ADVOGADO}}','{{OAB}}','{{ESCRITORIO}}','{{DATA_ATUAL}}'].map(v=>
+          `<span onclick="inserirNoPeticao('peticao-texto-${procId}','${v}')" style="padding:2px 9px;background:var(--navy);color:white;border-radius:12px;font-size:11px;cursor:pointer;font-family:monospace">${v}</span>`
+        ).join('')}
+      </div>
+    </div>`;
+}
+
+function inserirNoPeticao(elId, variavel) {
+  const el = document.getElementById(elId); if(!el) return;
+  const pos = el.selectionStart||el.value.length;
+  el.value = el.value.substring(0,pos)+variavel+el.value.substring(pos);
+  el.focus(); el.selectionStart = el.selectionEnd = pos+variavel.length;
+}
+
+function carregarModeloPeticao(procId) {
+  const modeloId = parseInt(document.getElementById('peticao-modelo-sel')?.value);
+  if(!modeloId) return;
+  const m = (store.modelos||[]).find(m=>m.id===modeloId); if(!m) return;
+  const el = document.getElementById('peticao-texto-'+procId); if(!el) return;
+  el.value = m.texto||'';
+  inserirVariaveisPeticao(procId);
+}
+
+function inserirVariaveisPeticao(procId) {
+  const el = document.getElementById('peticao-texto-'+procId); if(!el) return;
+  const proc = store.processos.find(p=>p.id===procId)||{};
+  const c = store.clientes.find(c=>c.id===proc.clienteId)||{nome:'—',cpf:'—',endereco:'—'};
+  const t = store.tipos.find(t=>t.id===proc.tipoId)||{nome:'—'};
+  const partes = getPartes(procId);
+  const autor = partes.find(p=>p.tipo==='autor')||{nome:c.nome};
+  const reu = partes.find(p=>p.tipo==='reu')||{nome:'—'};
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  el.value = el.value
+    .replace(/{{CLIENTE}}/g, c.nome)
+    .replace(/{{CPF_CLIENTE}}/g, c.cpf||'—')
+    .replace(/{{ENDERECO_CLIENTE}}/g, c.endereco||'—')
+    .replace(/{{PROCESSO}}/g, proc.numero||'—')
+    .replace(/{{TIPO_PROCESSO}}/g, t.nome)
+    .replace(/{{AUTOR}}/g, autor.nome)
+    .replace(/{{REU}}/g, reu.nome)
+    .replace(/{{VARA}}/g, proc.vara||'—')
+    .replace(/{{DATA_ABERTURA}}/g, fmtDate(proc.abertura))
+    .replace(/{{ADVOGADO}}/g, proc.adv||dados.nome||'—')
+    .replace(/{{OAB}}/g, dados.oab||'—')
+    .replace(/{{ESCRITORIO}}/g, dados.nome||'Diego Vila Nova — Advocacia e Consultoria Jurídica')
+    .replace(/{{DATA_ATUAL}}/g, hoje);
+  // Salvar rascunho
+  const p = store.processos.find(p=>p.id===procId);
+  if(p) { p.rascunhoPeticao = el.value; saveData(); }
+  showToast('Variáveis preenchidas!','success');
+}
+
+function imprimirPeticao(procId) {
+  const el = document.getElementById('peticao-texto-'+procId); if(!el) return;
+  const proc = store.processos.find(p=>p.id===procId)||{numero:'—'};
+  const c = store.clientes.find(c=>c.id===proc.clienteId)||{nome:'—'};
+  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+  const texto = el.value;
+  // Salvar rascunho antes de imprimir
+  proc.rascunhoPeticao = texto; saveData();
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Petição — ${proc.numero}</title>
+  <style>
+    body{font-family:'Times New Roman',serif;color:#000;padding:60px;max-width:720px;margin:0 auto;font-size:14px;line-height:1.8}
+    .cabecalho{text-align:center;margin-bottom:40px}
+    .cabecalho h1{font-size:16px;text-transform:uppercase;letter-spacing:1px}
+    .cabecalho p{font-size:13px;margin:4px 0}
+    .texto{white-space:pre-wrap;text-align:justify}
+    .rodape{margin-top:60px;text-align:center}
+    .rodape .linha{width:200px;border-top:1px solid #000;margin:0 auto 8px}
+    @media print{body{padding:30px}}
+  </style></head><body>
+  <div class="cabecalho">
+    <h1>${dados.nome||'Diego Vila Nova — Advocacia e Consultoria Jurídica'}</h1>
+    <p>${dados.oab||'OAB/PE 51.493'}</p>
+    <p style="margin-top:16px;font-size:12px;color:#666">Processo: ${proc.numero} — ${c.nome}</p>
+  </div>
+  <div class="texto">${texto.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+  <div class="rodape">
+    <div class="linha"></div>
+    <p>${proc.adv||dados.nome||'Diego Vila Nova'}</p>
+    <p>${dados.oab||'OAB/PE 51.493'}</p>
+  </div>
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`;
+  const win = window.open('','_blank');
+  win.document.write(html); win.document.close();
+  registrarAuditoria('exportou','processo','Petição impressa: '+proc.numero,'');
+}
+function getChecklist(procId) {
+  if(!store.checklist) store.checklist = {};
+  if(!store.checklist[procId]) store.checklist[procId] = [];
+  return store.checklist[procId];
+}
+
+function renderChecklistHTML(procId) {
+  const tarefas = getChecklist(procId);
+  if(!tarefas.length) return `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:12px;background:var(--surface);border-radius:var(--radius)">Nenhuma tarefa cadastrada. Clique em "+ Tarefa" para adicionar.</div>`;
+  const feitas = tarefas.filter(t=>t.feita).length;
+  const pct = Math.round(feitas/tarefas.length*100);
+  return `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--success);border-radius:4px;transition:width 0.3s"></div>
+      </div>
+      <span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${feitas}/${tarefas.length} concluídas</span>
+    </div>
+    ${tarefas.map(t => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);margin-bottom:6px;background:${t.feita?'var(--success-bg)':'var(--surface)'};border:1px solid ${t.feita?'#6EE7B7':'var(--border)'}">
+      <input type="checkbox" ${t.feita?'checked':''} onchange="toggleTarefa(${procId},${t.id},this.checked)"
+        style="accent-color:var(--success);width:16px;height:16px;cursor:pointer;flex-shrink:0">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;${t.feita?'text-decoration:line-through;color:var(--text-muted)':''}">${t.texto}</div>
+        ${t.prazo||t.resp?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${t.resp?'👤 '+t.resp:''}${t.resp&&t.prazo?' · ':''}${t.prazo?'📅 '+fmtDate(t.prazo):''}</div>`:''}
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button onclick="editarTarefa(${procId},${t.id})" style="background:white;border:1.5px solid #E2E8F0;border-radius:8px;cursor:pointer;font-size:13px;padding:4px 9px;line-height:1;transition:all 0.15s" title="Editar">✏️</button>
+        <button onclick="excluirTarefa(${procId},${t.id})" style="background:#DC2626;border:1.5px solid #DC2626;border-radius:8px;cursor:pointer;font-size:12px;padding:4px 9px;line-height:1;color:white;transition:all 0.15s" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+      </div>
+    </div>`).join('')}`;
+}
+
+function adicionarTarefa(procId) {
+  document.getElementById('tarefa-proc-id').value = procId;
+  document.getElementById('tarefa-edit-id').value = '';
+  document.getElementById('modal-tarefa-title').textContent = 'Nova Tarefa';
+  document.getElementById('tarefa-texto').value = '';
+  document.getElementById('tarefa-prazo').value = '';
+  document.getElementById('tarefa-resp').value = '';
+  closeModal('modal-detalhe');
+  openModal('modal-tarefa', false);
+}
+function editarTarefa(procId, tarefaId) {
+  const t = getChecklist(procId).find(t=>t.id===tarefaId); if(!t) return;
+  document.getElementById('tarefa-proc-id').value = procId;
+  document.getElementById('tarefa-edit-id').value = tarefaId;
+  document.getElementById('modal-tarefa-title').textContent = 'Editar Tarefa';
+  document.getElementById('tarefa-texto').value = t.texto||'';
+  document.getElementById('tarefa-prazo').value = t.prazo||'';
+  document.getElementById('tarefa-resp').value = t.resp||'';
+  closeModal('modal-detalhe');
+  openModal('modal-tarefa', false);
+}
+function salvarTarefa() {
+  const procId = parseInt(document.getElementById('tarefa-proc-id').value);
+  const texto = document.getElementById('tarefa-texto').value.trim();
+  const editId = document.getElementById('tarefa-edit-id').value;
+  if(!texto) { showToast('Descreva a tarefa.','error'); return; }
+  if(!store.checklist) store.checklist = {};
+  if(!store.checklist[procId]) store.checklist[procId] = [];
+  if(editId) {
+    const t = store.checklist[procId].find(t=>t.id==editId);
+    if(t) { t.texto=texto; t.prazo=document.getElementById('tarefa-prazo').value; t.resp=document.getElementById('tarefa-resp').value.trim(); }
+    showToast('Tarefa atualizada!','success');
+  } else {
+    if(!store.nextId.tarefa) store.nextId.tarefa = 1;
+    store.checklist[procId].push({ id:store.nextId.tarefa++, texto, prazo:document.getElementById('tarefa-prazo').value, resp:document.getElementById('tarefa-resp').value.trim(), feita:false, criada:today() });
+    showToast('✅ Tarefa adicionada!','success');
+  }
+  saveData(); closeModal('modal-tarefa');
+  setTimeout(()=>verDetalhe(procId), 100);
+}
+
+function toggleTarefa(procId, tarefaId, feita) {
+  const t = getChecklist(procId).find(t=>t.id===tarefaId);
+  if(t) { t.feita = feita; t.feita_em = feita ? today() : null; }
+  saveData();
+  const el = document.getElementById('checklist-'+procId);
+  if(el) el.innerHTML = renderChecklistHTML(procId);
+}
+
+function excluirTarefa(procId, tarefaId) {
+  store.checklist[procId] = store.checklist[procId].filter(t=>t.id!==tarefaId);
+  saveData();
+  const el = document.getElementById('checklist-'+procId);
+  if(el) el.innerHTML = renderChecklistHTML(procId);
+}
+
+// ==================== INTIMAÇÕES ====================
+const INTIM_PRAZOS = {
+  recursal:15, contestacao:15, apelacao:15,
+  embargos:5, impugnacao:15, manifestacao:15
+};
+
+function getIntimacoes(procId) {
+  if(!store.intimacoes) store.intimacoes = {};
+  if(!store.intimacoes[procId]) store.intimacoes[procId] = [];
+  return store.intimacoes[procId];
+}
+
+function renderIntimacoesHTML(procId) {
+  const intims = getIntimacoes(procId);
+  if(!intims.length) return `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:12px;background:var(--surface);border-radius:var(--radius)">Nenhuma intimação registrada. Clique em "+ Intimação" para adicionar.</div>`;
+  const hoje = today();
+  return intims.slice().sort((a,b)=>b.data.localeCompare(a.data)).map(i => {
+    const dias = i.prazoFinal ? Math.ceil((new Date(i.prazoFinal)-new Date())/(1000*60*60*24)) : null;
+    const vencida = i.prazoFinal && i.prazoFinal < hoje;
+    const urgente = !vencida && dias !== null && dias <= 5;
+    const cor = vencida ? 'var(--danger)' : urgente ? '#92400E' : 'var(--text-muted)';
+    const bg = vencida ? '#FFF5F5' : urgente ? '#FEF3C7' : 'var(--surface)';
+    return `<div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:${bg}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div style="font-weight:500;font-size:13px">${i.descricao||i.tipo}</div>
+        ${i.prazoFinal?`<span style="font-size:11px;font-weight:600;color:${cor};white-space:nowrap;margin-left:8px">${vencida?'⚠️ Vencido':urgente?'🔴 '+dias+'d restantes':'📅 '+dias+'d restantes'}</span>`:''}
+      </div>
+      <div style="font-size:11.5px;color:var(--text-muted)">
+        📨 Intimado em ${fmtDate(i.data)}
+        ${i.prazoFinal?` · Prazo final: <strong style="color:${cor}">${fmtDate(i.prazoFinal)}</strong>`:''}
+        ${i.tipo&&i.descricao?' · '+i.tipo:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirNovaIntimacao(procId) {
+  document.getElementById('intim-proc-id').value = procId;
+  document.getElementById('intim-tipo').value = '';
+  document.getElementById('intim-descricao').value = '';
+  document.getElementById('intim-data').value = today();
+  document.getElementById('intim-prazo-final').value = '';
+  document.getElementById('intim-aviso').style.display = 'none';
+  document.getElementById('intim-dias-bloco').style.display = 'none';
+  openModal('modal-intimacao', false);
+}
+
+function intimacaoCalcPrazo() {
+  const tipo = document.getElementById('intim-tipo').value;
+  const data = document.getElementById('intim-data').value;
+  const diasBloco = document.getElementById('intim-dias-bloco');
+  const diasInput = parseInt(document.getElementById('intim-dias').value)||0;
+  if(diasBloco) diasBloco.style.display = tipo==='personalizado' ? 'block' : 'none';
+  if(!tipo || !data) return;
+  const dias = tipo==='personalizado' ? diasInput : (INTIM_PRAZOS[tipo]||15);
+  if(!dias) return;
+  const dtFim = new Date(data+'T12:00:00');
+  dtFim.setDate(dtFim.getDate()+dias);
+  // Ajustar fim de semana
+  while(dtFim.getDay()===0||dtFim.getDay()===6) dtFim.setDate(dtFim.getDate()+1);
+  const fimStr = dtFim.toISOString().split('T')[0];
+  document.getElementById('intim-prazo-final').value = fimStr;
+  // Aviso
+  const avisoEl = document.getElementById('intim-aviso');
+  const diasRestantes = Math.ceil((dtFim-new Date())/(1000*60*60*24));
+  if(avisoEl) {
+    if(diasRestantes<0){ avisoEl.textContent='⚠️ Prazo já vencido há '+Math.abs(diasRestantes)+'dia(s)!'; avisoEl.style.cssText='display:block;padding:8px 12px;border-radius:var(--radius);font-size:12.5px;font-weight:500;background:#FEE2E2;color:var(--danger)'; }
+    else if(diasRestantes<=5){ avisoEl.textContent='🔴 URGENTE: '+diasRestantes+' dia(s) restantes!'; avisoEl.style.cssText='display:block;padding:8px 12px;border-radius:var(--radius);font-size:12.5px;font-weight:500;background:#FEE2E2;color:var(--danger)'; }
+    else if(diasRestantes<=10){ avisoEl.textContent='🟡 Atenção: '+diasRestantes+' dias restantes.'; avisoEl.style.cssText='display:block;padding:8px 12px;border-radius:var(--radius);font-size:12.5px;font-weight:500;background:#FEF3C7;color:#92400E'; }
+    else avisoEl.style.display='none';
+  }
+}
+
+function salvarIntimacao() {
+  const procId = parseInt(document.getElementById('intim-proc-id').value);
+  const tipo = document.getElementById('intim-tipo').value;
+  const data = document.getElementById('intim-data').value;
+  const prazoFinal = document.getElementById('intim-prazo-final').value;
+  const descricao = document.getElementById('intim-descricao').value.trim();
+  const criarEvento = document.getElementById('intim-criar-evento').value;
+  const fatal = document.getElementById('intim-fatal').value === 'sim';
+  if(!tipo||!data) { showToast('Preencha o tipo e a data da intimação.','error'); return; }
+  if(!store.intimacoes) store.intimacoes = {};
+  if(!store.intimacoes[procId]) store.intimacoes[procId] = [];
+  if(!store.nextId.intimacao) store.nextId.intimacao = 1;
+
+  // Verificar se é edição
+  const editId = document.getElementById('intim-proc-id').dataset.editId;
+  if(editId) {
+    const existing = store.intimacoes[procId].find(i=>i.id==editId);
+    if(existing) {
+      Object.assign(existing, { tipo, data, prazoFinal, descricao, fatal });
+      delete document.getElementById('intim-proc-id').dataset.editId;
+      saveData(); closeModal('modal-intimacao');
+      showToast('📨 Intimação atualizada!','success');
+      updateDashboard();
+      setTimeout(()=>verDetalhe(procId), 150);
+      return;
+    }
+  }
+
+  const nova = { id: store.nextId.intimacao++, tipo, data, prazoFinal, descricao, fatal, cumprido: false, criada: today() };
+  store.intimacoes[procId].push(nova);
+  // Criar evento na agenda automaticamente
+  if(criarEvento==='sim' && prazoFinal) {
+    const proc = store.processos.find(p=>p.id===procId);
+    const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+    if(!store.nextId.evento) store.nextId.evento=1;
+    store.eventos.push({
+      id: store.nextId.evento++, tipo: 'prazo',
+      titulo: (fatal?'🚨 FATAL: ':'⏰ Prazo: ')+(descricao||tipo)+' — '+(proc?.numero||''),
+      data: prazoFinal, prioridade: 'urgente', processoId: procId,
+      obs: (fatal?'⚠️ PRAZO FATAL — IMPRORROGÁVEL\n':'')+'Gerado via intimação de '+fmtDate(data),
+      autor: session.nome||session.email||'—'
+    });
+  }
+  registrarAuditoria('criou','processo','Intimação'+(fatal?' FATAL':'')+' registrada','Prazo: '+fmtDate(prazoFinal));
+  saveData(); closeModal('modal-intimacao');
+  showToast('📨 Intimação registrada'+(criarEvento==='sim'?' e prazo criado na agenda!':'!')+(fatal?' ⚠️ Marcada como FATAL!':''),'success');
+  updateDashboard();
+  setTimeout(()=>verDetalhe(procId), 150);
+}
+
+// ==================== PRAZOS FATAIS ====================
+function getPrazosFatais() {
+  if(!store.intimacoes) return [];
+  const hoje = today();
+  const d3 = new Date(); d3.setDate(d3.getDate()+3); const d3s = d3.toISOString().split('T')[0];
+  const fatais = [];
+  Object.entries(store.intimacoes).forEach(([procId, intims]) => {
+    intims.filter(i => i.fatal && !i.cumprido && i.prazoFinal).forEach(i => {
+      const dias = Math.ceil((new Date(i.prazoFinal)-new Date())/(1000*60*60*24));
+      if(i.prazoFinal <= d3s) { // vencido ou até 3 dias
+        const proc = store.processos.find(p=>p.id===parseInt(procId))||{numero:'—'};
+        const c = store.clientes.find(c=>c.id===proc.clienteId)||{nome:'—'};
+        fatais.push({ ...i, procId:parseInt(procId), proc, c, dias });
+      }
+    });
+  });
+  return fatais.sort((a,b)=>(a.prazoFinal||'').localeCompare(b.prazoFinal||''));
+}
+
+function renderAlertaFatais() {
+  const fatais = getPrazosFatais();
+  const bloco = document.getElementById('dash-alerta-fatal');
+  const lista = document.getElementById('dash-fatal-lista');
+  const sub = document.getElementById('dash-fatal-sub');
+  if(!bloco || !lista) return;
+  if(!fatais.length) { bloco.style.display='none'; return; }
+  bloco.style.display = 'block';
+  const vencidos = fatais.filter(f=>f.dias<0).length;
+  const hoje = fatais.filter(f=>f.dias===0).length;
+  const proximos = fatais.filter(f=>f.dias>0).length;
+  if(sub) sub.textContent = `${fatais.length} prazo(s) fatal(is) crítico(s)${vencidos?' · '+vencidos+' já vencido(s)':''}${hoje?' · '+hoje+' vence hoje':''}`;
+  lista.innerHTML = fatais.map(f => {
+    const diasLabel = f.dias < 0 ? `VENCIDO há ${Math.abs(f.dias)}d` : f.dias===0 ? 'VENCE HOJE' : `Vence em ${f.dias}d`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 12px">
+      <div>
+        <strong>${f.proc.numero}</strong> — ${f.c.nome}
+        <div style="font-size:11.5px;opacity:0.85">${f.descricao||f.tipo} · Prazo: ${fmtDate(f.prazoFinal)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap">${diasLabel}</span>
+        <button onclick="marcarIntimacaoCumprida(${f.procId},${f.id})" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:white;cursor:pointer;padding:4px 10px;font-size:12px" title="Marcar como cumprido">✅ Cumprido</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editarIntimacao(procId, intimId) {
+  const i = getIntimacoes(procId).find(i=>i.id===intimId); if(!i) return;
+  document.getElementById('intim-proc-id').value = procId;
+  document.getElementById('intim-tipo').value = i.tipo||'';
+  document.getElementById('intim-descricao').value = i.descricao||'';
+  document.getElementById('intim-data').value = i.data||'';
+  document.getElementById('intim-prazo-final').value = i.prazoFinal||'';
+  document.getElementById('intim-fatal').value = i.fatal?'sim':'nao';
+  document.getElementById('intim-criar-evento').value = 'nao';
+  document.getElementById('intim-dias-bloco').style.display = i.tipo==='personalizado'?'block':'none';
+  // Guardar id para edição
+  document.getElementById('intim-proc-id').dataset.editId = intimId;
+  closeModal('modal-detalhe');
+  openModal('modal-intimacao', false);
+}
+
+function excluirIntimacao(procId, intimId) {
+  if(!confirm('Excluir esta intimação?')) return;
+  store.intimacoes[procId] = store.intimacoes[procId].filter(i=>i.id!==intimId);
+  saveData(); updateDashboard();
+  showToast('Intimação excluída.','success');
+  setTimeout(()=>verDetalhe(procId), 150);
+}
+function marcarIntimacaoCumprida(procId, intimId) {
+  if(!store.intimacoes?.[procId]) return;
+  const i = store.intimacoes[procId].find(i=>i.id===intimId);
+  if(!i) return;
+  i.cumprido = true;
+  i.cumpridoEm = today();
+  saveData(); updateDashboard();
+  showToast('✅ Prazo marcado como cumprido!','success');
+  setTimeout(()=>verDetalhe(procId), 150);
+}
+
+// ==================== HISTÓRICO DE PRAZOS CUMPRIDOS ====================
+function renderHistoricoPrazosHTML(procId) {
+  const intims = getIntimacoes(procId);
+  const cumpridos = intims.filter(i=>i.cumprido);
+  const pendentes = intims.filter(i=>!i.cumprido);
+  if(!intims.length) return '';
+
+  const hoje = today();
+  return `
+    <div style="margin-bottom:20px">
+      ${pendentes.length ? pendentes.map(i=>{
+        const dias = i.prazoFinal ? Math.ceil((new Date(i.prazoFinal)-new Date())/(1000*60*60*24)) : null;
+        const vencida = i.prazoFinal && i.prazoFinal < hoje;
+        const cor = i.fatal ? (vencida?'var(--danger)':dias!==null&&dias<=3?'var(--danger)':'#92400E') : (vencida?'var(--danger)':dias!==null&&dias<=5?'#92400E':'var(--text-muted)');
+        const bg = i.fatal ? (vencida||dias<=3?'#FFF5F5':'#FEF3C7') : (vencida?'#FFF5F5':'var(--surface)');
+        return `<div style="padding:10px 12px;border:1.5px solid ${i.fatal?'#FCA5A5':'var(--border)'};border-radius:var(--radius);margin-bottom:8px;background:${bg}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="flex:1;min-width:0">
+              ${i.fatal?'<span style="background:var(--danger);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-right:6px">FATAL</span>':''}
+              <strong style="font-size:13px">${i.descricao||i.tipo}</strong>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">
+                📨 ${fmtDate(i.data)}${i.prazoFinal?' · Prazo: <strong style="color:'+cor+'">'+fmtDate(i.prazoFinal)+'</strong>':''}
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              ${i.prazoFinal?`<span style="font-size:11px;font-weight:700;color:${cor};white-space:nowrap">${vencida?'⚠️ Vencido':dias===0?'🔴 Hoje':'📅 '+dias+'d'}</span>`:''}
+              <button onclick="editarIntimacao(${procId},${i.id})" class="btn btn-outline btn-sm" style="font-size:10px;padding:2px 7px" title="Editar">✏️</button>
+              <button onclick="marcarIntimacaoCumprida(${procId},${i.id})" class="btn btn-outline btn-sm" style="font-size:10px;padding:2px 7px" title="Marcar cumprido">✅</button>
+              <button onclick="excluirIntimacao(${procId},${i.id})" class="btn btn-danger btn-sm" style="font-size:10px;padding:2px 7px" title="Excluir">🗑</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('') : `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:16px;background:var(--surface);border-radius:var(--radius)">Nenhuma intimação pendente.</div>`}
+
+      ${cumpridos.length ? `
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--success);font-weight:600;padding:4px 0">
+          ✅ ${cumpridos.length} prazo(s) cumprido(s) — clique para ver histórico
+        </summary>
+        <div style="margin-top:8px;padding-left:8px;border-left:2px solid var(--success)">
+          ${cumpridos.map(i=>`
+          <div style="padding:8px 10px;margin-bottom:6px;font-size:12.5px;background:var(--success-bg);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:500;color:var(--success)">✅ ${i.descricao||i.tipo}</div>
+              <div style="color:var(--text-muted);font-size:11px;margin-top:2px">
+                Intimado: ${fmtDate(i.data)} · Prazo: ${fmtDate(i.prazoFinal)} · Cumprido em: ${fmtDate(i.cumpridoEm)}
+              </div>
+            </div>
+            <button onclick="excluirIntimacao(${procId},${i.id})" class="btn btn-danger btn-sm" style="font-size:10px;padding:2px 7px" title="Excluir">🗑</button>
+          </div>`).join('')}
+        </div>
+      </details>` : ''}
+    </div>`;
+}
+const ETAPAS_PROCESSO = [
+  { label:'Petição\nInicial',    icon:'📝' },
+  { label:'Citação',             icon:'📨' },
+  { label:'Contestação',         icon:'⚖️' },
+  { label:'Instrução',           icon:'🔍' },
+  { label:'Audiência',           icon:'🎙️' },
+  { label:'Sentença',            icon:'📋' },
+  { label:'Recurso',             icon:'🔄' },
+  { label:'Trânsito\nem Julgado',icon:'✅' }
+];
+
+function renderPipelineHTML(processoId, etapaAtual) {
+  return `<div class="pipeline">
+    ${ETAPAS_PROCESSO.map((e,i) => {
+      const cls = i < etapaAtual ? 'done' : i === etapaAtual ? 'active' : 'futura';
+      return `<div class="pipeline-step ${cls}" onclick="avancarEtapa(${processoId},${i})" title="Definir como: ${e.label.replace('\n',' ')}">
+        <div class="pipeline-dot">${i < etapaAtual ? '✓' : i === etapaAtual ? e.icon : String(i+1)}</div>
+        <div class="pipeline-label">${e.label}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div style="text-align:center;font-size:11.5px;color:var(--text-muted);margin-top:2px">
+    Clique em uma etapa para avançar ou retroceder
+  </div>`;
+}
+
+function avancarEtapa(processoId, etapaIdx) {
+  const p = store.processos.find(p=>p.id===processoId); if(!p) return;
+  p.etapa = etapaIdx;
+  // Registrar no andamento automaticamente
+  const etapa = ETAPAS_PROCESSO[etapaIdx];
+  if(!store.andamentos[processoId]) store.andamentos[processoId] = [];
+  const session = JSON.parse(localStorage.getItem(LOGIN_KEY)||'{}');
+  const now = new Date();
+  store.andamentos[processoId].push({
+    data: today(),
+    hora: now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    autor: session.nome||session.email||'—',
+    texto: `Etapa atualizada para: ${etapa.icon} ${etapa.label.replace('\n',' ')}`,
+    status: p.status
+  });
+  saveData();
+  // Atualizar pipeline e andamentos no modal sem fechar
+  const pipelineEl = document.querySelector('.pipeline');
+  if(pipelineEl && pipelineEl.parentElement) {
+    pipelineEl.outerHTML = renderPipelineHTML(processoId, etapaIdx)
+      .split('</div>\n  <div style')[0] + '</div>';
+  }
+  registrarAuditoria('editou','processo','Etapa: '+etapa.label.replace('\n',' '),'Processo: '+p.numero);
+  showToast('Etapa atualizada: '+etapa.label.replace('\n',' '),'success');
+  // Reabrir detalhe para atualizar
+  closeModal('modal-detalhe');
+  setTimeout(()=>verDetalhe(processoId),100);
+}
+
+// ==================== DOCUMENTOS POR CLIENTE ====================
+function getDocsCliente(clienteId) {
+  if(!store.docsCliente) store.docsCliente = {};
+  if(!store.docsCliente[clienteId]) store.docsCliente[clienteId] = [];
+  return store.docsCliente[clienteId];
+}
+
+function abrirDocumentosCliente(clienteId) {
+  const c = store.clientes.find(c=>c.id===clienteId); if(!c) return;
+  document.getElementById('modal-docs-cliente-title').textContent = `📁 Documentos — ${c.nome}`;
+  document.getElementById('docs-cliente-sub').textContent = c.cpf ? 'CPF: '+c.cpf : '';
+  document.getElementById('docs-cliente-id').value = clienteId;
+  filtrarDocsCliente('');
+  openModal('modal-docs-cliente', false);
+}
+
+function handleDocClienteFiles(files) {
+  const clienteId = parseInt(document.getElementById('docs-cliente-id').value);
+  if(!files || !files.length) return;
+  let count = 0;
+  Array.from(files).forEach(file => {
+    if(file.size > 5*1024*1024) { showToast(file.name+': muito grande (máx 5MB).','error'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const docs = getDocsCliente(clienteId);
+      const ext = file.name.split('.').pop().toLowerCase();
+      const tipo = ['pdf'].includes(ext)?'pdf':['jpg','jpeg','png','gif','webp'].includes(ext)?'img':'outro';
+      // Detectar categoria pelo nome do arquivo
+      const nome = file.name.toLowerCase();
+      let categoria = 'outros';
+      if(nome.includes('rg')||nome.includes('cnh')||nome.includes('identidade')) categoria='rg';
+      else if(nome.includes('cpf')) categoria='cpf';
+      else if(nome.includes('procura')) categoria='procuracao';
+      else if(nome.includes('contrato')) categoria='contrato';
+      else if(nome.includes('comprova')||nome.includes('resid')) categoria='comprovante';
+      if(!store.nextId.docCliente) store.nextId.docCliente=1;
+      docs.push({ id:store.nextId.docCliente++, nome:file.name, categoria, tipo, data:today(), tamanho:file.size, conteudo:e.target.result });
+      count++;
+      saveData(); renderDocClienteLista(clienteId);
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('doc-cliente-file').value='';
+  showToast('Documento(s) adicionado(s)!','success');
+}
+
+function handleDocClienteDrop(event) {
+  const files = event.dataTransfer.files;
+  handleDocClienteFiles(files);
+}
+
+let _dcliFilter = '';
+function filtrarDocsCliente(cat) {
+  _dcliFilter = cat;
+  document.querySelectorAll('[id^="dcli-filtro-"]').forEach(b => b.className='btn btn-outline btn-sm');
+  const ativo = cat===''?'dcli-filtro-todos':cat==='rg'?'dcli-filtro-rg':cat==='cpf'?'dcli-filtro-cpf':cat==='procuracao'?'dcli-filtro-proc':cat==='contrato'?'dcli-filtro-cont':cat==='comprovante'?'dcli-filtro-comp':'dcli-filtro-out';
+  const el = document.getElementById(ativo);
+  if(el) el.className = 'btn btn-primary btn-sm';
+  const clienteId = parseInt(document.getElementById('docs-cliente-id')?.value);
+  if(clienteId) renderDocClienteLista(clienteId);
+}
+
+function renderDocClienteLista(clienteId) {
+  let docs = getDocsCliente(clienteId);
+  if(_dcliFilter) docs = docs.filter(d=>d.categoria===_dcliFilter);
+  const lista = document.getElementById('docs-cliente-lista');
+  const contador = document.getElementById('docs-cliente-contador');
+  if(contador) contador.textContent = getDocsCliente(clienteId).length+' documento(s)';
+  if(!lista) return;
+  if(!docs.length) {
+    lista.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px 0">Nenhum documento encontrado.</div>';
+    return;
+  }
+  const CATS = { rg:'🪪 RG/CNH', cpf:'📋 CPF', procuracao:'✍️ Procuração', contrato:'📄 Contrato', comprovante:'🏠 Comprovante', outros:'📁 Outros' };
+  const ICONS = { pdf:'📄', img:'🖼️', outro:'📎' };
+  lista.innerHTML = docs.map(d => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:var(--surface);transition:background 0.1s" onmouseover="this.style.background='var(--blue-50)'" onmouseout="this.style.background='var(--surface)'">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">${ICONS[d.tipo]||'📎'}</span>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text-primary)">${d.nome}</div>
+          <div style="font-size:11.5px;color:var(--text-muted)">${CATS[d.categoria]||d.categoria||'—'} · ${fmtDate(d.data)} ${d.tamanho?'· '+Math.round(d.tamanho/1024)+'KB':''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="downloadDocCliente(${clienteId},${d.id})" title="Download">⬇️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirDocCliente(${clienteId},${d.id})" title="Excluir">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function uploadDocCliente() {
+  document.getElementById('doc-cliente-file').click();
+}
+
+function downloadDocCliente(clienteId, docId) {
+  const doc = getDocsCliente(clienteId).find(d=>d.id===docId);
+  if(!doc) return;
+  const a = document.createElement('a');
+  a.href = doc.conteudo; a.download = doc.nome; a.click();
+}
+
+function excluirDocCliente(clienteId, docId) {
+  if(!confirm('Excluir este documento?')) return;
+  store.docsCliente[clienteId] = store.docsCliente[clienteId].filter(d=>d.id!==docId);
+  saveData(); renderDocClienteLista(clienteId);
+  const contador = document.getElementById('docs-cliente-contador');
+  if(contador) contador.textContent = getDocsCliente(clienteId).length+' documento(s)';
+  showToast('Documento excluído.');
+}
+function abrirReagendar(id) {
+  const p = store.parcelas.find(p=>p.id===id); if(!p) return;
+  const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+  const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+  document.getElementById('reagendar-id').value = id;
+  document.getElementById('reagendar-nova-data').value = p.vencimento||'';
+  document.getElementById('reagendar-motivo').value = '';
+  document.getElementById('reagendar-info').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div style="font-size:11px;color:var(--text-muted)">Cliente</div><strong>${c.nome}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Processo</div><strong style="color:var(--blue-600)">${pr.numero}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Parcela</div><strong>${p.num}/${p.total}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Vencimento atual</div><strong style="color:var(--warning)">${fmtDate(p.vencimento)}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Valor</div><strong>${fmtMoney(p.valor)}</strong></div>
+    </div>`;
+  openModal('modal-reagendar', false);
+}
+function confirmarReagendar() {
+  const id = parseInt(document.getElementById('reagendar-id').value);
+  const novaData = document.getElementById('reagendar-nova-data').value;
+  const motivo = document.getElementById('reagendar-motivo').value.trim();
+  if(!novaData) { showToast('Informe a nova data de vencimento.','error'); return; }
+  const p = store.parcelas.find(p=>p.id===id); if(!p) return;
+  const dataAntiga = p.vencimento;
+  p.vencimento = novaData;
+  p.status = 'pendente'; // Reativar se estava vencido
+  if(motivo) p.obs = (p.obs?p.obs+' | ':'')+'Reagendado de '+fmtDate(dataAntiga)+': '+motivo;
+  saveData(); closeModal('modal-reagendar'); renderParcelas(); renderFinVisao();
+  registrarAuditoria('editou','financeiro','Parcela reagendada: '+fmtDate(dataAntiga)+' → '+fmtDate(novaData), motivo||'');
+  showToast('📅 Parcela reagendada para '+fmtDate(novaData)+'!','success');
+}
+
+// ==================== DESCONTO / ACRÉSCIMO ====================
+function abrirDescontoAcrescimo(id) {
+  const p = store.parcelas.find(p=>p.id===id); if(!p) return;
+  const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+  const pr = store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'};
+  document.getElementById('da-parcela-id').value = id;
+  document.getElementById('da-tipo').value = 'desconto';
+  document.getElementById('da-modalidade').value = 'percentual';
+  document.getElementById('da-valor-input').value = '';
+  document.getElementById('da-novo-valor').value = fmtMoney(p.valor);
+  document.getElementById('da-obs').value = '';
+  document.getElementById('da-valor-label').textContent = 'Percentual (%)';
+  document.getElementById('da-info').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div style="font-size:11px;color:var(--text-muted)">Cliente</div><strong>${c.nome}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Processo</div><strong style="color:var(--blue-600)">${pr.numero}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Parcela</div><strong>${p.num}/${p.total}</strong></div>
+      <div><div style="font-size:11px;color:var(--text-muted)">Valor original</div><strong>${fmtMoney(p.valor)}</strong></div>
+    </div>`;
+  openModal('modal-desconto-acrescimo', false);
+}
+function calcularDA() {
+  const id = parseInt(document.getElementById('da-parcela-id').value);
+  const p = store.parcelas.find(p=>p.id===id); if(!p) return;
+  const tipo = document.getElementById('da-tipo').value;
+  const modalidade = document.getElementById('da-modalidade').value;
+  const input = parseFloat(document.getElementById('da-valor-input').value)||0;
+  const labelEl = document.getElementById('da-valor-label');
+  if(labelEl) labelEl.textContent = modalidade==='percentual' ? 'Percentual (%)' : 'Valor fixo (R$)';
+  let novoValor = p.valor;
+  if(input > 0) {
+    const ajuste = modalidade==='percentual' ? p.valor*(input/100) : input;
+    novoValor = tipo==='desconto' ? Math.max(0, p.valor-ajuste) : p.valor+ajuste;
+  }
+  const el = document.getElementById('da-novo-valor');
+  if(el) {
+    el.value = fmtMoney(novoValor);
+    el.style.color = tipo==='desconto' ? 'var(--success)' : 'var(--danger)';
+  }
+}
+function confirmarDA() {
+  const id = parseInt(document.getElementById('da-parcela-id').value);
+  const p = store.parcelas.find(p=>p.id===id); if(!p) return;
+  const tipo = document.getElementById('da-tipo').value;
+  const modalidade = document.getElementById('da-modalidade').value;
+  const input = parseFloat(document.getElementById('da-valor-input').value)||0;
+  const obs = document.getElementById('da-obs').value.trim();
+  if(!input) { showToast('Informe o valor do desconto ou acréscimo.','error'); return; }
+  const ajuste = modalidade==='percentual' ? p.valor*(input/100) : input;
+  const valorOriginal = p.valor;
+  const tipoLabel = {desconto:'Desconto', acrescimo:'Acréscimo', juros:'Juros'}[tipo]||tipo;
+  p.valorOriginal = p.valorOriginal || p.valor; // guardar original
+  p.valor = tipo==='desconto' ? Math.max(0, p.valor-ajuste) : p.valor+ajuste;
+  p.valor = parseFloat(p.valor.toFixed(2));
+  const descricao = tipoLabel+(modalidade==='percentual'?' de '+input+'%':' de '+fmtMoney(ajuste));
+  p.obs = (p.obs?p.obs+' | ':'')+descricao+(obs?' — '+obs:'');
+  saveData(); closeModal('modal-desconto-acrescimo'); renderParcelas(); renderFinVisao();
+  registrarAuditoria('editou','financeiro',descricao+' aplicado na parcela '+p.num+'/'+p.total,'De '+fmtMoney(valorOriginal)+' para '+fmtMoney(p.valor));
+  showToast('💱 '+descricao+' aplicado! Novo valor: '+fmtMoney(p.valor),'success');
+}
 function updateDashboard() {
+  renderAlertaFatais();
   const ativos = store.processos.filter(p => p.status === 'andamento').length;
   document.getElementById('dash-ativos').textContent = ativos;
   document.getElementById('dash-clientes').textContent = store.clientes.length;
@@ -7727,36 +9693,7 @@ function renderTopClientes() {
   }).join('');
 }
 
-function renderInadimplencia() {
-  const el = document.getElementById('inadimplencia-container');
-  if(!el) return;
-  const vencidas = store.parcelas.filter(p => p.status !== 'pago' && isVencido(p.vencimento));
-  if(!vencidas.length) { el.innerHTML = '<div class="alert alert-success">✅ Sem inadimplência no momento.</div>'; return; }
-
-  // Agrupar por cliente
-  const porCliente = {};
-  vencidas.forEach(p => {
-    const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—', id:0};
-    if(!porCliente[c.id]) porCliente[c.id] = { nome: c.nome, total: 0, qtd: 0 };
-    porCliente[c.id].total += p.valor;
-    porCliente[c.id].qtd++;
-  });
-
-  const totalGeral = vencidas.reduce((s,p) => s+p.valor, 0);
-  const lista = Object.values(porCliente).sort((a,b) => b.total - a.total).slice(0,5);
-
-  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--danger-bg);border-radius:var(--radius);margin-bottom:12px">
-    <span style="font-size:13px;font-weight:600;color:var(--danger)">Total Vencido</span>
-    <span style="font-size:15px;font-weight:700;color:var(--danger)">${fmtMoney(totalGeral)}</span>
-  </div>` + lista.map(c => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <div>
-        <div style="font-weight:500">${c.nome}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${c.qtd} parcela(s) em atraso</div>
-      </div>
-      <span style="font-weight:700;color:var(--danger)">${fmtMoney(c.total)}</span>
-    </div>`).join('');
-}
+// renderInadimplencia legacy removida (duplicata)
 // Helpers de período relatório
 function relPeriodoMesAtual() {
   const hoje = new Date(); const y=hoje.getFullYear(); const m=String(hoje.getMonth()+1).padStart(2,'0');
@@ -8252,6 +10189,7 @@ function entrarNoSistema() {
     screen.style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'flex';
     aplicarPermissoes();
+    iniciarDarkMode();
     // Onboarding: só abre se tiver sessão ativa E nunca tiver sido concluído
     try {
       if(localStorage.getItem(LOGIN_KEY) && !localStorage.getItem(OBD_KEY)) {
@@ -8413,7 +10351,9 @@ function checkLogin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-wrapper').style.display = 'flex';
   aplicarPermissoes();
+  iniciarDarkMode();
   carregarLembrar();
+  setTimeout(() => updateDashboard(), 100);
   // Verificar sessão Supabase em segundo plano
   getSB().then(sb => {
     if(sb && sb.auth) {
@@ -8449,13 +10389,11 @@ function checkLogin() {
 
 // ==================== INIT ====================
 function init() {
+  normalizarStore();
   checkLogin();
+  iniciarDarkMode();
   const now = new Date();
   document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  if(!store.eventos) store.eventos = [];
-  if(!store.nextId.evento) store.nextId.evento = 1;
-  if(!store.documentos) store.documentos = {};
-  if(!store.nextId.doc) store.nextId.doc = 1;
   updateDashboard();
   atualizarBadgeAgenda();
   gerarNotificacoesAutomaticas();
@@ -8548,16 +10486,8 @@ async function initWithSupabase() {
     showToast('⚠️ Erro de conexão — dados locais carregados.', '');
   }
 
-  // Garantir campos obrigatórios
-  if(!store.modelos)    store.modelos    = [];
-  if(!store.eventos)    store.eventos    = [];
-  if(!store.documentos) store.documentos = {};
-  if(!store.andamentos) store.andamentos = {};
-  if(!store.nextId)     store.nextId     = {};
-  if(!store.nextId.modelo) store.nextId.modelo = 1;
-  if(!store.nextId.evento) store.nextId.evento = 1;
-  if(!store.nextId.doc)    store.nextId.doc    = 1;
-
+  // Garantir campos obrigatórios via normalizarStore
+  normalizarStore();
   init();
 }
 
