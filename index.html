@@ -2134,16 +2134,24 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
             </div><!-- /card-body backup -->
           </div><!-- /card backup -->
-          <!-- ONBOARDING -->
+          <!-- ASSISTENTE DE CONFIGURAÇÃO -->
           <div class="card" style="margin-top:20px">
-            <div class="card-header"><span class="card-title">🎯 Configuração Inicial</span></div>
+            <div class="card-header"><span class="card-title">🎯 Assistente de Configuração</span></div>
             <div class="card-body">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
-                <div>
-                  <div style="font-size:14px;font-weight:600;margin-bottom:4px">Assistente de Configuração</div>
-                  <div style="font-size:12.5px;color:var(--text-secondary)">Reabra o guia de configuração inicial para revisar ou atualizar as configurações do escritório.</div>
-                </div>
-                <button class="btn btn-outline" onclick="iniciarOnboarding(true)" style="white-space:nowrap;flex-shrink:0">🎯 Reabrir</button>
+              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                O assistente guia você pela configuração inicial do sistema: dados do escritório, áreas de atuação, WhatsApp e PIX.
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="iniciarOnboarding(true)" style="display:flex;align-items:center;gap:8px">
+                  🎯 Rever Configuração
+                </button>
+                <button class="btn btn-outline" onclick="if(confirm('Reiniciar o assistente do zero? Os dados do escritório serão mantidos, mas você poderá reconfigurá-los.')) reiniciarOnboarding()" style="display:flex;align-items:center;gap:8px">
+                  🔄 Reiniciar do Zero
+                </button>
+              </div>
+              <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+                💡 <strong>Rever</strong> — abre o assistente de onde você parou.<br>
+                💡 <strong>Reiniciar</strong> — recomeça da etapa 1, útil se pulou etapas.
               </div>
             </div>
           </div>
@@ -5115,41 +5123,47 @@ document.addEventListener('click', e => {
 });
 
 // ==================== ONBOARDING ====================
-const OBD_KEY = 'lexpro_onboarding_done';
-const OBD_DADOS_KEY = 'lexpro_escritorio';
-const WPP_KEY = 'lexpro_wpp_config'; // declarado aqui para uso no onboarding
+const OBD_KEY      = 'lexpro_onboarding_done';
+const OBD_DADOS_KEY= 'lexpro_escritorio';
+const WPP_KEY      = 'lexpro_wpp_config';
 let obdStep = 1;
 const OBD_TOTAL = 5;
 const OBD_TIPOS_SUGERIDOS = [
-  { nome:'Trabalhista', area:'Trabalhista' },
-  { nome:'Previdenciário / INSS', area:'Previdenciário' },
-  { nome:'Cível', area:'Cível' },
-  { nome:'Criminal', area:'Criminal' },
-  { nome:'Família e Sucessões', area:'Família' },
-  { nome:'Consumidor', area:'Consumidor' },
-  { nome:'Tributário', area:'Tributário' },
-  { nome:'Administrativo', area:'Administrativo' }
+  { nome:'Trabalhista',           area:'Trabalhista',    icon:'⚒️' },
+  { nome:'Previdenciário / INSS', area:'Previdenciário', icon:'🏥' },
+  { nome:'Cível',                 area:'Cível',          icon:'⚖️' },
+  { nome:'Criminal',              area:'Criminal',       icon:'🔒' },
+  { nome:'Família e Sucessões',   area:'Família',        icon:'👨‍👩‍👧' },
+  { nome:'Consumidor',            area:'Consumidor',     icon:'🛒' },
+  { nome:'Tributário',            area:'Tributário',     icon:'📋' },
+  { nome:'Administrativo',        area:'Administrativo', icon:'🏛' }
 ];
 
 function iniciarOnboarding(forcar) {
-  // Segurança: nunca abre sem sessão ativa
   if(!localStorage.getItem(LOGIN_KEY)) return;
   if(!forcar && localStorage.getItem(OBD_KEY)) return;
   try {
     obdStep = 1;
     const el = document.getElementById('onboarding-screen');
-    if(el) { el.style.visibility = ''; el.style.display = 'flex'; }
+    if(el) { el.style.visibility=''; el.style.display='flex'; }
     renderObdStep();
   } catch(e) { fecharOnboarding(); }
 }
+
 function fecharOnboarding() {
-  try { localStorage.setItem(OBD_KEY, '1'); } catch(e) {}
+  try { localStorage.setItem(OBD_KEY,'1'); } catch(e) {}
   try {
     const el = document.getElementById('onboarding-screen');
-    if(el) { el.style.display = 'none'; el.style.visibility = 'hidden'; }
+    if(el) { el.style.display='none'; el.style.visibility='hidden'; }
   } catch(e) {}
-  try { showToast('Configuração concluída! Bem-vindo ao sistema. 🎉', 'success'); } catch(e) {}
+  try { showToast('Configuração concluída! Bem-vindo ao sistema. 🎉','success'); } catch(e) {}
 }
+
+function reiniciarOnboarding() {
+  try { localStorage.removeItem(OBD_KEY); } catch(e) {}
+  iniciarOnboarding(true);
+}
+
 function obdProximo() {
   if(!salvarObdStep()) return;
   if(obdStep >= OBD_TOTAL) { fecharOnboarding(); return; }
@@ -5162,123 +5176,169 @@ function obdAnterior() {
 function obdToggleTipo(i, label) {
   const cb = document.getElementById('obd-tipo-'+i);
   cb.checked = !cb.checked;
-  label.style.borderColor = cb.checked ? 'var(--navy)' : 'var(--border)';
-  label.style.background = cb.checked ? '#EEF2FF' : 'white';
+  label.style.borderColor = cb.checked ? 'var(--navy)' : '#E2E8F0';
+  label.style.background  = cb.checked ? '#EEF2FF'     : 'white';
+  label.style.boxShadow   = cb.checked ? '0 0 0 2px rgba(26,46,69,0.15)' : 'none';
 }
 function salvarObdStep() {
   if(obdStep === 2) {
     const nome = document.getElementById('obd-nome')?.value.trim();
     if(!nome) { showToast('Informe o nome do escritório.','error'); return false; }
     localStorage.setItem(OBD_DADOS_KEY, JSON.stringify({
-      nome, oab: document.getElementById('obd-oab')?.value.trim(),
-      tel: document.getElementById('obd-tel')?.value.trim(),
+      nome,
+      oab:      document.getElementById('obd-oab')?.value.trim(),
+      tel:      document.getElementById('obd-tel')?.value.trim(),
       endereco: document.getElementById('obd-endereco')?.value.trim(),
-      email: document.getElementById('obd-email')?.value.trim()
+      email:    document.getElementById('obd-email')?.value.trim()
     }));
   }
   if(obdStep === 3) {
     OBD_TIPOS_SUGERIDOS.forEach((t,i) => {
       const cb = document.getElementById('obd-tipo-'+i);
-      if(cb && cb.checked && !store.tipos.some(st=>st.nome===t.nome)) {
-        store.tipos.push({ id: store.nextId.tipo++, nome: t.nome, area: t.area, desc: '' });
-      }
+      if(cb && cb.checked && !store.tipos.some(st=>st.nome===t.nome))
+        store.tipos.push({ id:store.nextId.tipo++, nome:t.nome, area:t.area, desc:'' });
     });
     saveData();
   }
   if(obdStep === 4) {
     const cfg = (() => { try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}'); } catch(e){ return {}; } })();
-    cfg.numero = document.getElementById('obd-wpp')?.value.trim()||cfg.numero;
-    cfg.pix = document.getElementById('obd-pix')?.value.trim()||cfg.pix;
-    cfg.pixTipo = document.getElementById('obd-pix-tipo')?.value||cfg.pixTipo;
-    cfg.pixTitular = document.getElementById('obd-pix-titular')?.value.trim()||cfg.pixTitular;
+    cfg.numero     = document.getElementById('obd-wpp')?.value.trim()         || cfg.numero;
+    cfg.pix        = document.getElementById('obd-pix')?.value.trim()         || cfg.pix;
+    cfg.pixTipo    = document.getElementById('obd-pix-tipo')?.value           || cfg.pixTipo;
+    cfg.pixTitular = document.getElementById('obd-pix-titular')?.value.trim() || cfg.pixTitular;
     localStorage.setItem(WPP_KEY, JSON.stringify(cfg));
   }
   return true;
 }
+
 function renderObdStep() {
   try {
-  const progress = document.getElementById('obd-progress');
-  const btnBack = document.getElementById('obd-btn-back');
-  const btnNext = document.getElementById('obd-btn-next');
-  const content = document.getElementById('obd-content');
-  if(!content) return;
-  label.textContent = 'Etapa '+obdStep+' de '+OBD_TOTAL;
-  progress.style.width = Math.round((obdStep/OBD_TOTAL)*100)+'%';
-  btnBack.style.display = obdStep > 1 ? '' : 'none';
-  btnNext.textContent = obdStep === OBD_TOTAL ? '✅ Concluir' : 'Próximo →';
-  const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
-  const cfg = (() => { try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}'); } catch(e){ return {}; } })();
-  const tiposHtml = OBD_TIPOS_SUGERIDOS.map((t,i) => {
-    const icons = {Trabalhista:'⚒️',Previdenciário:'🏥',Cível:'⚖️',Criminal:'🔒',Família:'👨‍👩‍👧',Consumidor:'🛒',Tributário:'📋',Administrativo:'🏛'};
-    return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:13.5px;background:white" id="obd-tipo-label-${i}" onclick="obdToggleTipo(${i},this)">
-      <input type="checkbox" id="obd-tipo-${i}" style="accent-color:var(--navy);width:16px;height:16px" checked>
-      <span>${icons[t.area]||'⚖️'} ${t.nome}</span>
-    </label>`;
-  }).join('');
-  const steps = {
-    1: `<div style="text-align:center;padding:10px 0 20px">
-      <div style="width:72px;height:72px;background:var(--navy);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:700;color:var(--gold)">DV</div>
-      <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin:0 0 10px">Bem-vindo ao seu ERP!</h2>
-      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 24px">Vamos configurar o sistema em poucos passos. Isso levará menos de 3 minutos.</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${[['📋','Orçamentos e Propostas'],['⚖️','Gestão de Processos'],['💰','Controle Financeiro'],['📱','Cobranças via WhatsApp'],['📊','Relatórios e Métricas'],['🔔','Alertas de Prazos']].map(([ic,tx])=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;font-size:13px">
-        <span style="font-size:20px">${ic}</span><span style="color:var(--text-secondary)">${tx}</span>
-      </div>`).join('')}
-    </div>`,
-    2: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">🏛 Dados do Escritório</h3>
-      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Aparecem nos PDFs, propostas e contratos gerados pelo sistema.</p>
+    const labelEl  = document.getElementById('obd-step-label');
+    const progress = document.getElementById('obd-progress');
+    const btnBack  = document.getElementById('obd-btn-back');
+    const btnNext  = document.getElementById('obd-btn-next');
+    const ct       = document.getElementById('obd-content');
+    if(!ct) return;
+    if(labelEl)  labelEl.textContent = 'Etapa '+obdStep+' de '+OBD_TOTAL;
+    if(progress) progress.style.width = Math.round((obdStep/OBD_TOTAL)*100)+'%';
+    if(btnBack)  btnBack.style.display = obdStep > 1 ? '' : 'none';
+    if(btnNext)  btnNext.textContent   = obdStep === OBD_TOTAL ? '✅ Concluir' : 'Próximo →';
+
+    const dados = (() => { try { return JSON.parse(localStorage.getItem(OBD_DADOS_KEY)||'{}'); } catch(e){ return {}; } })();
+    const cfg   = (() => { try { return JSON.parse(localStorage.getItem(WPP_KEY)||'{}');        } catch(e){ return {}; } })();
+
+    const FEATS = [['⚖️','Gestão de Processos'],['📋','Checklist e Prazos'],
+                   ['💰','Controle Financeiro'],['📱','Cobranças WhatsApp'],
+                   ['📊','Relatórios Completos'],['🔔','Alertas Automáticos'],
+                   ['📁','Documentos e Partes'],['👥','Carga de Trabalho']];
+
+    const tiposHtml = OBD_TIPOS_SUGERIDOS.map((t,i) =>
+      `<label id="obd-tipo-label-${i}" onclick="obdToggleTipo(${i},this)"
+        style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;cursor:pointer;font-size:13.5px;background:white;transition:all 0.15s;user-select:none">
+        <input type="checkbox" id="obd-tipo-${i}" style="accent-color:var(--navy);width:16px;height:16px;flex-shrink:0" checked>
+        <span>${t.icon} ${t.nome}</span>
+       </label>`
+    ).join('');
+
+    const steps = {
+      1: `<div style="text-align:center;padding:8px 0 20px">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--navy),#1D3A5C);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(26,46,69,0.3)">
+          <span style="font-size:32px;font-weight:800;color:var(--gold);font-family:'Cormorant Garamond',serif">DV</span>
+        </div>
+        <h2 style="font-size:24px;font-weight:700;color:var(--navy);margin:0 0 8px;font-family:'Syne',sans-serif">Bem-vindo ao seu ERP!</h2>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 auto 24px;max-width:380px">
+          Vamos configurar tudo em <strong>menos de 3 minutos</strong> para que o sistema comece com os dados do seu escritório.
+        </p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${FEATS.map(([ic,tx])=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:13px">
+          <span style="font-size:19px">${ic}</span><span style="color:var(--text-secondary);font-weight:500">${tx}</span>
+        </div>`).join('')}
+      </div>`,
+
+      2: `<div style="margin-bottom:18px">
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0 0 4px">🏛 Dados do Escritório</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0">Aparecem nos PDFs, propostas, recibos e contratos gerados pelo sistema.</p>
+      </div>
       <div class="form-group"><label class="form-label">Nome do Escritório *</label>
-        <input type="text" class="form-control" id="obd-nome" value="${dados.nome||'Diego Vila Nova Advocacia e Consultoria Jurídica'}"></div>
+        <input type="text" class="form-control" id="obd-nome" value="${dados.nome||'Diego Vila Nova Advocacia e Consultoria Jurídica'}" style="font-size:14px"></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">OAB</label>
           <input type="text" class="form-control" id="obd-oab" value="${dados.oab||'OAB/PE 51.493'}"></div>
         <div class="form-group"><label class="form-label">Telefone</label>
-          <input type="text" class="form-control" id="obd-tel" value="${dados.tel||''}"></div>
+          <input type="text" class="form-control" id="obd-tel" value="${dados.tel||''}" placeholder="(81) 9 9999-9999"></div>
       </div>
-      <div class="form-group"><label class="form-label">Endereço</label>
-        <input type="text" class="form-control" id="obd-endereco" value="${dados.endereco||''}"></div>
-      <div class="form-group" style="margin-bottom:0"><label class="form-label">E-mail</label>
-        <input type="email" class="form-control" id="obd-email" value="${dados.email||''}"></div>`,
-    3: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">📋 Tipos de Processo</h3>
-      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Marque as áreas em que o escritório atua. Serão cadastradas automaticamente.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${tiposHtml}</div>`,
-    4: `<h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px">📱 WhatsApp e PIX</h3>
-      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Configure para enviar cobranças com a chave PIX já na mensagem.</p>
+      <div class="form-group"><label class="form-label">Endereço Completo</label>
+        <input type="text" class="form-control" id="obd-endereco" value="${dados.endereco||''}" placeholder="Rua, número, bairro — Cidade/UF"></div>
+      <div class="form-group" style="margin-bottom:0"><label class="form-label">E-mail do Escritório</label>
+        <input type="email" class="form-control" id="obd-email" value="${dados.email||''}" placeholder="contato@escritorio.com.br"></div>`,
+
+      3: `<div style="margin-bottom:16px">
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0 0 4px">📋 Áreas de Atuação</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0">Marque as áreas em que o escritório atua. Serão cadastradas automaticamente como tipos de processo.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${tiposHtml}</div>
+      <div style="margin-top:12px;padding:10px 14px;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;font-size:12.5px;color:#0369A1">
+        💡 Você poderá adicionar ou remover tipos em <strong>Opções → Tipos de Processo</strong>.
+      </div>`,
+
+      4: `<div style="margin-bottom:18px">
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0 0 4px">📱 WhatsApp e PIX</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0">Configure para enviar cobranças e recibos pelo WhatsApp com a chave PIX incluída automaticamente.</p>
+      </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">WhatsApp (com DDD)</label>
+        <div class="form-group"><label class="form-label">WhatsApp do Escritório (com DDD)</label>
           <input type="text" class="form-control" id="obd-wpp" value="${cfg.numero||''}" placeholder="81999999999"></div>
         <div class="form-group"><label class="form-label">Chave PIX</label>
-          <input type="text" class="form-control" id="obd-pix" value="${cfg.pix||''}"></div>
+          <input type="text" class="form-control" id="obd-pix" value="${cfg.pix||''}" placeholder="CPF, e-mail, telefone..."></div>
       </div>
       <div class="form-row">
-        <div class="form-group" style="margin-bottom:0"><label class="form-label">Tipo de Chave</label>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Tipo de Chave PIX</label>
           <select class="form-control" id="obd-pix-tipo">
-            <option value="cpf" ${cfg.pixTipo==='cpf'?'selected':''}>CPF/CNPJ</option>
-            <option value="email" ${cfg.pixTipo==='email'?'selected':''}>E-mail</option>
-            <option value="telefone" ${cfg.pixTipo==='telefone'?'selected':''}>Telefone</option>
-            <option value="aleatoria" ${cfg.pixTipo==='aleatoria'?'selected':''}>Aleatória</option>
+            <option value="cpf"      ${cfg.pixTipo==='cpf'      ?'selected':''}>CPF / CNPJ</option>
+            <option value="email"    ${cfg.pixTipo==='email'    ?'selected':''}>E-mail</option>
+            <option value="telefone" ${cfg.pixTipo==='telefone' ?'selected':''}>Telefone</option>
+            <option value="aleatoria"${cfg.pixTipo==='aleatoria'?'selected':''}>Chave Aleatória</option>
           </select></div>
-        <div class="form-group" style="margin-bottom:0"><label class="form-label">Titular do PIX</label>
-          <input type="text" class="form-control" id="obd-pix-titular" value="${cfg.pixTitular||''}"></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Titular da Conta PIX</label>
+          <input type="text" class="form-control" id="obd-pix-titular" value="${cfg.pixTitular||''}" placeholder="Nome completo"></div>
       </div>
-      <div style="background:var(--surface);border-radius:10px;padding:12px;margin-top:14px;font-size:12.5px;color:var(--text-secondary)">
-        💡 A mensagem personalizada pode ser editada em <strong>Opções → WhatsApp</strong>.</div>`,
-    5: `<div style="text-align:center;padding:10px 0 24px">
-      <div style="font-size:56px;margin-bottom:12px">🎉</div>
-      <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin:0 0 10px">Tudo pronto!</h2>
-      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:380px;margin:0 auto 20px">Seu sistema está configurado. Você pode ajustar qualquer configuração em <strong>Opções</strong>.</p>
-    </div>
-    <div style="background:var(--surface);border-radius:12px;padding:16px 18px;font-size:13px;display:grid;gap:12px">
-      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">🏛</span><div><div style="font-size:11px;color:var(--text-muted)">Escritório</div><strong>${dados.nome||'—'}</strong></div></div>
-      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">📋</span><div><div style="font-size:11px;color:var(--text-muted)">Tipos de processo</div><strong>${store.tipos.length} cadastrado(s)</strong></div></div>
-      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:18px">📱</span><div><div style="font-size:11px;color:var(--text-muted)">Chave PIX</div><strong>${cfg.pix||'Não configurado'}</strong></div></div>
-    </div>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-muted)">Para reabrir: <strong>Opções → Sistema → Assistente de Configuração</strong></div>`
-  };
-  content.innerHTML = steps[obdStep]||'';
-  } catch(e) { console.error('Onboarding erro:', e); fecharOnboarding(); }
+      <div style="margin-top:12px;padding:10px 14px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:12.5px;color:#166534">
+        ✅ A mensagem personalizada pode ser editada em <strong>Opções → WhatsApp</strong>.
+      </div>`,
+
+      5: `<div style="text-align:center;padding:10px 0 20px">
+        <div style="font-size:60px;margin-bottom:12px">🎉</div>
+        <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin:0 0 8px;font-family:'Syne',sans-serif">Tudo configurado!</h2>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:380px;margin:0 auto 20px">
+          Seu sistema está pronto para uso. Você pode alterar qualquer configuração a qualquer momento.
+        </p>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:16px 18px;display:grid;gap:12px;margin-bottom:16px">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="width:36px;height:36px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="color:var(--gold);font-weight:700;font-size:13px">DV</span></div>
+          <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Escritório</div>
+          <strong style="font-size:14px;color:var(--navy)">${dados.nome||'Diego Vila Nova Advocacia e Consultoria Jurídica'}</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="width:36px;height:36px;background:#EEF2FF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div>
+          <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Tipos de Processo</div>
+          <strong style="font-size:14px;color:var(--navy)">${store.tipos.length} cadastrado(s)</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="width:36px;height:36px;background:#F0FDF4;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📱</div>
+          <div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Chave PIX</div>
+          <strong style="font-size:14px;color:var(--navy)">${cfg.pix||'Não configurado'}</strong></div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;font-size:12.5px;color:#92400E;text-align:center">
+        Para rever ou refazer: <strong>Opções → Sistema → Assistente de Configuração</strong>
+      </div>`
+    };
+
+    ct.innerHTML = steps[obdStep] || '';
+  } catch(e) { console.error('Onboarding erro:',e); fecharOnboarding(); }
 }
 
 const WPP_MSG_RECIBO_PADRAO = `Olá, *{{NOME}}*! ✅
