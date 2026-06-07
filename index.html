@@ -240,7 +240,7 @@ body {
 /* SIDEBAR */
 .sidebar {
   width: 240px;
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(180deg, #0F1E2E 0%, #1A2E45 100%);
   display: flex;
   flex-direction: column;
@@ -248,6 +248,7 @@ body {
   left: 0; top: 0;
   z-index: 100;
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
 .logo {
@@ -268,7 +269,7 @@ body {
 .logo-text { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 18px; color: white; }
 .logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
 
-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+nav { flex: 1; padding: 16px 12px; overflow-y: auto; min-height: 0; }
 
 .nav-section { margin-bottom: 6px; }
 .nav-label {
@@ -292,7 +293,9 @@ nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
 }
 
 .sidebar-footer {
-  padding: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
 }
 .user-info { display: flex; align-items: center; gap: 10px; }
 .user-avatar {
@@ -1249,10 +1252,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           </div>
           <select class="form-control" style="width:180px" id="filter-status-parcela" onchange="renderParcelas()">
             <option value="">Todos os status</option>
-            <option value="pendente">Pendente</option>
-            <option value="pago">Pago</option>
-            <option value="vencido">Vencido</option>
+            <option value="pendente">⏳ Pendente</option>
+            <option value="pago">✅ Pago</option>
+            <option value="vencido">⚠️ Vencido</option>
           </select>
+          <button class="btn btn-outline" onclick="openModal('modal-gerar-parcelas')" title="Gerar parcelas manualmente para um processo">⚙️ Gerar Parcelas</button>
         </div>
         <div class="card">
           <div class="table-wrap">
@@ -2124,9 +2128,40 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             </div>
           </div>
 
+          <!-- Modelo de mensagem de recibo -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <span class="card-title">🧾 Modelo de Mensagem de Recibo (Confirmação de Pagamento)</span>
+            </div>
+            <div class="card-body">
+              <div style="background:#E2F5EC;border:1px solid #6EE7B7;border-radius:var(--radius);padding:12px;margin-bottom:14px;font-size:12.5px;color:#065F46">
+                ✅ Esta mensagem é enviada ao cliente após confirmar o pagamento de uma parcela.
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{NOME}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{NOME}}</span>
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{PROCESSO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PROCESSO}}</span>
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{PARCELA}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{PARCELA}}</span>
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{VALOR}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{VALOR}}</span>
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{DATA_PAGAMENTO}}')" style="padding:3px 10px;background:var(--navy);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{DATA_PAGAMENTO}}</span>
+                <span onclick="inserirVariavel('wpp-msg-recibo','{{ESCRITORIO}}')" style="padding:3px 10px;background:var(--gold);color:white;border-radius:20px;font-size:11.5px;cursor:pointer;font-family:monospace">{{ESCRITORIO}}</span>
+              </div>
+              <textarea class="form-control" id="wpp-msg-recibo" rows="8" oninput="salvarConfigWpp()" placeholder="Digite o modelo da mensagem de recibo..."></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+                <button class="btn btn-outline btn-sm" onclick="resetarMsgRecibo()">↩️ Restaurar padrão</button>
+                <button class="btn btn-primary btn-sm" onclick="salvarConfigWpp();showToast('Configurações salvas!','success')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
           <!-- Preview -->
           <div class="card">
-            <div class="card-header"><span class="card-title">👁 Preview da Mensagem</span></div>
+            <div class="card-header">
+              <span class="card-title">👁 Preview</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="mostrarPreviewWpp('cobranca')" id="prev-btn-cob" style="font-size:12px">💰 Cobrança</button>
+                <button class="btn btn-primary btn-sm" onclick="mostrarPreviewWpp('recibo')" id="prev-btn-rec" style="font-size:12px">🧾 Recibo</button>
+              </div>
+            </div>
             <div class="card-body">
               <div id="wpp-preview" style="background:#E7FFDB;border-radius:12px 12px 4px 12px;padding:14px 16px;font-size:13.5px;line-height:1.6;color:#111;white-space:pre-wrap;font-family:'Inter',sans-serif;max-width:420px;box-shadow:0 1px 4px rgba(0,0,0,0.1)">
                 Configure a mensagem acima para ver o preview.
@@ -2269,6 +2304,55 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 </div><!-- /main -->
 
 <!-- ===== MODAIS ===== -->
+
+<!-- MODAL GERAR PARCELAS -->
+<div class="modal-overlay" id="modal-gerar-parcelas">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <span class="modal-title">⚙️ Gerar Parcelas para Processo</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-gerar-parcelas')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--blue-800)">
+        💡 Use este formulário para gerar parcelas de um processo que ainda não possui financeiro cadastrado.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Processo *</label>
+        <select class="form-control" id="gp-processo" onchange="gpCarregarCliente()">
+          <option value="">— Selecionar Processo —</option>
+        </select>
+      </div>
+      <div id="gp-info-cliente" style="display:none;background:var(--surface);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:13px"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor Total (R$) *</label>
+          <input type="number" class="form-control" id="gp-valor" placeholder="0,00" min="0" step="0.01" oninput="gpCalc()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Parcelas *</label>
+          <input type="number" class="form-control" id="gp-nparc" value="1" min="1" max="120" oninput="gpCalc()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Valor por Parcela</label>
+          <input type="text" class="form-control" id="gp-valor-parc" readonly style="background:var(--surface);color:var(--blue-600);font-weight:600">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data da 1ª Parcela *</label>
+          <input type="date" class="form-control" id="gp-data1">
+        </div>
+      </div>
+      <div id="gp-aviso-existente" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#B91C1C">
+        ⚠️ Este processo já possui parcelas. Ao confirmar, as parcelas existentes serão <strong>substituídas</strong>.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-gerar-parcelas')">Cancelar</button>
+      <button class="btn btn-primary" onclick="gerarParcelasManual()">⚙️ Gerar Parcelas</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL WHATSAPP -->
 <div class="modal-overlay" id="modal-whatsapp">
@@ -3058,6 +3142,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
       <!-- Condições Financeiras -->
       <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)">Condições Financeiras</div>
+      <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:var(--blue-800)">
+        💡 <strong>Fluxo correto:</strong> preencha as condições financeiras aqui e salve o cliente <strong>antes</strong> de criar o processo. As parcelas serão geradas automaticamente na criação do processo.
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Valor Total do Serviço (R$)</label>
@@ -3146,9 +3233,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         </div>
         <div class="form-group">
           <label class="form-label">Cliente *</label>
-          <select class="form-control" id="proc-cliente" onchange="preencherTipoPorCliente()">
+          <select class="form-control" id="proc-cliente" onchange="preencherTipoPorCliente();mostrarPreviewFinanceiroCliente()">
             <option value="">— Selecionar Cliente —</option>
           </select>
+          <!-- Preview financeiro do cliente -->
+          <div id="proc-preview-financeiro" style="display:none;margin-top:8px;padding:10px 12px;border-radius:8px;font-size:12.5px"></div>
         </div>
       </div>
       <div class="form-row">
@@ -4075,6 +4164,72 @@ function populateProcessosExito() {
   });
   sel.value = cur;
 }
+// ==================== GERAR PARCELAS MANUAL ====================
+function gpPopulateProcessos() {
+  const sel = document.getElementById('gp-processo');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— Selecionar Processo —</option>';
+  store.processos.forEach(p => {
+    const c = store.clientes.find(c=>c.id===p.clienteId)||{nome:'—'};
+    sel.innerHTML += `<option value="${p.id}">${p.numero} — ${c.nome}</option>`;
+  });
+}
+function gpCarregarCliente() {
+  const pId = parseInt(document.getElementById('gp-processo').value);
+  const infoEl = document.getElementById('gp-info-cliente');
+  const avisoEl = document.getElementById('gp-aviso-existente');
+  if(!pId) { if(infoEl) infoEl.style.display='none'; if(avisoEl) avisoEl.style.display='none'; return; }
+  const proc = store.processos.find(p=>p.id===pId);
+  const cli = store.clientes.find(c=>c.id===proc?.clienteId);
+  if(infoEl && cli) {
+    infoEl.style.display='block';
+    infoEl.innerHTML = `<strong>👤 ${cli.nome}</strong>${cli.cpf?' · '+cli.cpf:''}
+      ${parseFloat(cli.valor)>0?`<br>💰 Condições no cadastro: ${fmtMoney(cli.valor)} em ${cli.nParcelas||1}x`:'<br><span style="color:var(--warning)">⚠️ Sem condições financeiras no cadastro</span>'}`;
+    if(parseFloat(cli.valor)>0) {
+      document.getElementById('gp-valor').value = cli.valor;
+      document.getElementById('gp-nparc').value = cli.nParcelas||1;
+      if(cli.datasParcelas && cli.datasParcelas[0]) document.getElementById('gp-data1').value = cli.datasParcelas[0];
+      gpCalc();
+    }
+  }
+  const jaTemParcelas = store.parcelas.some(p=>p.processoId===pId);
+  if(avisoEl) avisoEl.style.display = jaTemParcelas ? 'block' : 'none';
+}
+function gpCalc() {
+  const valor = parseFloat(document.getElementById('gp-valor')?.value)||0;
+  const n = parseInt(document.getElementById('gp-nparc')?.value)||1;
+  const el = document.getElementById('gp-valor-parc');
+  if(el) el.value = valor>0&&n>0 ? fmtMoney(valor/n) : '';
+}
+function gerarParcelasManual() {
+  const pId = parseInt(document.getElementById('gp-processo').value);
+  const valor = parseFloat(document.getElementById('gp-valor').value)||0;
+  const nParcelas = parseInt(document.getElementById('gp-nparc').value)||1;
+  const data1 = document.getElementById('gp-data1').value;
+  if(!pId)   { showToast('Selecione um processo.','error'); return; }
+  if(!valor) { showToast('Informe o valor total.','error'); return; }
+  if(!data1) { showToast('Informe a data da 1ª parcela.','error'); return; }
+  const proc = store.processos.find(p=>p.id===pId);
+  if(!proc) { showToast('Processo não encontrado.','error'); return; }
+  // Remover parcelas existentes deste processo e recriar
+  store.parcelas = store.parcelas.filter(p=>p.processoId!==pId);
+  if(!store.nextId.parcela) store.nextId.parcela = 1;
+  const valorParcela = parseFloat((valor/nParcelas).toFixed(2));
+  for(let i=0;i<nParcelas;i++) {
+    const d = new Date(data1+'T12:00:00');
+    d.setMonth(d.getMonth()+i);
+    store.parcelas.push({
+      id: store.nextId.parcela++, processoId: pId, clienteId: proc.clienteId,
+      num: i+1, total: nParcelas, vencimento: d.toISOString().split('T')[0],
+      valor: valorParcela, status: 'pendente', dtPagamento: null, obs: ''
+    });
+  }
+  saveData(); closeModal('modal-gerar-parcelas');
+  renderParcelas(); renderFinVisao(); updateParcelasSelect();
+  registrarAuditoria('criou','financeiro','Parcelas geradas: '+proc.numero,nParcelas+'x de '+fmtMoney(valorParcela));
+  showToast('✅ '+nParcelas+' parcela(s) gerada(s)!','success');
+}
+
 let buscaIdx = -1;
 
 function buscaGlobal(q) {
@@ -4393,6 +4548,20 @@ function renderObdStep() {
   } catch(e) { console.error('Onboarding erro:', e); fecharOnboarding(); }
 }
 
+const WPP_MSG_RECIBO_PADRAO = `Olá, *{{NOME}}*! ✅
+
+Confirmamos o recebimento do seu pagamento. Segue o comprovante:
+
+📋 *Processo:* {{PROCESSO}}
+🔢 *Parcela:* {{PARCELA}}
+💰 *Valor pago:* {{VALOR}}
+📅 *Data do pagamento:* {{DATA_PAGAMENTO}}
+
+Agradecemos pela pontualidade! 🙏
+
+Atenciosamente,
+*{{ESCRITORIO}}*`;
+
 const WPP_MSG_PADRAO = `Olá, *{{NOME}}*! 👋
 
 Esperamos que esteja bem. Passamos para lembrá-lo(a) sobre a parcela do seu processo em nosso escritório.
@@ -4420,7 +4589,8 @@ function salvarConfigWpp() {
     pix:        document.getElementById('wpp-pix')?.value||'',
     pixTipo:    document.getElementById('wpp-pix-tipo')?.value||'cpf',
     pixTitular: document.getElementById('wpp-pix-titular')?.value||'',
-    msg:        document.getElementById('wpp-msg-cobranca')?.value||''
+    msg:        document.getElementById('wpp-msg-cobranca')?.value||'',
+    msgRecibo:  document.getElementById('wpp-msg-recibo')?.value||''
   };
   localStorage.setItem(WPP_KEY, JSON.stringify(cfg));
   renderPreviewWpp();
@@ -4428,6 +4598,24 @@ function salvarConfigWpp() {
 function resetarMsgWpp() {
   const el = document.getElementById('wpp-msg-cobranca');
   if(el) { el.value = WPP_MSG_PADRAO; salvarConfigWpp(); }
+}
+function resetarMsgRecibo() {
+  const el = document.getElementById('wpp-msg-recibo');
+  if(el) { el.value = WPP_MSG_RECIBO_PADRAO; salvarConfigWpp(); }
+}
+function mostrarPreviewWpp(tipo) {
+  const cfg = getConfigWpp();
+  const el = document.getElementById('wpp-preview');
+  if(!el) return;
+  if(tipo === 'recibo') {
+    el.textContent = (cfg.msgRecibo || WPP_MSG_RECIBO_PADRAO)
+      .replace(/{{NOME}}/g, 'João Silva')
+      .replace(/{{PROCESSO}}/g, '0001234-56.2024.5.06.0001')
+      .replace(/{{PARCELA}}/g, '2/6')
+      .replace(/{{VALOR}}/g, 'R$ 500,00')
+      .replace(/{{DATA_PAGAMENTO}}/g, new Date().toLocaleDateString('pt-BR'))
+      .replace(/{{ESCRITORIO}}/g, 'Diego Vila Nova — Advocacia e Consultoria Jurídica');
+  } else { renderPreviewWpp(); }
 }
 function inserirVariavel(inputId, variavel) {
   const el = document.getElementById(inputId);
@@ -4459,7 +4647,32 @@ function carregarConfigWpp() {
   set('wpp-pix-tipo', cfg.pixTipo); set('wpp-pix-titular', cfg.pixTitular);
   const msgEl = document.getElementById('wpp-msg-cobranca');
   if(msgEl) msgEl.value = cfg.msg || WPP_MSG_PADRAO;
+  const reciboEl = document.getElementById('wpp-msg-recibo');
+  if(reciboEl) reciboEl.value = cfg.msgRecibo || WPP_MSG_RECIBO_PADRAO;
   renderPreviewWpp();
+}
+function montarMensagemRecibo(clienteId, parcelaId) {
+  const cfg = getConfigWpp();
+  const c = store.clientes.find(c=>c.id===clienteId)||{nome:'Cliente',tel:''};
+  const p = parcelaId ? store.parcelas.find(p=>p.id===parcelaId) : null;
+  const pr = p ? store.processos.find(pr=>pr.id===p.processoId)||{numero:'—'} : null;
+  const msg = (cfg.msgRecibo || WPP_MSG_RECIBO_PADRAO)
+    .replace(/{{NOME}}/g, c.nome)
+    .replace(/{{PROCESSO}}/g, pr?pr.numero:'—')
+    .replace(/{{PARCELA}}/g, p?p.num+'/'+p.total:'—')
+    .replace(/{{VALOR}}/g, p?fmtMoney(p.valor):'—')
+    .replace(/{{DATA_PAGAMENTO}}/g, p&&p.dtPagamento?fmtDate(p.dtPagamento):today())
+    .replace(/{{ESCRITORIO}}/g, 'Diego Vila Nova — Advocacia e Consultoria Jurídica');
+  return { msg, tel: c.tel||'' };
+}
+function abrirModalWppRecibo(clienteId, parcelaId) {
+  const { msg, tel } = montarMensagemRecibo(clienteId, parcelaId);
+  document.getElementById('wpp-send-clienteId').value = clienteId||'';
+  document.getElementById('wpp-send-parcelaId').value = parcelaId||'';
+  document.getElementById('wpp-send-msg').value = msg;
+  const telNum = tel.replace(/\D/g,'');
+  document.getElementById('wpp-send-numero').value = telNum.startsWith('55')?telNum:(telNum?'55'+telNum:'');
+  openModal('modal-whatsapp', false);
 }
 function montarMensagemWpp(clienteId, parcelaId) {
   const cfg = getConfigWpp();
@@ -6140,6 +6353,15 @@ function openModal(id, reset = true) {
       // Inicializar checkboxes com perfil secretaria
       onPerfilChange('secretaria');
     }
+    if(id === 'modal-gerar-parcelas') {
+      ['gp-valor','gp-valor-parc','gp-data1'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+      document.getElementById('gp-nparc').value='1';
+      const infoEl=document.getElementById('gp-info-cliente');
+      const avisoEl=document.getElementById('gp-aviso-existente');
+      if(infoEl) infoEl.style.display='none';
+      if(avisoEl) avisoEl.style.display='none';
+      gpPopulateProcessos();
+    }
     if(id === 'modal-exito') {
       document.getElementById('exito-edit-id').value = '';
       document.getElementById('modal-exito-title').textContent = 'Registrar Honorário por Êxito';
@@ -6721,9 +6943,34 @@ function preencherTipoPorCliente() {
     preencherValorPorTipo();
   }
 }
-function preencherValorPorTipo() { /* financeiro removido do processo */ }
-function calcularParcelas() { /* financeiro removido do processo */ }
-function procGetDatas() { return []; }
+function mostrarPreviewFinanceiroCliente() {
+  const cId = parseInt(document.getElementById('proc-cliente').value);
+  const el = document.getElementById('proc-preview-financeiro');
+  if(!el) return;
+  if(!cId) { el.style.display='none'; return; }
+  const cli = store.clientes.find(c=>c.id===cId);
+  if(!cli) { el.style.display='none'; return; }
+  const valor = parseFloat(cli.valor)||0;
+  if(valor > 0) {
+    const nParc = parseInt(cli.nParcelas)||1;
+    const dt1 = cli.datasParcelas?.[0] ? fmtDate(cli.datasParcelas[0]) : '—';
+    el.style.display = 'block';
+    el.style.background = '#E2F5EC';
+    el.style.border = '1px solid #6EE7B7';
+    el.style.color = '#065F46';
+    el.innerHTML = `✅ <strong>Condições financeiras encontradas:</strong> ${fmtMoney(valor)} em ${nParc}x de ${fmtMoney(valor/nParc)} · 1ª parcela: ${dt1}<br>
+      <span style="font-size:11.5px;opacity:0.85">As parcelas serão geradas automaticamente ao salvar.</span>`;
+  } else {
+    el.style.display = 'block';
+    el.style.background = '#FEF3C7';
+    el.style.border = '1px solid #FCD34D';
+    el.style.color = '#92400E';
+    el.innerHTML = `⚠️ <strong>Este cliente não tem condições financeiras cadastradas.</strong><br>
+      <span style="font-size:11.5px">O processo será criado sem parcelas. <a href="#" onclick="closeModal('modal-processo');setTimeout(()=>editarCliente(${cId}),200);return false;" style="color:#92400E;font-weight:600;text-decoration:underline">Clique aqui para cadastrar antes →</a></span>`;
+  }
+}
+
+function atualizarPreviewParcelasProcesso() { mostrarPreviewFinanceiroCliente(); }
 
 const statusLabels = {
   andamento: { label: 'Em Andamento', cls: 'badge-blue' },
@@ -6768,13 +7015,15 @@ function salvarProcesso() {
 
     // Gerar parcelas a partir das condições financeiras do cliente
     const cli = store.clientes.find(c => c.id === cId);
-    console.log('[DEBUG] cli:', cli ? {nome:cli.nome, valor:cli.valor, nParcelas:cli.nParcelas, datasParcelas:cli.datasParcelas} : 'NÃO ENCONTRADO');
-    console.log('[DEBUG] cId:', cId, '| store.clientes.length:', store.clientes.length);
-    if(cli && cli.valor > 0) {
-      const nParcelas = cli.nParcelas || 1;
-      const valorParcela = parseFloat((cli.valor / nParcelas).toFixed(2));
+    // Forçar conversão numérica para garantir compatibilidade
+    const cliValor = parseFloat(cli?.valor) || 0;
+    const cliNParcelas = parseInt(cli?.nParcelas) || 1;
+    console.log('[DEBUG] cli:', cli?.nome, '| valor:', cliValor, '| nParcelas:', cliNParcelas, '| datasParcelas:', cli?.datasParcelas);
+    if(cli && cliValor > 0) {
+      const nParcelas = cliNParcelas;
+      const valorParcela = parseFloat((cliValor / nParcelas).toFixed(2));
       const dt1 = (cli.datasParcelas && cli.datasParcelas[0]) || today();
-      console.log('[DEBUG] Gerando', nParcelas, 'parcelas | dt1:', dt1, '| valor:', valorParcela);
+      console.log('[DEBUG] Gerando', nParcelas, 'parcelas | dt1:', dt1, '| valorParcela:', valorParcela);
       for(let i = 0; i < nParcelas; i++) {
         const dtVenc = (cli.datasParcelas && cli.datasParcelas[i]) || addMonths(dt1, i);
         store.parcelas.push({
@@ -6790,7 +7039,7 @@ function salvarProcesso() {
           obs: ''
         });
       }
-      console.log('[DEBUG] store.parcelas após push:', store.parcelas.length);
+      console.log('[DEBUG] Total parcelas no store:', store.parcelas.length);
       registrarAuditoria('criou','processo','Criou processo: '+num+' com '+nParcelas+' parcela(s)','');
       showToast('Processo criado com '+nParcelas+' parcela(s)!', 'success');
     } else {
@@ -6817,7 +7066,8 @@ function renderProcessos() {
     const t = store.tipos.find(t => t.id === p.tipoId)||{nome:'—'};
     const st = statusLabels[p.status]||{label:p.status,cls:'badge-gray'};
     const pago = store.parcelas.filter(pa => pa.processoId===p.id && pa.status==='pago').reduce((s,pa)=>s+pa.valor,0);
-    const pct = p.valor > 0 ? Math.min(100, Math.round(pago/p.valor*100)) : 0;
+    const totalParc = store.parcelas.filter(pa => pa.processoId===p.id).reduce((s,pa)=>s+pa.valor,0);
+    const pct = totalParc > 0 ? Math.min(100, Math.round(pago/totalParc*100)) : 0;
     const numDocs = ((store.documentos||{})[p.id]||[]).length;
     return `<tr>
       <td><strong style="color:var(--blue-600)">${p.numero}</strong>${p.lembrete&&p.lembrete.ativo?` <span title="${(p.lembrete.msg||'Lembrete ativo').replace(/"/g,"'")}" style="cursor:default">🔔</span>`:''}</td>
@@ -6830,7 +7080,7 @@ function renderProcessos() {
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${pct}% pago</div>
       </td>
-      <td><strong>${fmtMoney(p.valor)}</strong></td>
+      <td><strong>${fmtMoney(totalParc)}</strong></td>
       <td style="white-space:nowrap">
         <button class="btn btn-outline btn-sm" onclick="verDetalhe(${p.id})" title="Detalhes">🔍</button>
         <button class="btn btn-outline btn-sm" onclick="atualizarAndamento(${p.id})" title="Andamento">📝</button>
@@ -7212,7 +7462,16 @@ function renderParcelas(q = '') {
   }
   const tb = document.getElementById('tbody-parcelas');
   if(!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:28px">Nenhuma parcela encontrada.</td></tr>'; return; }
-  list.sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+  list.sort((a, b) => {
+    const aPago = a.computedStatus === 'pago';
+    const bPago = b.computedStatus === 'pago';
+    // Pendentes/vencidos antes dos pagos
+    if(aPago !== bPago) return aPago ? 1 : -1;
+    // Entre pendentes/vencidos: vencimento mais próximo primeiro
+    if(!aPago) return (a.vencimento||'').localeCompare(b.vencimento||'');
+    // Entre pagos: mais recente primeiro (data de pagamento decrescente)
+    return (b.dtPagamento||'').localeCompare(a.dtPagamento||'');
+  });
   tb.innerHTML = list.map(p => {
     const c = store.clientes.find(c => c.id === p.clienteId)||{nome:'—'};
     const pr = store.processos.find(pr => pr.id === p.processoId)||{numero:'—'};
@@ -7226,8 +7485,12 @@ function renderParcelas(q = '') {
       <td>${fmtDate(p.vencimento)}</td>
       <td><strong>${fmtMoney(p.valor)}</strong></td>
       <td><span class="badge ${stCls}">${stLabel}</span>${p.dtPagamento?`<br><span style="font-size:10px;color:var(--text-muted)">Pago em ${fmtDate(p.dtPagamento)}</span>`:''}</td>
-      <td>${st!=='pago'?`<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>`:'<span style="color:var(--success);font-size:12px">✔ Confirmado</span>'}
-        <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${p.clienteId},${p.id})" title="Enviar cobrança WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>
+      <td>${st!=='pago'
+        ? `<button class="btn btn-primary btn-sm" onclick="marcarPago(${p.id})">✅ Pagar</button>
+           <button class="btn btn-outline btn-sm" onclick="abrirModalWpp(${p.clienteId},${p.id})" title="Enviar Cobrança WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E">📱</button>`
+        : `<span style="color:var(--success);font-size:12px">✔ Confirmado</span>
+           <button class="btn btn-outline btn-sm" onclick="gerarReciboPagamento(${p.id})" title="Gerar Recibo PDF" style="font-size:11px;padding:3px 8px">🧾</button>
+           <button class="btn btn-outline btn-sm" onclick="abrirModalWppRecibo(${p.clienteId},${p.id})" title="Enviar Recibo WhatsApp" style="background:#E7FFDB;border-color:#25D366;color:#128C7E;font-size:11px;padding:3px 8px">📱</button>`}
       </td>
     </tr>`;
   }).join('');
@@ -8142,7 +8405,7 @@ function checkLogin() {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app-wrapper').style.display = 'none';
     carregarLembrar();
-    // Fazer signOut no Supabase silenciosamente para limpar sessão residual
+    // Limpar sessão Supabase residual silenciosamente
     getSB().then(sb => { if(sb && sb.auth) sb.auth.signOut(); }).catch(()=>{});
     return;
   }
@@ -8151,11 +8414,23 @@ function checkLogin() {
   document.getElementById('app-wrapper').style.display = 'flex';
   aplicarPermissoes();
   carregarLembrar();
-  // Verificar validade da sessão Supabase em segundo plano
+  // Verificar sessão Supabase em segundo plano
   getSB().then(sb => {
     if(sb && sb.auth) {
-      sb.auth.getSession().then(({ data }) => {
-        if(data.session) {
+      sb.auth.getSession().then(({ data, error }) => {
+        // Token inválido ou expirado — limpar e forçar novo login
+        if(error && (error.message.includes('Refresh Token') || error.message.includes('invalid'))) {
+          console.warn('Token expirado, limpando sessão...');
+          localStorage.removeItem(LOGIN_KEY);
+          localStorage.removeItem(LEMBRAR_KEY);
+          // Limpar tokens Supabase do localStorage
+          Object.keys(localStorage).forEach(k => {
+            if(k.startsWith('sb-')) localStorage.removeItem(k);
+          });
+          location.reload();
+          return;
+        }
+        if(data && data.session) {
           const users = getUsers();
           const u = users.find(u => u.email === data.session.user.email);
           const sessao = {
@@ -8167,7 +8442,7 @@ function checkLogin() {
           localStorage.setItem(LOGIN_KEY, JSON.stringify(sessao));
           aplicarPermissoes();
         }
-      });
+      }).catch(() => {});
     }
   }).catch(()=>{});
 }
